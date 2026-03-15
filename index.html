@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
 
 <meta charset="UTF-8">
@@ -32,9 +31,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:18px 40px;
-background:rgba(0,0,0,0.7);
-backdrop-filter:blur(10px);
-z-index:10;
+background:rgba(0,0,0,0.8);
 }
 
 .logo{
@@ -44,10 +41,9 @@ font-size:22px;
 }
 
 .menu a{
-margin-left:25px;
+margin-left:20px;
 text-decoration:none;
 color:white;
-font-size:14px;
 }
 
 .menu a:hover{
@@ -58,9 +54,10 @@ color:#00ffd5;
 
 .hero{
 height:100vh;
+
 background:
-linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.9)),
-url("https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=ni5M9sz61GbJuB5QIZjUgsnq0iy9YnX66PztaABGCMw%3D&token-time=1774828800")
+linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.9)),
+url("https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png")
 center/cover no-repeat;
 
 display:flex;
@@ -80,20 +77,20 @@ font-size:18px;
 }
 
 .btn{
-margin-top:25px;
+margin-top:20px;
 display:inline-block;
-padding:14px 35px;
+padding:15px 35px;
 background:#00ffd5;
 color:black;
-font-weight:bold;
 border-radius:8px;
+font-weight:bold;
 text-decoration:none;
 }
 
 /* SECTION */
 
 section{
-padding:90px 20px;
+padding:80px 20px;
 max-width:1100px;
 margin:auto;
 text-align:center;
@@ -101,29 +98,40 @@ text-align:center;
 
 section h2{
 color:#00ffd5;
-margin-bottom:30px;
-font-size:32px;
+margin-bottom:25px;
 }
 
-/* FEATURES */
+/* NEWS */
 
-.features{
+.news{
 display:flex;
 flex-wrap:wrap;
 gap:20px;
 justify-content:center;
 }
 
-.feature{
+.news-box{
 background:#111;
-padding:30px;
+padding:20px;
 border-radius:10px;
 width:260px;
 }
 
-.feature:hover{
-transform:translateY(-5px);
-transition:0.3s;
+/* SEARCH */
+
+.search input{
+padding:12px;
+width:220px;
+border:none;
+border-radius:5px;
+}
+
+.search button{
+padding:12px;
+margin-left:5px;
+background:#00ffd5;
+border:none;
+border-radius:5px;
 }
 
 /* GALLERY */
@@ -138,23 +146,14 @@ justify-content:center;
 .gallery img{
 width:300px;
 border-radius:10px;
-transition:0.3s;
-}
-
-.gallery img:hover{
-transform:scale(1.05);
 }
 
 /* DOWNLOAD */
 
-.download{
-margin-top:20px;
-}
-
 .download a{
 display:inline-block;
 margin:10px;
-padding:16px 35px;
+padding:15px 35px;
 background:#00ffd5;
 color:black;
 font-weight:bold;
@@ -162,28 +161,43 @@ border-radius:8px;
 text-decoration:none;
 }
 
-/* NEWS */
+/* LOGIN POPUP */
 
-.news{
-display:flex;
-flex-wrap:wrap;
-gap:20px;
+.popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+align-items:center;
 justify-content:center;
 }
 
-.news-box{
+.popup-box{
 background:#111;
-padding:25px;
+padding:30px;
 border-radius:10px;
-width:260px;
+width:280px;
 }
 
-.news-box h3{
-color:#00ffd5;
-margin-bottom:10px;
+.popup-box input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:5px;
 }
 
-/* FOOTER */
+.popup-box button{
+margin-top:10px;
+width:100%;
+padding:10px;
+background:#00ffd5;
+border:none;
+font-weight:bold;
+}
 
 footer{
 background:#000;
@@ -193,6 +207,18 @@ margin-top:80px;
 }
 
 </style>
+
+<script>
+
+function openLogin(){
+document.getElementById("login").style.display="flex";
+}
+
+function closeLogin(){
+document.getElementById("login").style.display="none";
+}
+
+</script>
 
 </head>
 
@@ -204,9 +230,8 @@ margin-top:80px;
 
 <div class="menu">
 <a href="#">Trang chủ</a>
-<a href="#gallery">Hình ảnh</a>
 <a href="#download">Tải game</a>
-<a href="#news">Tin tức</a>
+<a href="#" onclick="openLogin()">Tài khoản</a>
 </div>
 
 </div>
@@ -216,6 +241,7 @@ margin-top:80px;
 <div>
 
 <h1>Kaii Visual Novel</h1>
+
 <p>Trang tải game chính thức</p>
 
 <a class="btn" href="#download">Tải ngay</a>
@@ -226,40 +252,51 @@ margin-top:80px;
 
 <section>
 
-<h2>Tính năng</h2>
+<h2>Tin tức</h2>
 
-<div class="features">
+<div class="news">
 
-<div class="feature">
-<h3>Cốt truyện</h3>
-<p>Nhiều nhánh story và lựa chọn.</p>
+<div class="news-box">
+<h3>Cập nhật 1.0</h3>
+<p>Phát hành bản đầu tiên của game.</p>
 </div>
 
-<div class="feature">
-<h3>Đồ họa</h3>
-<p>Visual novel phong cách anime.</p>
+<div class="news-box">
+<h3>Nhân vật mới</h3>
+<p>Thêm nhiều nội dung mới.</p>
 </div>
 
-<div class="feature">
-<h3>Nhiều nhân vật</h3>
-<p>Khám phá các nhân vật khác nhau.</p>
+<div class="news-box">
+<h3>Update sắp tới</h3>
+<p>Sẽ có thêm nhiều route mới.</p>
 </div>
 
 </div>
 
 </section>
 
-<section id="gallery">
+<section>
+
+<h2>Tìm thể loại game</h2>
+
+<div class="search">
+
+<input placeholder="Nhập thể loại game">
+<button>Tìm</button>
+
+</div>
+
+</section>
+
+<section>
 
 <h2>Hình ảnh trong game</h2>
 
 <div class="gallery">
 
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/eyJ3IjoxMDgwfQ%3D%3D/1.png">
+<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/1.png">
 
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/68936209/67dde7ae097148ecafb8b399af1611d9/eyJ3IjoxMDgwfQ%3D%3D/1.png">
-
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/eyJ3IjoxMDgwfQ%3D%3D/1.png">
+<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/68936209/67dde7ae097148ecafb8b399af1611d9/1.png">
 
 </div>
 
@@ -273,36 +310,28 @@ margin-top:80px;
 
 <a href="#">Windows</a>
 <a href="#">Android</a>
-<a href="#">Patch</a>
 
 </div>
 
 </section>
 
-<section id="news">
+<div class="popup" id="login">
 
-<h2>Tin tức</h2>
+<div class="popup-box">
 
-<div class="news">
+<h3>Đăng nhập</h3>
 
-<div class="news-box">
-<h3>Phiên bản 1.0</h3>
-<p>Phát hành bản đầu tiên của game.</p>
-</div>
+<input placeholder="Tên tài khoản">
 
-<div class="news-box">
-<h3>Nhân vật mới</h3>
-<p>Thêm nhiều nội dung và story.</p>
-</div>
+<input placeholder="Mật khẩu" type="password">
 
-<div class="news-box">
-<h3>Cập nhật sắp tới</h3>
-<p>Sẽ có thêm nhiều route mới.</p>
-</div>
+<button>Đăng nhập</button>
+
+<button onclick="closeLogin()">Đóng</button>
 
 </div>
 
-</section>
+</div>
 
 <footer>
 
