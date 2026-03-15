@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Kaii VN</title>
 
 <style>
+
+html{
+scroll-behavior:smooth;
+}
 
 *{
 margin:0;
@@ -30,20 +32,23 @@ width:100%;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:18px 40px;
-background:rgba(0,0,0,0.8);
+padding:16px 30px;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(10px);
+z-index:100;
 }
 
 .logo{
 color:#00ffd5;
 font-weight:bold;
-font-size:22px;
+font-size:20px;
 }
 
 .menu a{
 margin-left:20px;
 text-decoration:none;
 color:white;
+font-size:14px;
 }
 
 .menu a:hover{
@@ -54,20 +59,20 @@ color:#00ffd5;
 
 .hero{
 height:100vh;
-
 background:
-linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.9)),
-url("https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png")
+linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.9)),
+url("https://images.unsplash.com/photo-1503264116251-35a269479413")
 center/cover no-repeat;
 
 display:flex;
 align-items:center;
 justify-content:center;
 text-align:center;
+padding:20px;
 }
 
 .hero h1{
-font-size:55px;
+font-size:52px;
 text-shadow:0 0 20px #00ffd5;
 }
 
@@ -77,9 +82,9 @@ font-size:18px;
 }
 
 .btn{
-margin-top:20px;
 display:inline-block;
-padding:15px 35px;
+margin-top:20px;
+padding:14px 34px;
 background:#00ffd5;
 color:black;
 border-radius:8px;
@@ -98,7 +103,8 @@ text-align:center;
 
 section h2{
 color:#00ffd5;
-margin-bottom:25px;
+margin-bottom:30px;
+font-size:30px;
 }
 
 /* NEWS */
@@ -112,9 +118,14 @@ justify-content:center;
 
 .news-box{
 background:#111;
-padding:20px;
+padding:25px;
 border-radius:10px;
 width:260px;
+}
+
+.news-box h3{
+color:#00ffd5;
+margin-bottom:10px;
 }
 
 /* SEARCH */
@@ -132,6 +143,7 @@ margin-left:5px;
 background:#00ffd5;
 border:none;
 border-radius:5px;
+cursor:pointer;
 }
 
 /* GALLERY */
@@ -146,6 +158,11 @@ justify-content:center;
 .gallery img{
 width:300px;
 border-radius:10px;
+transition:0.3s;
+}
+
+.gallery img:hover{
+transform:scale(1.05);
 }
 
 /* DOWNLOAD */
@@ -161,7 +178,7 @@ border-radius:8px;
 text-decoration:none;
 }
 
-/* LOGIN POPUP */
+/* POPUP LOGIN */
 
 .popup{
 position:fixed;
@@ -197,6 +214,7 @@ padding:10px;
 background:#00ffd5;
 border:none;
 font-weight:bold;
+cursor:pointer;
 }
 
 footer{
@@ -225,30 +243,29 @@ document.getElementById("login").style.display="none";
 <body>
 
 <div class="navbar">
-
 <div class="logo">KAII VN</div>
 
 <div class="menu">
 <a href="#">Trang chủ</a>
 <a href="#download">Tải game</a>
+<a href="#gallery">Hình ảnh</a>
 <a href="#" onclick="openLogin()">Tài khoản</a>
 </div>
-
 </div>
+
+<!-- HERO -->
 
 <div class="hero">
 
 <div>
-
 <h1>Kaii Visual Novel</h1>
-
 <p>Trang tải game chính thức</p>
-
 <a class="btn" href="#download">Tải ngay</a>
-
 </div>
 
 </div>
+
+<!-- NEWS -->
 
 <section>
 
@@ -257,23 +274,25 @@ document.getElementById("login").style.display="none";
 <div class="news">
 
 <div class="news-box">
-<h3>Cập nhật 1.0</h3>
+<h3>Phiên bản 1.0</h3>
 <p>Phát hành bản đầu tiên của game.</p>
 </div>
 
 <div class="news-box">
 <h3>Nhân vật mới</h3>
-<p>Thêm nhiều nội dung mới.</p>
+<p>Thêm nhiều nhân vật và nội dung.</p>
 </div>
 
 <div class="news-box">
-<h3>Update sắp tới</h3>
-<p>Sẽ có thêm nhiều route mới.</p>
+<h3>Cập nhật sắp tới</h3>
+<p>Sẽ có thêm route và story mới.</p>
 </div>
 
 </div>
 
 </section>
+
+<!-- SEARCH -->
 
 <section>
 
@@ -281,26 +300,32 @@ document.getElementById("login").style.display="none";
 
 <div class="search">
 
-<input placeholder="Nhập thể loại game">
+<input placeholder="Ví dụ: Visual Novel">
 <button>Tìm</button>
 
 </div>
 
 </section>
 
-<section>
+<!-- GALLERY -->
+
+<section id="gallery">
 
 <h2>Hình ảnh trong game</h2>
 
 <div class="gallery">
 
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/1.png">
+<img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8">
 
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/68936209/67dde7ae097148ecafb8b399af1611d9/1.png">
+<img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+
+<img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470">
 
 </div>
 
 </section>
+
+<!-- DOWNLOAD -->
 
 <section id="download">
 
@@ -310,10 +335,13 @@ document.getElementById("login").style.display="none";
 
 <a href="#">Windows</a>
 <a href="#">Android</a>
+<a href="#">Patch</a>
 
 </div>
 
 </section>
+
+<!-- LOGIN POPUP -->
 
 <div class="popup" id="login">
 
@@ -322,11 +350,9 @@ document.getElementById("login").style.display="none";
 <h3>Đăng nhập</h3>
 
 <input placeholder="Tên tài khoản">
-
-<input placeholder="Mật khẩu" type="password">
+<input type="password" placeholder="Mật khẩu">
 
 <button>Đăng nhập</button>
-
 <button onclick="closeLogin()">Đóng</button>
 
 </div>
