@@ -14,7 +14,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial;
+font-family:Arial, sans-serif;
 }
 
 body{
@@ -27,25 +27,25 @@ overflow-x:hidden;
 
 .navbar{
 position:fixed;
-width:100%;
 top:0;
+width:100%;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px 50px;
-background:rgba(0,0,0,0.6);
-backdrop-filter:blur(15px);
+padding:18px 40px;
+background:rgba(0,0,0,0.65);
+backdrop-filter:blur(12px);
 z-index:100;
 }
 
 .logo{
 color:#00ffd5;
-font-size:24px;
+font-size:22px;
 font-weight:bold;
 }
 
 .menu a{
-margin-left:25px;
+margin-left:20px;
 text-decoration:none;
 color:white;
 font-size:14px;
@@ -59,7 +59,7 @@ color:#00ffd5;
 
 .hero{
 height:100vh;
-background:url("background.jpg") center/cover no-repeat;
+background:url("https://images.unsplash.com/photo-1503264116251-35a269479413") center/cover no-repeat;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -70,11 +70,11 @@ text-align:center;
 background:rgba(0,0,0,0.65);
 padding:60px;
 border-radius:15px;
-box-shadow:0 0 40px rgba(0,255,213,0.3);
+box-shadow:0 0 60px rgba(0,255,213,0.3);
 }
 
 .hero h1{
-font-size:52px;
+font-size:50px;
 margin-bottom:10px;
 }
 
@@ -84,11 +84,16 @@ margin-bottom:25px;
 
 .btn{
 background:#00ffd5;
+color:black;
 padding:12px 30px;
 border-radius:8px;
 text-decoration:none;
-color:black;
 font-weight:bold;
+transition:0.3s;
+}
+
+.btn:hover{
+transform:scale(1.05);
 }
 
 /* section */
@@ -101,9 +106,31 @@ text-align:center;
 }
 
 .section h2{
-font-size:35px;
 color:#00ffd5;
-margin-bottom:20px;
+font-size:34px;
+margin-bottom:30px;
+}
+
+/* cards */
+
+.cards{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.card{
+background:#121212;
+padding:30px;
+width:260px;
+border-radius:12px;
+transition:0.4s;
+}
+
+.card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 25px #00ffd5;
 }
 
 /* gallery */
@@ -112,7 +139,6 @@ margin-bottom:20px;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
 gap:20px;
-margin-top:40px;
 }
 
 .gallery img{
@@ -125,34 +151,13 @@ transition:0.4s;
 transform:scale(1.08);
 }
 
-/* cards */
-
-.cards{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-justify-content:center;
-margin-top:40px;
-}
-
-.card{
-background:#121212;
-padding:30px;
-width:260px;
-border-radius:10px;
-transition:0.3s;
-}
-
-.card:hover{
-transform:translateY(-10px);
-box-shadow:0 0 20px #00ffd5;
-}
+/* footer */
 
 footer{
 background:black;
 padding:40px;
 text-align:center;
-margin-top:60px;
+margin-top:80px;
 }
 
 </style>
@@ -180,7 +185,7 @@ margin-top:60px;
 
 <h1>Kaii Visual Novel</h1>
 
-<p>Trải nghiệm visual novel trực tiếp trên trình duyệt</p>
+<p>Trải nghiệm visual novel trực tiếp trên web</p>
 
 <a class="btn">Bắt đầu</a>
 
@@ -219,9 +224,9 @@ margin-top:60px;
 
 <div class="gallery">
 
-<img src="background.jpg">
-<img src="background.jpg">
-<img src="background.jpg">
+<img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+<img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470">
+<img src="https://images.unsplash.com/photo-1503264116251-35a269479413">
 
 </div>
 
