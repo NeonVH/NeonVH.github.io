@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Kai VN</title>
+<title>Kaii VN</title>
 
 <style>
 
@@ -24,7 +24,6 @@ font-family:Arial;
 body{
 background:#020202;
 color:white;
-overflow-x:hidden;
 }
 
 /* NAVBAR */
@@ -38,22 +37,20 @@ justify-content:space-between;
 align-items:center;
 padding:20px 60px;
 background:rgba(0,0,0,0.6);
-backdrop-filter:blur(12px);
+backdrop-filter:blur(10px);
 z-index:100;
 }
 
 .logo{
 font-size:24px;
-font-weight:bold;
 color:#00ffd5;
+font-weight:bold;
 }
 
 .menu a{
 margin-left:25px;
 text-decoration:none;
 color:white;
-font-size:15px;
-transition:0.3s;
 }
 
 .menu a:hover{
@@ -78,143 +75,158 @@ text-align:center;
 
 .hero h1{
 font-size:60px;
-text-shadow:0 0 25px #00ffd5;
-margin-bottom:10px;
+text-shadow:0 0 20px #00ffd5;
 }
 
 .hero p{
+margin-top:10px;
 font-size:20px;
-margin-bottom:30px;
 }
 
 /* BUTTON */
 
 .btn{
 display:inline-block;
+margin-top:30px;
 padding:15px 40px;
 background:#00ffd5;
 color:black;
 font-weight:bold;
 border-radius:8px;
 text-decoration:none;
-box-shadow:0 0 20px #00ffd5;
-transition:0.3s;
-}
-
-.btn:hover{
-transform:scale(1.1);
-box-shadow:0 0 40px #00ffd5;
 }
 
 /* SECTION */
 
 .section{
 padding:120px 20px;
-max-width:1200px;
+max-width:1100px;
 margin:auto;
 text-align:center;
 }
 
 .section h2{
-font-size:42px;
+font-size:40px;
 color:#00ffd5;
 margin-bottom:20px;
 }
 
-.section p{
-max-width:800px;
-margin:auto;
-opacity:0.9;
-}
+/* GAME INFO */
 
-/* FEATURES */
-
-.features{
+.game-info{
 display:flex;
 flex-wrap:wrap;
 justify-content:center;
+gap:25px;
+margin-top:40px;
+}
+
+.info{
+background:#111;
+padding:30px;
+border-radius:10px;
+width:250px;
+}
+
+/* DOWNLOAD BUTTONS */
+
+.download-buttons{
+margin-top:40px;
+}
+
+.download-buttons a{
+display:inline-block;
+margin:10px;
+padding:18px 40px;
+background:#00ffd5;
+color:black;
+border-radius:10px;
+font-weight:bold;
+text-decoration:none;
+}
+
+/* NEWS */
+
+.news{
+display:flex;
+flex-wrap:wrap;
 gap:30px;
-margin-top:50px;
+justify-content:center;
+margin-top:40px;
 }
 
-.feature{
-background:#0f0f0f;
-padding:40px;
-width:260px;
-border-radius:12px;
-transition:0.3s;
+.news-box{
+background:#0e0e0e;
+padding:30px;
+border-radius:10px;
+width:280px;
 }
 
-.feature:hover{
-transform:translateY(-10px);
-box-shadow:0 0 30px #00ffd5;
-}
-
-.feature h3{
+.news-box h3{
 color:#00ffd5;
 margin-bottom:10px;
 }
 
-/* GALLERY */
+/* POPUP */
 
-.gallery{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-gap:25px;
-margin-top:50px;
-}
-
-.gallery img{
+.popup{
+position:fixed;
+top:0;
+left:0;
 width:100%;
-border-radius:12px;
-transition:0.4s;
-}
-
-.gallery img:hover{
-transform:scale(1.07);
-box-shadow:0 0 30px #00ffd5;
-}
-
-/* CHARACTER */
-
-.characters{
-display:flex;
-flex-wrap:wrap;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+align-items:center;
 justify-content:center;
-gap:30px;
-margin-top:50px;
 }
 
-.character{
-background:#0e0e0e;
-padding:30px;
-border-radius:12px;
-width:250px;
-transition:0.3s;
-}
-
-.character:hover{
-transform:translateY(-10px);
-box-shadow:0 0 30px #00ffd5;
-}
-
-.character img{
-width:100%;
+.popup-box{
+background:#111;
+padding:40px;
 border-radius:10px;
-margin-bottom:10px;
+width:300px;
+}
+
+.popup-box input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:5px;
+}
+
+.popup-box button{
+margin-top:15px;
+width:100%;
+padding:10px;
+background:#00ffd5;
+border:none;
+font-weight:bold;
 }
 
 /* FOOTER */
 
 footer{
-margin-top:120px;
+margin-top:100px;
 background:#000;
 padding:40px;
 text-align:center;
-opacity:0.8;
 }
 
 </style>
+
+<script>
+
+function openLogin(){
+document.getElementById("login").style.display="flex";
+}
+
+function closeLogin(){
+document.getElementById("login").style.display="none";
+}
+
+</script>
 
 </head>
 
@@ -225,74 +237,101 @@ opacity:0.8;
 <div class="logo">KAII VN</div>
 
 <div class="menu">
-<a href="#home">Trang chủ</a>
-<a href="#gioithieu">Giới thiệu</a>
-<a href="#tinhnang">Tính năng</a>
-<a href="#gallery">Ảnh</a>
-</div>
+
+<a href="#">Trang chủ</a>
+<a href="#download">Tải game</a>
+<a href="#news">Tin tức</a>
+<a onclick="openLogin()">Tài khoản</a>
 
 </div>
 
-<div class="hero" id="home">
+</div>
+
+<div class="hero">
 
 <div>
 
 <h1>Kaii Visual Novel</h1>
 
-<p>Trải nghiệm visual novel cùng với càng cô nàng đáng yêu đang chờ bạn</p>
+<p>Trang tải game chính thức</p>
 
-<a class="btn" href="#gioithieu">Khám phá</a>
-
-</div>
-
-</div>
-
-<div class="section" id="gioithieu">
-
-<h2>Giới thiệu</h2>
-
-<p>
-Đây là website demo cho dự án Visual Novel chạy trực tiếp trên web.
-Bạn có thể trải nghiệm câu chuyện, nhân vật và các cảnh trong game
-mà không cần tải xuống.
-</p>
-
-</div>
-
-<div class="section" id="tinhnang">
-
-<h2>Tính năng</h2>
-
-<div class="features">
-
-<div class="feature">
-<h3>Visual Novel</h3>
-<p>Hiển thị cảnh và nhân vật giống game.</p>
-</div>
-
-<div class="feature">
-<h3>Chơi trên web</h3>
-<p>Không cần tải game vẫn có thể trải nghiệm.</p>
-</div>
-
-<div class="feature">
-<h3>Dễ mở rộng</h3>
-<p>Có thể thêm nhiều câu chuyện và nhân vật.</p>
-</div>
+<a class="btn" href="#download">Tải ngay</a>
 
 </div>
 
 </div>
 
-<div class="section" id="gallery">
+<div class="section" id="download">
 
-<h2>Thư viện ảnh</h2>
+<h2>Tải game</h2>
 
-<div class="gallery">
+<div class="game-info">
 
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=RpznTndYKxek-siEabDybCuqSZmEMTP0xi9KTVG_Qgc%3D&token-time=1774828800">
+<div class="info">
+<h3>Dung lượng</h3>
+<p>2.1 GB</p>
+</div>
 
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/68936209/67dde7ae097148ecafb8b399af1611d9/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=EDQjKSwarAcVJz6BFyuvSVRb5sr9ANhmTeYIfGA6KWg%3D&token-time=1774828800">
+<div class="info">
+<h3>Phiên bản</h3>
+<p>v1.0</p>
+</div>
+
+<div class="info">
+<h3>Nền tảng</h3>
+<p>Windows / Android</p>
+</div>
+
+</div>
+
+<div class="download-buttons">
+
+<a href="#">Tải cho Windows</a>
+<a href="#">Tải cho Android</a>
+<a href="#">Patch Update</a>
+
+</div>
+
+</div>
+
+<div class="section" id="news">
+
+<h2>Tin tức</h2>
+
+<div class="news">
+
+<div class="news-box">
+<h3>Cập nhật 1.0</h3>
+<p>Phát hành phiên bản đầu tiên của game.</p>
+</div>
+
+<div class="news-box">
+<h3>Nhân vật mới</h3>
+<p>Thêm nhân vật và nhiều cảnh mới.</p>
+</div>
+
+<div class="news-box">
+<h3>Cập nhật sắp tới</h3>
+<p>Sẽ thêm nhiều nội dung trong bản update tiếp theo.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="popup" id="login">
+
+<div class="popup-box">
+
+<h3>Đăng nhập</h3>
+
+<input placeholder="Tên tài khoản">
+
+<input type="password" placeholder="Mật khẩu">
+
+<button>Đăng nhập</button>
+
+<button onclick="closeLogin()">Đóng</button>
 
 </div>
 
