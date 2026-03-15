@@ -1,75 +1,125 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Sakura VN+ Library</title>
 
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Be+Vietnam+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Be+Vietnam+Pro:wght@300;400;600&display=swap" rel="stylesheet">
 
+<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 
+/* ========= GLOBAL ========= */
+
 body{
 font-family:'Be Vietnam Pro',sans-serif;
-background:url("https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=2000&q=80") center/cover fixed no-repeat;
+background:url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2000&q=80") center/cover fixed no-repeat;
 color:white;
+cursor:none;
 }
+
+.cyber{font-family:'Orbitron',sans-serif}
 
 /* glass */
 
 .glass{
 background:rgba(0,0,0,0.6);
 backdrop-filter:blur(12px);
-border:1px solid rgba(255,255,255,0.08);
-}
-
-/* heading font */
-
-.cyber{
-font-family:'Orbitron',sans-serif;
+border:1px solid rgba(255,255,255,0.1);
 }
 
 /* neon */
 
-.neon{
-color:#bc13fe;
-text-shadow:0 0 10px #bc13fe;
+.neon{color:#bc13fe}
+
+/* ========= GLITCH EFFECT ========= */
+
+.glitch:hover{
+animation:glitch 0.4s linear infinite;
 }
 
-.neon-border{
-border:1px solid #bc13fe;
+@keyframes glitch{
+0%{transform:translate(0)}
+20%{transform:translate(-2px,2px)}
+40%{transform:translate(-2px,-2px)}
+60%{transform:translate(2px,2px)}
+80%{transform:translate(2px,-2px)}
+100%{transform:translate(0)}
 }
 
-.neon-border:hover{
-background:#bc13fe;
-box-shadow:0 0 10px #bc13fe;
+/* ========= SCROLL REVEAL ========= */
+
+.reveal{
+opacity:0;
+transform:translateY(40px);
+transition:1s;
 }
 
-/* cards */
+.reveal.active{
+opacity:1;
+transform:translateY(0);
+}
+
+/* ========= GAME CARD ========= */
 
 .game-card{
 transition:0.3s;
+transform-style:preserve-3d;
+position:relative;
+overflow:hidden;
 }
 
 .game-card:hover{
-transform:scale(1.05);
 box-shadow:0 0 20px #ff00ff;
 }
 
-/* scroll */
-
-::-webkit-scrollbar{
-width:6px;
+.game-card::before{
+content:"";
+position:absolute;
+top:-100%;
+left:-100%;
+width:200%;
+height:200%;
+background:linear-gradient(120deg,transparent,rgba(255,255,255,0.4),transparent);
+transform:rotate(25deg);
+transition:0.5s;
 }
 
-::-webkit-scrollbar-thumb{
+.game-card:hover::before{
+top:0;
+left:0;
+}
+
+/* ========= CUSTOM CURSOR ========= */
+
+.cursor{
+width:10px;
+height:10px;
+border-radius:50%;
 background:#bc13fe;
+position:fixed;
+pointer-events:none;
+z-index:999;
+transition:transform 0.1s;
+}
+
+.cursor.big{
+transform:scale(4);
+border:1px solid #bc13fe;
+background:transparent;
+}
+
+/* ========= MOBILE MENU ========= */
+
+#mobileMenu{
+right:-100%;
 }
 
 </style>
@@ -78,126 +128,67 @@ background:#bc13fe;
 
 <body>
 
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+
 <!-- AGE MODAL -->
-
-<div id="ageModal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 opacity-100 transition">
-
+<div id="ageModal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
 <div class="glass p-10 rounded-xl text-center w-96">
-
-<h2 class="cyber text-2xl neon mb-4">
-BẠN CÓ ĐỦ 18 TUỔI ĐỂ VÀO KHÔNG?
-</h2>
-
+<h2 class="cyber text-2xl neon mb-4">BẠN CÓ ĐỦ 18 TUỔI ĐỂ VÀO TRANG?</h2>
 <div class="flex gap-4 justify-center">
-
-<button onclick="enterSite()" class="px-6 py-2 bg-purple-600 rounded">
-CÓ (VÀO)
-</button>
-
-<button onclick="leaveSite()" class="px-6 py-2 border border-purple-400 rounded">
-KHÔNG
-</button>
-
+<button onclick="enterSite()" class="px-6 py-2 bg-purple-600 rounded">CÓ</button>
+<button onclick="leaveSite()" class="px-6 py-2 border border-purple-400 rounded">KHÔNG</button>
+</div>
+</div>
 </div>
 
-</div>
-
-</div>
-
-<!-- LOGIN MODAL -->
-
+<!-- AUTH MODAL -->
 <div id="authModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-
 <div class="glass p-8 rounded-xl w-96">
-
-<h2 id="authTitle" class="cyber text-xl neon mb-4">
-Đăng nhập
-</h2>
-
+<h2 id="authTitle" class="cyber neon text-xl mb-4">Đăng nhập</h2>
 <input placeholder="Email" class="w-full mb-3 p-2 rounded bg-black/50 border border-purple-500">
-
 <input type="password" placeholder="Password" class="w-full mb-4 p-2 rounded bg-black/50 border border-purple-500">
-
-<button class="w-full bg-purple-600 py-2 rounded mb-3">
-Xác nhận
-</button>
-
-<p id="switchText" class="text-sm text-gray-300 cursor-pointer">
-Chưa có tài khoản? Đăng ký ngay
-</p>
-
+<button class="w-full bg-purple-600 py-2 rounded mb-3">Xác nhận</button>
+<p id="switchText" class="text-sm text-gray-300 cursor-pointer">Chưa có tài khoản? Đăng ký ngay</p>
 </div>
-
 </div>
 
 <!-- MOBILE MENU -->
-
-<div id="mobileMenu" class="fixed top-0 right-[-100%] h-full w-72 glass p-6 z-50 transition-all duration-300">
-
+<div id="mobileMenu" class="fixed top-0 h-full w-72 glass p-6 z-50 transition-all duration-300">
 <div class="flex justify-between items-center mb-6">
-
-<h2 class="cyber neon text-lg">
-Menu
-</h2>
-
-<button onclick="closeMenu()">
-<i class="fa fa-times text-xl"></i>
-</button>
-
+<h2 class="cyber neon">Menu</h2>
+<button onclick="closeMenu()"><i class="fa fa-times text-xl"></i></button>
 </div>
 
 <input placeholder="Tìm game..." class="w-full mb-4 p-2 rounded bg-black/50 border border-purple-500">
 
 <div class="flex flex-col gap-4">
-
 <a href="#">Trang chủ</a>
 <a href="#">PC Game</a>
 <a href="#">Mobile Game</a>
 <a href="#">Nhóm dịch</a>
-
-<button onclick="openAuth()" class="neon-border py-2 rounded">
-Đăng nhập
-</button>
-
-<button onclick="openAuth()" class="neon-border py-2 rounded">
-Đăng ký
-</button>
-
+<button onclick="openAuth()" class="border border-purple-500 py-2 rounded">Đăng nhập</button>
+<button onclick="openAuth()" class="border border-purple-500 py-2 rounded">Đăng ký</button>
 </div>
-
 </div>
 
 <!-- NAVBAR -->
-
 <nav class="glass sticky top-0 z-40">
-
 <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
 
-<h1 class="cyber neon text-xl">
-Sakura VN+
-</h1>
+<h1 class="cyber neon text-xl glitch">Sakura VN+</h1>
 
 <div class="hidden md:flex gap-6 text-sm">
-
 <a href="#">Trang chủ</a>
-<a href="#">PC Game</a>
-<a href="#">Mobile Game</a>
+<a href="#">PC</a>
+<a href="#">Mobile</a>
 <a href="#">Nhóm dịch</a>
-
 </div>
 
 <div class="hidden md:flex items-center gap-3">
-
 <input placeholder="Tìm game..." class="bg-black/40 border border-purple-500 rounded-full px-4 py-1 text-sm">
-
-<button onclick="openAuth()" class="neon-border px-3 py-1 rounded">
-Đăng nhập
-</button>
-
-<button onclick="openAuth()" class="neon-border px-3 py-1 rounded">
-Đăng ký
-</button>
-
+<button onclick="openAuth()" class="border border-purple-500 px-3 py-1 rounded">Đăng nhập</button>
+<button onclick="openAuth()" class="border border-purple-500 px-3 py-1 rounded">Đăng ký</button>
 </div>
 
 <button onclick="openMenu()" class="md:hidden text-2xl">
@@ -205,118 +196,83 @@ Sakura VN+
 </button>
 
 </div>
-
 </nav>
 
 <!-- HERO -->
+<section class="max-w-4xl mx-auto mt-16 p-10 glass rounded-xl text-center reveal">
 
-<section class="max-w-4xl mx-auto mt-16 p-10 glass rounded-xl text-center">
-
-<h1 class="cyber text-4xl neon mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+<h1 class="cyber text-4xl neon mb-4 glitch">
 Khám phá thế giới Visual Novel
 </h1>
 
-<button class="px-6 py-2 bg-purple-600 rounded">
+<button class="px-6 py-2 bg-purple-600 rounded glitch">
 Xem game mới
 </button>
 
 </section>
 
 <!-- MAIN GRID -->
-
-<div class="max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-12 gap-6 px-6">
+<div class="max-w-7xl mx-auto mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 px-6">
 
 <!-- FILTER -->
-
-<div class="md:col-span-3 glass p-5 rounded-xl order-2 md:order-none">
-
-<h2 class="cyber neon mb-4">
-BỘ LỌC
-</h2>
-
+<div class="lg:col-span-3 glass p-5 rounded-xl reveal order-2 lg:order-none">
+<h2 class="cyber neon mb-4">BỘ LỌC</h2>
 <label><input type="checkbox"> Romance</label><br>
 <label><input type="checkbox"> Harem</label><br>
 <label><input type="checkbox"> Fantasy</label><br>
-
 <hr class="my-4 border-gray-700">
-
 <label><input type="radio" name="status"> Full</label><br>
 <label><input type="radio" name="status"> Đang dịch</label>
-
 <hr class="my-4 border-gray-700">
-
 <label><input type="radio" name="rate"> 5★</label><br>
-<label><input type="radio" name="rate"> 4★</label><br>
-<label><input type="radio" name="rate"> 3★</label>
-
+<label><input type="radio" name="rate"> 4★</label>
 </div>
 
 <!-- GAME GRID -->
+<div class="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-4">
 
-<div class="md:col-span-6">
-
-<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-
-<div class="game-card glass rounded-lg overflow-hidden">
-<div class="relative">
+<div class="game-card glass rounded-lg overflow-hidden reveal">
 <img src="https://picsum.photos/300/400">
-<span class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">18+</span>
-</div>
 <div class="p-3">
 <h3 class="cyber text-sm">Học viện tình yêu</h3>
 <p class="text-xs text-purple-400">VN Team</p>
 </div>
 </div>
 
-<div class="game-card glass rounded-lg overflow-hidden">
-<div class="relative">
+<div class="game-card glass rounded-lg overflow-hidden reveal">
 <img src="https://picsum.photos/301/400">
-<span class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">18+</span>
-</div>
 <div class="p-3">
 <h3 class="cyber text-sm">Bí ẩn học đường</h3>
 <p class="text-xs text-purple-400">Night VN</p>
 </div>
 </div>
 
-<div class="game-card glass rounded-lg overflow-hidden">
-<div class="relative">
+<div class="game-card glass rounded-lg overflow-hidden reveal">
 <img src="https://picsum.photos/302/400">
-<span class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">18+</span>
-</div>
 <div class="p-3">
 <h3 class="cyber text-sm">Thế giới phép thuật</h3>
 <p class="text-xs text-purple-400">Magic VN</p>
 </div>
 </div>
 
-<div class="game-card glass rounded-lg overflow-hidden">
-<div class="relative">
+<div class="game-card glass rounded-lg overflow-hidden reveal">
 <img src="https://picsum.photos/303/400">
-<span class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">18+</span>
-</div>
 <div class="p-3">
 <h3 class="cyber text-sm">Đêm định mệnh</h3>
 <p class="text-xs text-purple-400">VN Night</p>
 </div>
 </div>
 
-<div class="game-card glass rounded-lg overflow-hidden">
-<div class="relative">
+<div class="game-card glass rounded-lg overflow-hidden reveal">
 <img src="https://picsum.photos/304/400">
-<span class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">18+</span>
-</div>
 <div class="p-3">
 <h3 class="cyber text-sm">Harem School</h3>
 <p class="text-xs text-purple-400">VN Studio</p>
 </div>
 </div>
 
-<div class="game-card glass rounded-lg overflow-hidden">
-<div class="relative">
+<div class="game-card glass rounded-lg overflow-hidden reveal">
 <img src="https://picsum.photos/305/400">
-<span class="absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">18+</span>
-</div>
 <div class="p-3">
 <h3 class="cyber text-sm">Mystic Dream</h3>
 <p class="text-xs text-purple-400">Dream VN</p>
@@ -325,44 +281,28 @@ BỘ LỌC
 
 </div>
 
-</div>
-
 <!-- NEWS -->
-
-<div class="md:col-span-3 glass p-5 rounded-xl order-3">
-
-<h2 class="cyber neon mb-4">
-Cập nhật mới nhất
-</h2>
-
+<div class="lg:col-span-3 glass p-5 rounded-xl reveal order-3">
+<h2 class="cyber neon mb-4">Cập nhật mới</h2>
 <ul class="text-sm space-y-3 text-gray-300">
-
 <li>[Tin] VN Team ra patch Love Academy</li>
-<li>[Thông báo] Bảo trì server tải game</li>
-<li>[Tin] Night VN ra bản update</li>
-<li>[Tin] Thêm game mới vào thư viện</li>
-
+<li>[Thông báo] Bảo trì server</li>
+<li>[Tin] Night VN ra update</li>
+<li>[Tin] Thêm game mới</li>
 </ul>
-
 </div>
 
 </div>
 
 <!-- FOOTER -->
-
 <footer class="mt-20 text-center glass py-6">
-
-<p class="text-gray-300 text-sm">
-Cảnh báo: Nội dung dành cho người trên 18 tuổi.
-</p>
-
-<p class="text-gray-400 text-sm mt-2">
-© 2026 Sakura VN+ Library
-</p>
-
+<p class="text-gray-300 text-sm">Cảnh báo: Nội dung dành cho người trên 18 tuổi.</p>
+<p class="text-gray-400 text-sm mt-2">© 2026 Sakura VN+ Library</p>
 </footer>
 
 <script>
+
+/* AGE GATE */
 
 function enterSite(){
 localStorage.setItem("ageVerified","true")
@@ -379,14 +319,14 @@ document.getElementById("ageModal").style.display="none"
 }
 }
 
+/* AUTH MODAL */
+
 function openAuth(){
 document.getElementById("authModal").classList.remove("hidden")
 }
 
 document.getElementById("switchText").onclick=function(){
-
 let title=document.getElementById("authTitle")
-
 if(title.innerText=="Đăng nhập"){
 title.innerText="Đăng ký"
 this.innerText="Đã có tài khoản? Đăng nhập"
@@ -394,8 +334,9 @@ this.innerText="Đã có tài khoản? Đăng nhập"
 title.innerText="Đăng nhập"
 this.innerText="Chưa có tài khoản? Đăng ký ngay"
 }
-
 }
+
+/* MOBILE MENU */
 
 function openMenu(){
 document.getElementById("mobileMenu").style.right="0"
@@ -404,6 +345,50 @@ document.getElementById("mobileMenu").style.right="0"
 function closeMenu(){
 document.getElementById("mobileMenu").style.right="-100%"
 }
+
+/* SCROLL REVEAL */
+
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add("active")
+}
+})
+})
+
+document.querySelectorAll(".reveal").forEach(el=>{
+observer.observe(el)
+})
+
+/* 3D TILT */
+
+document.querySelectorAll(".game-card").forEach(card=>{
+card.addEventListener("mousemove",(e)=>{
+let rect=card.getBoundingClientRect()
+let x=e.clientX-rect.left
+let y=e.clientY-rect.top
+let rotateX=(y/rect.height-0.5)*10
+let rotateY=(x/rect.width-0.5)*-10
+card.style.transform=`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
+})
+card.addEventListener("mouseleave",()=>{
+card.style.transform="rotateX(0) rotateY(0)"
+})
+})
+
+/* CUSTOM CURSOR */
+
+const cursor=document.getElementById("cursor")
+
+document.addEventListener("mousemove",e=>{
+cursor.style.left=e.clientX+"px"
+cursor.style.top=e.clientY+"px"
+})
+
+document.querySelectorAll("a,button").forEach(el=>{
+el.addEventListener("mouseenter",()=>cursor.classList.add("big"))
+el.addEventListener("mouseleave",()=>cursor.classList.remove("big"))
+})
 
 </script>
 
