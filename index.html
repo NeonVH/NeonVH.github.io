@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V14</title>
+    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V15</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -94,15 +94,17 @@
     <div id="homeView" class="view-section view-active">
         <div class="relative pt-32 pb-20 px-6 flex flex-col items-center justify-center text-center border-b border-white/10">
             <span class="bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white px-5 py-1.5 rounded-full text-xs font-black tracking-widest mb-6 shadow-[0_0_15px_#bc13fe]">HOT NHẤT 2026</span>
-            <h1 class="logo-font text-5xl md:text-7xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#bc13fe] drop-shadow-lg">HỒNG NHÃN MA ĐẠO</h1>
-            <p class="text-gray-300 max-w-lg mx-auto mb-10 text-sm md:text-base leading-relaxed">Hành trình cứu thế giới ảo bằng tình yêu cấm kỵ giữa ma nữ và kiếm sĩ nhân loại. Quyết định vận mệnh của Neonverse ngay trên trình duyệt.</p>
-            <button onclick="openGameDetail(1)" class="px-10 py-4 bg-white text-black font-black rounded-full hover:bg-[#bc13fe] hover:text-white hover:shadow-[0_0_30px_#bc13fe] transition-all transform hover:scale-105 uppercase tracking-wider"><i class="fa-solid fa-play mr-2"></i> Chơi ngay</button>
+            
+            <h1 class="logo-font text-5xl md:text-7xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#bc13fe] drop-shadow-lg uppercase leading-tight">NEON VISUAL NOVEL 18</h1>
+            <p class="text-gray-300 max-w-2xl mx-auto mb-10 text-sm md:text-base leading-relaxed">Khám phá những câu chuyện đầy cảm xúc, những nhân vật bí ẩn và những lựa chọn có thể thay đổi toàn bộ hành trình của bạn. Mỗi quyết định bạn đưa ra sẽ mở ra một con đường mới, một kết thúc khác.</p>
+            
+            <button onclick="document.getElementById('gameGridContainer').scrollIntoView({behavior: 'smooth', block: 'start'})" class="px-10 py-4 bg-white text-black font-black rounded-full hover:bg-[#bc13fe] hover:text-white hover:shadow-[0_0_30px_#bc13fe] transition-all transform hover:scale-105 uppercase tracking-wider"><i class="fa-solid fa-eye mr-2"></i> Xem ngay</button>
         </div>
         <div class="max-w-screen-xl mx-auto px-4 md:px-6 py-10">
             <div class="flex justify-between items-end mb-6">
                 <h2 class="logo-font text-xl md:text-2xl font-bold uppercase tracking-wider"><i class="fa-solid fa-bolt text-[#bc13fe] mr-2"></i> Mới Cập Nhật</h2>
             </div>
-            <div id="gameGridContainer" class="flex flex-col gap-3 md:gap-4"></div>
+            <div id="gameGridContainer" class="flex flex-col gap-3 md:gap-4 scroll-mt-24"></div>
         </div>
     </div>
 
@@ -153,22 +155,17 @@
 
         <div id="detailDownloadSection" class="mt-12 pt-8 border-t border-white/10">
             <h3 class="logo-font text-xl md:text-2xl font-bold mb-6 uppercase text-white"><i class="fa-solid fa-cloud-arrow-down mr-2 text-[#00f0ff]"></i> Tải Game</h3>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="glass-panel p-5 md:p-6 rounded-2xl border-t-2 border-[#bc13fe]">
                     <h4 class="font-bold text-[#bc13fe] mb-4 text-lg"><i class="fa-brands fa-android mr-2"></i> Phiên Bản Android</h4>
-                    <div id="detailAndroidLinks" class="flex flex-col gap-3">
-                        </div>
+                    <div id="detailAndroidLinks" class="flex flex-col gap-3"></div>
                 </div>
-                
                 <div class="glass-panel p-5 md:p-6 rounded-2xl border-t-2 border-[#00f0ff]">
                     <h4 class="font-bold text-[#00f0ff] mb-4 text-lg"><i class="fa-solid fa-desktop mr-2"></i> Phiên Bản PC</h4>
-                    <div id="detailPcLinks" class="flex flex-col gap-3">
-                        </div>
+                    <div id="detailPcLinks" class="flex flex-col gap-3"></div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div id="adminView" class="view-section view-hidden max-w-screen-md mx-auto px-4 md:px-6 pt-28 pb-20">
@@ -228,18 +225,16 @@
 
                 <div class="p-4 border border-yellow-400/30 rounded-xl bg-black/40 mt-6">
                     <h3 class="font-bold text-yellow-400 mb-4 uppercase tracking-wider"><i class="fa-solid fa-link mr-2"></i> CÀI ĐẶT LINK TẢI GAME</h3>
-                    
                     <div class="mb-4">
-                        <label class="block text-xs font-bold text-[#bc13fe] mb-2 uppercase"><i class="fa-brands fa-android mr-1"></i> Link Android (Bỏ trống nếu không có)</label>
+                        <label class="block text-xs font-bold text-[#bc13fe] mb-2 uppercase"><i class="fa-brands fa-android mr-1"></i> Link Android</label>
                         <div class="space-y-2">
                             <input id="adLinkAndTerabox" type="url" placeholder="URL Terabox Android..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2.5 text-white focus:border-[#bc13fe] outline-none text-sm">
                             <input id="adLinkAndMediafire" type="url" placeholder="URL MediaFire Android..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2.5 text-white focus:border-[#bc13fe] outline-none text-sm">
                             <input id="adLinkAndDrive" type="url" placeholder="URL Google Drive Android..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2.5 text-white focus:border-[#bc13fe] outline-none text-sm">
                         </div>
                     </div>
-                    
                     <div>
-                        <label class="block text-xs font-bold text-[#00f0ff] mb-2 uppercase"><i class="fa-solid fa-desktop mr-1"></i> Link PC (Bỏ trống nếu không có)</label>
+                        <label class="block text-xs font-bold text-[#00f0ff] mb-2 uppercase"><i class="fa-solid fa-desktop mr-1"></i> Link PC</label>
                         <div class="space-y-2">
                             <input id="adLinkPcTerabox" type="url" placeholder="URL Terabox PC..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2.5 text-white focus:border-[#00f0ff] outline-none text-sm">
                             <input id="adLinkPcMediafire" type="url" placeholder="URL MediaFire PC..." class="w-full bg-black/60 border border-white/20 rounded-lg p-2.5 text-white focus:border-[#00f0ff] outline-none text-sm">
@@ -307,13 +302,10 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // HÌNH ẢNH FALLBACK NẾU LINK BỊ LỖI
         const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' font-weight='bold' fill='%23bc13fe' text-anchor='middle' dominant-baseline='middle'%3EL%E1%BB%97i Link %E1%BA%A2nh%3C/text%3E%3C/svg%3E";
 
-        const defaultGamesDB = [
-            { id: 1, title: "Hồng Nhãn Ma Đạo", author: "MagicVN", version: "v1.0 Final", progress: "100%", platform: "Android/PC", transType: "Dev+AI", size: "3.5 GB", genre: "Fantasy, Romance", team: "Magic Team", is18: false, cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500", desc: "Kiệt tác Fantasy, đồ họa siêu đỉnh.", adminMsg: "<span style='color: #00f0ff'>Game đã test kỹ trên Android 13!</span>", screenshots: [], links: { android: { terabox: 'https://terabox.com' }, pc: { mediafire: 'https://mediafire.com' } } },
-            { id: 2, title: "Cyber Romance 2077", author: "NeoCity", version: "Ep. 3", progress: "Đang dịch", platform: "PC", transType: "Thô AI", size: "1.2 GB", genre: "Sci-Fi, 3DCG", team: "VN Studio", is18: true, cover: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=500", desc: "Thành phố Cyberpunk năm 2077.", adminMsg: "", screenshots: [], links: { pc: { drive: 'https://drive.google.com' } } }
-        ];
+        // UPDATE V15: ĐÃ XÓA SẠCH GAME DEMO THEO YÊU CẦU
+        const defaultGamesDB = [];
 
         let gamesDB = []; 
 
@@ -322,6 +314,19 @@
             renderGameGrid();
             checkAuthState();
             initParticles();
+
+            // UPDATE V15: KHÔI PHỤC TRẠNG THÁI TRANG KHI F5 (RELOAD)
+            const savedView = localStorage.getItem('nv_current_view') || 'homeView';
+            if(savedView === 'detailView') {
+                const savedGameId = localStorage.getItem('nv_current_game');
+                if(savedGameId) {
+                    openGameDetail(savedGameId);
+                } else {
+                    switchView('homeView');
+                }
+            } else {
+                switchView(savedView);
+            }
         }
 
         function loadGamesFromStorage() {
@@ -332,6 +337,13 @@
         function renderGameGrid() {
             const container = document.getElementById('gameGridContainer');
             if(!container) return;
+            
+            // Xử lý nếu sảnh trống (chưa có bài nào được đăng)
+            if(gamesDB.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-10 italic">Hệ thống đang trống. Admin vui lòng đăng bài mới!</p>';
+                return;
+            }
+
             container.innerHTML = gamesDB.map(game => `
                 <div onclick="openGameDetail('${game.id}')" class="card-3d glass-panel rounded-xl md:rounded-2xl overflow-hidden flex flex-row items-stretch h-[150px] md:h-[180px]">
                     <div class="w-32 md:w-44 flex-shrink-0 relative">
@@ -418,7 +430,6 @@
             const adminMsg = document.getElementById('adMsg').value;
             const is18 = document.getElementById('ad18').checked;
 
-            // Thu thập Link tải
             const links = {
                 android: {
                     terabox: document.getElementById('adLinkAndTerabox').value.trim(),
@@ -485,7 +496,7 @@
                 customGames[index].title = title; customGames[index].author = author; customGames[index].version = version;
                 customGames[index].progress = progress; customGames[index].platform = platform; customGames[index].transType = transType;
                 customGames[index].size = size; customGames[index].genre = genre; customGames[index].team = team; customGames[index].desc = desc; customGames[index].adminMsg = adminMsg; customGames[index].is18 = is18;
-                customGames[index].links = links; // Cập nhật link tải
+                customGames[index].links = links; 
                 if(coverData) customGames[index].cover = coverData;
                 if(screenshotsArray.length > 0) customGames[index].screenshots = screenshotsArray;
 
@@ -517,7 +528,6 @@
             document.getElementById('adDesc').value = game.desc; document.getElementById('adMsg').value = game.adminMsg || "";
             document.getElementById('ad18').checked = game.is18;
             
-            // Đổ link tải cũ vào form
             const links = game.links || { android: {}, pc: {} };
             document.getElementById('adLinkAndTerabox').value = links.android?.terabox || "";
             document.getElementById('adLinkAndMediafire').value = links.android?.mediafire || "";
@@ -545,13 +555,18 @@
 
         function resetAdminForm() { document.getElementById('adGameId').value = ""; document.getElementById('adminForm').reset(); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME`; }
 
+        // UPDATE V15: LƯU TRẠNG THÁI VÀO LOCALSTORAGE KHI CHUYỂN TRANG
         function switchView(viewId) {
+            // Lưu view hiện tại vào local
+            localStorage.setItem('nv_current_view', viewId);
+            
             const views = ['homeView', 'detailView', 'adminView'];
             views.forEach(id => { const el = document.getElementById(id); if(!el) return; if(id === viewId) { el.classList.remove('view-hidden'); el.classList.add('view-active'); } else { el.classList.remove('view-active'); el.classList.add('view-hidden'); } });
-            if(viewId === 'adminView') renderAdminManageList(); window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if(viewId === 'adminView') renderAdminManageList(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // HÀM TẠO NÚT TẢI (UI MỚI V14)
         function renderLinkButton(url, name, bgClass, iconClass) {
             if(!url) return '';
             return `<a href="${url}" target="_blank" class="w-full py-3 md:py-3.5 ${bgClass} text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-80 hover:shadow-lg transition transform hover:-translate-y-1 text-sm"><i class="${iconClass}"></i> Tải qua ${name}</a>`;
@@ -560,6 +575,9 @@
         function openGameDetail(gameId) {
             const game = gamesDB.find(g => g.id == gameId);
             if(!game) return;
+
+            // UPDATE V15: Lưu ID game đang xem
+            localStorage.setItem('nv_current_game', gameId);
             
             const coverImg = document.getElementById('detailCover');
             coverImg.src = game.cover;
@@ -589,7 +607,6 @@
             } 
             else { scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu cho game này.</p>'; }
 
-            // RENDER LINK TẢI XUỐNG V14
             const links = game.links || { android: {}, pc: {} };
             
             let andHtml = '';
