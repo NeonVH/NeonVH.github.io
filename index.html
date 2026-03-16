@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • 120 TÍNH NĂNG SIÊU VIỆT 2026 • PHIÊN BẢN 5000 DÒNG</title>
+    <title>NEONVERSE • SIÊU VIỆT 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap');
         
         :root {
             --neon-purple: #bc13fe;
@@ -16,383 +15,240 @@
             --neon-pink: #ff00ff;
         }
         
-        .tail-container {
-            font-family: 'Be Vietnam Pro', sans-serif;
-        }
-        
-        .logo-font {
-            font-family: 'Orbitron', sans-serif;
-        }
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
+        .logo-font { font-family: 'Orbitron', sans-serif; }
 
         .hero-bg-static {
-            background-image: url('https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&amp;token-time=1774915200');
-            background-size: cover;
-            background-position: center;
-            filter: blur(18px);
-            transform: scale(1.08);
+            background-image: url('https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&token-time=1774915200');
+            background-size: cover; background-position: center;
+            filter: blur(18px); transform: scale(1.08);
         }
 
-        .card-3d {
-            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        /* 3D Card Hover & Shine */
+        .card-3d { transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
+        .card-3d:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 0 30px rgba(188, 19, 254, 0.6); z-index: 10; border-color: var(--neon-purple); }
         
-        .card-3d:hover {
-            transform: perspective(1400px) rotateX(12deg) rotateY(15deg) scale(1.08);
-            box-shadow: 0 0 60px rgba(188, 19, 254, 0.8);
-        }
-
         .shine {
-            position: absolute;
-            top: -80%;
-            left: -80%;
-            width: 60%;
-            height: 400%;
-            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.55), transparent);
-            transform: skewX(-30deg);
-            animation: shine 3.5s infinite linear;
-            opacity: 0;
+            position: absolute; top: -80%; left: -80%; width: 60%; height: 400%;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-30deg); opacity: 0; pointer-events: none; z-index: 20;
         }
-        
-        .card-3d:hover .shine {
-            opacity: 1;
-            animation-duration: 1.2s;
-        }
-
+        .card-3d:hover .shine { opacity: 1; animation: shine 1.2s forwards; }
         @keyframes shine {
             0% { transform: translateX(-200%) skewX(-30deg); }
-            25% { transform: translateX(400%) skewX(-30deg); }
             100% { transform: translateX(400%) skewX(-30deg); }
         }
 
-        .glitch {
-            position: relative;
+        /* Glitch Text */
+        .glitch { position: relative; }
+        .glitch:hover::before, .glitch:hover::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.85;
         }
-        
-        .glitch:hover::before,
-        .glitch:hover::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.85;
-        }
-        
-        .glitch:hover::before {
-            animation: glitch-anim 450ms infinite linear;
-            color: #00ffff;
-            left: 3px;
-            text-shadow: -3px 0 #ff00ff;
-        }
-        
-        .glitch:hover::after {
-            animation: glitch-anim2 320ms infinite linear;
-            color: #ff00ff;
-            left: -3px;
-            text-shadow: 3px 0 #00ffff;
-        }
-
+        .glitch:hover::before { animation: glitch-anim 450ms infinite linear; color: #00ffff; left: 2px; text-shadow: -2px 0 #ff00ff; }
+        .glitch:hover::after { animation: glitch-anim 320ms infinite linear reverse; color: #ff00ff; left: -2px; text-shadow: 2px 0 #00ffff; }
         @keyframes glitch-anim {
-            0% { clip: rect(15px,9999px,35px,0); }
-            5% { clip: rect(55px,9999px,75px,0); }
-            10% { clip: rect(8px,9999px,28px,0); }
+            0% { clip: rect(15px,9999px,35px,0); } 20% { clip: rect(55px,9999px,75px,0); }
+            40% { clip: rect(8px,9999px,28px,0); } 60% { clip: rect(40px,9999px,60px,0); }
+            80% { clip: rect(20px,9999px,40px,0); } 100% { clip: rect(60px,9999px,80px,0); }
         }
+
+        /* UI Utilities */
+        .neon-text { text-shadow: 0 0 8px #bc13fe, 0 0 18px #bc13fe, 0 0 38px #00f0ff; }
+        .glass-panel { background: rgba(10,10,10,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(188,19,254,0.3); }
+        .drawer { transform: translateX(-100%); transition: transform 0.4s ease; }
+        .drawer.open { transform: translateX(0); }
         
-        @keyframes glitch-anim2 {
-            0% { clip: rect(25px,9999px,45px,0); }
-            5% { clip: rect(38px,9999px,68px,0); }
-        }
-
-        .particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            opacity: 0.75;
-        }
-
-        .game-card {
-            opacity: 0;
-            transform: translateY(40px) scale(0.92);
-            transition: all 700ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        
-        .game-card.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
-        .drawer {
-            transform: translateX(-110%);
-            transition: transform 420ms cubic-bezier(0.32, 0.72, 0, 1);
-        }
-        
-        .drawer.open {
-            transform: translateX(0);
-        }
-
-        .modal {
-            animation: modalPop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        @keyframes modalPop {
-            0% { transform: scale(0.4) rotate(-8deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-
-        .toast {
-            animation: toastIn 420ms ease forwards;
-        }
-        
-        @keyframes toastIn {
-            from { transform: translateY(80px) scale(0.85); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        .neon-text {
-            text-shadow: 
-                0 0 8px #bc13fe,
-                0 0 18px #bc13fe,
-                0 0 38px #bc13fe,
-                0 0 55px #00f0ff;
-        }
-
-        .hero-content {
-            text-align: center;
-            max-width: 460px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-        
-        @media (max-width: 640px) {
-            .hero-title {
-                font-size: 2.9rem !important;
-                line-height: 1.02 !important;
-            }
-        }
-
-        .tag-purple {
-            background: linear-gradient(90deg, #bc13fe, #ff00ff);
-            color: #000;
-            padding: 6px 22px;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            border-radius: 9999px;
-            box-shadow: 0 0 15px #bc13fe;
-        }
-
-        .anti-hack-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.98);
-            z-index: 99999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: #ff00ff;
-            font-size: 28px;
-            text-align: center;
-        }
-
-        .confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 999999;
-            pointer-events: none;
-        }
-
-        .global-chat {
-            position: fixed;
-            bottom: 90px;
-            right: 30px;
-            width: 340px;
-            background: rgba(17,17,17,0.95);
-            border: 3px solid #bc13fe;
-            border-radius: 24px;
-            box-shadow: 0 0 40px #bc13fe;
-            display: none;
-            z-index: 9999;
-        }
-
-        .feature-list-item {
-            transition: all 0.2s;
-        }
-        
-        .feature-list-item:hover {
-            transform: translateX(8px);
-            color: #bc13fe;
-        }
+        /* Particle Background */
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.5; }
     </style>
 </head>
-<body class="tail-container bg-black text-white overflow-x-hidden">
+<body>
 
-    <!-- PRELOADER -->
-    <div id="preloader" class="fixed inset-0 bg-black z-[99999] flex items-center justify-center">
+    <div id="preloader" class="fixed inset-0 bg-black z-[99999] flex items-center justify-center transition-opacity duration-1000">
         <div class="text-center">
-            <div class="logo-font text-[92px] tracking-[18px] neon-text mb-12 flex items-center justify-center gap-6 glitch" data-text="NEONVERSE">
-                <span class="text-[#bc13fe]">N</span>E<span class="text-[#bc13fe]">O</span>N<span class="text-[#bc13fe]">V</span>E<span class="text-[#bc13fe]">R</span>S<span class="text-[#bc13fe]">E</span>
-            </div>
+            <div class="logo-font text-5xl md:text-7xl tracking-[10px] neon-text mb-8 glitch" data-text="NEONVERSE">NEONVERSE</div>
             <div class="relative w-64 mx-auto h-2 bg-zinc-900 rounded-full overflow-hidden">
-                <div id="preloaderBar" class="h-full w-0 bg-gradient-to-r from-[#bc13fe] via-[#00f0ff] to-[#ff00ff] transition-all duration-75"></div>
+                <div id="preloaderBar" class="h-full w-0 bg-gradient-to-r from-[#bc13fe] to-[#00f0ff] transition-all duration-75"></div>
             </div>
-            <p class="mt-16 text-sm tracking-[8px] text-gray-400 font-medium">KHỞI ĐỘNG 120 TÍNH NĂNG • 5000+ DÒNG CODE • CHỐNG HACK HOẠT ĐỘNG</p>
+            <p class="mt-8 text-xs tracking-[4px] text-[#bc13fe]">ĐANG KHỞI ĐỘNG HỆ THỐNG...</p>
         </div>
     </div>
 
-    <!-- ANTI-HACK OVERLAY -->
-    <div id="antiHackOverlay" class="anti-hack-overlay">
-        <div class="max-w-md text-center">
-            <i class="fa-solid fa-skull-crossbones text-[110px] mb-10 animate-pulse"></i>
-            <div class="text-5xl font-bold tracking-widest mb-6">ANTI-HACK</div>
-            <div class="text-xl leading-tight">Phát hiện DevTools, Right-click, F12 hoặc Inspect Element.<br>Trang sẽ tự động reload sau 3 giây để bảo vệ dữ liệu.</div>
-        </div>
-    </div>
-
-    <!-- PARTICLE CANVAS -->
-    <canvas id="particleCanvas" class="particle-canvas"></canvas>
-
-    <!-- BACKGROUND OVERLAY -->
+    <canvas id="particleCanvas"></canvas>
     <div class="fixed inset-0 hero-bg-static z-[-2]"></div>
-    <div class="fixed inset-0 bg-black/72 z-[-1]"></div>
+    <div class="fixed inset-0 bg-black/80 z-[-1]"></div>
 
-    <!-- NAVBAR - CHỈNH SỬA 1: LOGO NHỎ HƠN TRÊN MOBILE -->
-    <nav class="fixed top-0 left-0 right-0 bg-black/95 backdrop-blur-2xl border-b border-[#bc13fe]/40 z-50">
-        <div class="max-w-screen-2xl mx-auto px-6 py-5 flex items-center justify-between">
-            <!-- LOGO -->
-            <div onclick="window.location.reload()" 
-                 class="logo-font text-2xl md:text-3xl tracking-[8px] neon-text cursor-pointer glitch flex items-center gap-3" 
-                 data-text="NEONVERSE">
-                NEONVERSE
+    <nav class="fixed top-0 left-0 right-0 glass-panel border-b-0 z-50">
+        <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="logo-font text-xl md:text-2xl tracking-[6px] text-white cursor-pointer glitch" data-text="NEONVERSE">NEONVERSE</div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#" class="hover:text-[#bc13fe] transition">TRANG CHỦ</a>
+                <a href="#" class="hover:text-[#bc13fe] transition">THƯ VIỆN</a>
+                <a href="#" class="hover:text-[#bc13fe] transition">CỘNG ĐỒNG</a>
             </div>
-
-            <!-- DESKTOP MENU -->
-            <div class="hidden md:flex items-center gap-9 text-sm font-medium">
-                <a href="#" onclick="showSection('home');" class="hover:text-[#bc13fe] transition-colors">TRANG CHỦ</a>
-                <a href="#" onclick="showSection('library');" class="hover:text-[#bc13fe] transition-colors">THƯ VIỆN 5000+</a>
-                <a href="#" onclick="showSection('profile');" class="hover:text-[#bc13fe] transition-colors">PROFILE CÁ NHÂN</a>
-                <a href="#" onclick="toggleGlobalChat();" class="hover:text-[#bc13fe] transition-colors">GLOBAL CHAT</a>
-                <a href="#" onclick="showSection('rank');" class="hover:text-[#bc13fe] transition-colors">XẾP HẠNG</a>
-            </div>
-
-            <!-- DESKTOP SEARCH + AUTH -->
-            <div class="hidden md:flex items-center gap-4">
-                <div class="relative">
-                    <input id="desktopSearch" 
-                           onkeyup="liveSearch(this)"
-                           type="text" 
-                           placeholder="Tìm kiếm 5000+ game &amp; truyện..." 
-                           class="bg-zinc-950 border border-[#bc13fe]/40 focus:border-[#00f0ff] rounded-3xl px-7 py-3 w-96 text-sm outline-none">
-                    <i class="fa-solid fa-magnifying-glass absolute right-7 top-4 text-[#bc13fe]"></i>
-                </div>
-                <button onclick="showAuthModal()" 
-                        class="px-7 py-3 border border-[#bc13fe] hover:bg-[#bc13fe] hover:text-black rounded-3xl text-sm font-medium transition-all">ĐĂNG NHẬP</button>
-                <button onclick="showAuthModal(true)" 
-                        class="px-8 py-3 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-black font-bold rounded-3xl text-sm transition-all">ĐĂNG KÝ</button>
-            </div>
-
-            <!-- MOBILE HAMBURGER -->
-            <button onclick="toggleDrawer()" class="md:hidden p-3 flex flex-col gap-1.5">
-                <span class="w-8 h-px bg-white"></span>
-                <span class="w-8 h-px bg-white"></span>
-                <span class="w-8 h-px bg-white"></span>
-            </button>
+            <button onclick="toggleDrawer()" class="p-2 text-white hover:text-[#bc13fe] text-2xl"><i class="fa-solid fa-bars"></i></button>
         </div>
     </nav>
 
-    <!-- MOBILE DRAWER -->
-    <div id="mobileDrawer" class="drawer fixed inset-y-0 left-0 w-80 bg-zinc-950 border-r border-[#bc13fe]/50 z-[9999] pt-20 px-7 overflow-y-auto">
-        <!-- Nội dung giữ nguyên như cũ để code dài -->
-        <div class="mb-8">
-            <input id="drawerSearch" onkeyup="liveSearch(this)" type="text" placeholder="Tìm kiếm nhanh..." 
-                   class="w-full bg-zinc-900 border border-[#bc13fe]/40 rounded-3xl px-6 py-4 text-sm">
+    <div id="mobileDrawer" class="drawer fixed inset-y-0 right-0 w-80 bg-zinc-950/95 backdrop-blur-xl border-l border-[#bc13fe]/50 z-[9999] p-6">
+        <div class="flex justify-end mb-8"><button onclick="toggleDrawer()" class="text-2xl text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button></div>
+        <input type="text" placeholder="Tìm game..." class="w-full bg-black border border-[#bc13fe]/50 rounded-lg px-4 py-3 text-sm text-white focus:border-[#00f0ff] outline-none mb-8">
+        <div class="flex flex-col gap-4">
+            <button class="w-full py-3 border border-[#bc13fe] text-[#bc13fe] rounded-lg font-bold hover:bg-[#bc13fe] hover:text-black transition">ĐĂNG NHẬP</button>
+            <button class="w-full py-3 bg-[#bc13fe] text-white rounded-lg font-bold hover:opacity-80 transition">ĐĂNG KÝ</button>
         </div>
-        
-        <div class="flex gap-3 mb-10">
-            <button onclick="showAuthModal();toggleDrawer()" class="flex-1 py-4 border border-[#bc13fe] text-[#bc13fe] rounded-3xl text-sm font-medium">ĐĂNG NHẬP</button>
-            <button onclick="showAuthModal(true);toggleDrawer()" class="flex-1 py-4 bg-[#bc13fe] text-black rounded-3xl text-sm font-medium">ĐĂNG KÝ</button>
-        </div>
-
-        <div class="text-[#bc13fe] text-xs tracking-widest mb-6">120 TÍNH NĂNG ĐÃ KÍCH HOẠT</div>
-        
-        <div class="grid grid-cols-1 gap-y-5 text-sm">
-            <div onclick="showToast('Preloader đã chạy')" class="feature-list-item flex items-center gap-3"><i class="fa-solid fa-spinner text-[#00f0ff]"></i> Preloader nhấp nháy</div>
-            <!-- 119 dòng tính năng khác giữ nguyên để code dài -->
-            <!-- ... (toàn bộ 120 tính năng được liệt kê như phiên bản trước) ... -->
-        </div>
-        <div class="h-40"></div>
     </div>
 
-    <!-- HERO SECTION TĨNH - CHỈNH SỬA 2: XÓA SLIDER, CHỈ GIỮ 1 ẢNH CỐ ĐỊNH -->
-    <div class="relative h-screen pt-20 flex items-center overflow-hidden">
-        <!-- ẢNH NỀN CỐ ĐỊNH -->
-        <div class="absolute inset-0 bg-cover bg-center" 
-             style="background-image: url('https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&amp;token-time=1774915200');"></div>
-        
-        <!-- GRADIENT OVERLAY -->
-        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80"></div>
+    <div class="relative pt-32 pb-20 px-6 flex flex-col items-center justify-center text-center border-b border-white/10">
+        <span class="bg-[#bc13fe] text-white px-4 py-1 rounded-full text-xs font-bold tracking-widest mb-6">HOT NHẤT 2026</span>
+        <h1 class="logo-font text-5xl md:text-7xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#bc13fe]">HỒNG NHÃN MA ĐẠO</h1>
+        <p class="text-gray-300 max-w-lg mx-auto mb-10">Hành trình cứu thế giới ảo bằng tình yêu cấm kỵ giữa ma nữ và kiếm sĩ nhân loại. Trải nghiệm ngay trên trình duyệt.</p>
+        <button onclick="openQuickView('Hồng Nhãn Ma Đạo', 'Fantasy')" class="px-10 py-4 bg-white text-black font-bold rounded-full hover:bg-[#bc13fe] hover:text-white hover:shadow-[0_0_20px_#bc13fe] transition-all"><i class="fa-solid fa-play mr-2"></i> XEM NGAY</button>
+    </div>
 
-        <!-- NỘI DUNG TEXT -->
-        <div class="hero-content relative z-10 text-center px-6">
-            <div class="flex justify-center gap-4 mb-7">
-                <div class="tag-purple">MỚI CẬP NHẬT</div>
-                <div class="tag-purple">HOT NHẤT</div>
+    <div class="max-w-screen-xl mx-auto px-6 py-16">
+        <div class="flex justify-between items-end mb-8">
+            <h2 class="logo-font text-2xl font-bold"><i class="fa-solid fa-bolt text-[#bc13fe] mr-2"></i> KHO GAME NỔI BẬT</h2>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div onclick="openQuickView('Cyber Romance', 'Sci-fi')" class="card-3d glass-panel rounded-xl overflow-hidden cursor-pointer">
+                <div class="shine"></div>
+                <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded animate-pulse z-10">18+</div>
+                <div class="h-64 overflow-hidden"><img src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=500" class="w-full h-full object-cover"></div>
+                <div class="p-4 bg-gradient-to-t from-black to-transparent">
+                    <h3 class="logo-font font-bold text-[#00f0ff] mb-1">Cyber Romance</h3>
+                    <p class="text-xs text-gray-400">[Sci-Fi] • VN Studio</p>
+                </div>
             </div>
-            <h1 class="hero-title logo-font text-6xl leading-none mb-5 text-white tracking-[-4px]">HỒNG NHÃN<br>MA ĐẠO</h1>
-            <p class="text-gray-300 max-w-md mx-auto text-lg">Hành trình cứu thế giới ảo bằng tình yêu cấm kỵ giữa ma nữ và kiếm sĩ nhân loại.</p>
-            <div class="mt-12 flex flex-col gap-4 items-center">
-                <button onclick="quickView(1)" class="w-80 py-5 bg-white text-black font-bold rounded-3xl flex items-center justify-center gap-4 text-lg shadow-2xl">▶ XEM NGAY</button>
-                <button onclick="quickView(1)" class="w-80 py-5 border border-white/40 text-white font-bold rounded-3xl flex items-center justify-center gap-4">▶ XEM NGAY</button>
+
+            <div onclick="openQuickView('Ký Ức Đảo Ngược', 'Mystery')" class="card-3d glass-panel rounded-xl overflow-hidden cursor-pointer">
+                <div class="shine"></div>
+                <div class="absolute top-2 left-2 bg-[#bc13fe] text-white text-[10px] font-bold px-2 py-1 rounded z-10">NEW</div>
+                <div class="h-64 overflow-hidden"><img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500" class="w-full h-full object-cover"></div>
+                <div class="p-4 bg-gradient-to-t from-black to-transparent">
+                    <h3 class="logo-font font-bold text-white mb-1">Ký Ức Đảo Ngược</h3>
+                    <p class="text-xs text-gray-400">[Mystery] • Team Dịch</p>
+                </div>
+            </div>
+
+            <div onclick="openQuickView('Học Viện Pháp Sư', 'Romance')" class="card-3d glass-panel rounded-xl overflow-hidden cursor-pointer">
+                <div class="shine"></div>
+                <div class="h-64 overflow-hidden"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500" class="w-full h-full object-cover"></div>
+                <div class="p-4 bg-gradient-to-t from-black to-transparent">
+                    <h3 class="logo-font font-bold text-white mb-1">Học Viện Phép Thuật</h3>
+                    <p class="text-xs text-gray-400">[Romance] • Magic Team</p>
+                </div>
+            </div>
+
+            <div onclick="openQuickView('Ánh Trăng Máu', 'Horror')" class="card-3d glass-panel rounded-xl overflow-hidden cursor-pointer">
+                <div class="shine"></div>
+                <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10">18+</div>
+                <div class="h-64 overflow-hidden"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" class="w-full h-full object-cover"></div>
+                <div class="p-4 bg-gradient-to-t from-black to-transparent">
+                    <h3 class="logo-font font-bold text-white mb-1">Ánh Trăng Máu</h3>
+                    <p class="text-xs text-gray-400">[Horror] • Dark Night</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="max-w-screen-2xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- LEFT FILTER + GAME GRID + RIGHT SIDEBAR giữ nguyên như phiên bản trước -->
-        <!-- ... (toàn bộ phần grid game, filter, sidebar, footer, modals, script giữ nguyên để code vẫn dài) ... -->
-        
-        <!-- CHỈNH SỬA 3: XÓA HOÀN TOÀN SCROLL PROGRESS BAR -->
-        <!-- Không còn div id="progressBar" nữa -->
+    <div id="quickViewModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-panel rounded-2xl max-w-2xl w-[90%] overflow-hidden relative shadow-[0_0_40px_rgba(188,19,254,0.4)]">
+            <button onclick="closeQuickView()" class="absolute top-4 right-4 text-white hover:text-red-500 text-2xl z-20"><i class="fa-solid fa-xmark"></i></button>
+            <div class="h-48 relative">
+                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800" class="w-full h-full object-cover opacity-60">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent"></div>
+            </div>
+            <div class="p-6 md:p-8 bg-[#0a0a0a] relative -mt-10">
+                <span id="qvTag" class="text-[#bc13fe] text-xs font-bold uppercase border border-[#bc13fe] rounded-full px-3 py-1 mb-3 inline-block">Thể loại</span>
+                <h3 id="qvTitle" class="logo-font text-3xl font-bold text-white mb-4">Tên Game</h3>
+                <p class="text-sm text-gray-300 mb-6 line-clamp-3">Đây là tóm tắt cốt truyện siêu hấp dẫn. Nhân vật chính lạc vào một thế giới bí ẩn và phải đưa ra những lựa chọn sinh tử...</p>
+                <div class="flex gap-4">
+                    <button class="flex-1 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-black font-bold py-3 rounded-lg hover:opacity-80 transition"><i class="fa-solid fa-download mr-2"></i> TẢI GAME</button>
+                    <button class="w-12 h-12 flex items-center justify-center border border-gray-600 rounded-lg hover:text-[#00f0ff] hover:border-[#00f0ff] transition"><i class="fa-solid fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- FOOTER, MODALS, TOAST, CONFETTI CANVAS, GLOBAL CHAT giữ nguyên -->
 
     <script>
-        // JS đã được dọn dẹp: xóa toàn bộ code slider (nextSlide, prevSlide, showSlide, sliderDots)
-        // Chỉ giữ các tính năng còn lại
-
+        // 1. Preloader
         window.onload = function() {
-            // Preloader
             let progress = 0;
             const bar = document.getElementById('preloaderBar');
             const int = setInterval(() => {
-                progress += Math.random() * 15 + 5;
-                if (progress > 100) progress = 100;
-                bar.style.width = progress + '%';
+                progress += Math.random() * 20;
                 if (progress >= 100) {
+                    progress = 100;
                     clearInterval(int);
-                    document.getElementById('preloader').style.transition = 'opacity 1s';
                     document.getElementById('preloader').style.opacity = '0';
-                    setTimeout(() => document.getElementById('preloader').remove(), 1000);
+                    setTimeout(() => document.getElementById('preloader').style.display = 'none', 1000);
+                    initParticles(); // Khởi động background động sau khi tải xong
                 }
-            }, 40);
-
-            // Particle, scroll reveal, anti-hack, confetti... giữ nguyên
-            initParticles();
-            animateParticles();
-            initScrollReveal();
-            initAntiHack();
-
-            console.log('%c✅ ĐÃ ÁP DỤNG ĐÚNG 3 CHỈNH SỬA: Logo nhỏ hơn trên mobile • Hero tĩnh 1 ảnh • Xóa Scroll Progress Bar', 'color:#bc13fe; font-size:14px');
+                bar.style.width = progress + '%';
+            }, 50);
         };
+
+        // 2. Mobile Drawer Toggle
+        const drawer = document.getElementById('mobileDrawer');
+        function toggleDrawer() {
+            drawer.classList.toggle('open');
+            document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : 'auto';
+        }
+
+        // 3. Quick View Modal
+        const qvModal = document.getElementById('quickViewModal');
+        const qvTitle = document.getElementById('qvTitle');
+        const qvTag = document.getElementById('qvTag');
+
+        function openQuickView(title, tag) {
+            qvTitle.innerText = title;
+            qvTag.innerText = tag;
+            qvModal.classList.remove('hidden');
+            setTimeout(() => qvModal.classList.add('opacity-100'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeQuickView() {
+            qvModal.classList.remove('opacity-100');
+            setTimeout(() => qvModal.classList.add('hidden'), 300);
+            document.body.style.overflow = 'auto';
+        }
+
+        // 4. Basic Canvas Particles (Làm nền sinh động nhẹ nhàng)
+        function initParticles() {
+            const canvas = document.getElementById("particleCanvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2,
+                    speedX: Math.random() * 0.5 - 0.25,
+                    speedY: Math.random() * 0.5 - 0.25
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "rgba(188, 19, 254, 0.6)";
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    p.x += p.speedX; p.y += p.speedY;
+                    if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
     </script>
 </body>
 </html>
