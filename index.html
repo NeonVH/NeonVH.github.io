@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V9</title>
+    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V10</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -19,7 +19,7 @@
             filter: blur(8px); transform: scale(1.05); 
         }
 
-        /* 3D Card Hover & Shine (Giữ nguyên hiệu ứng ngang mượt) */
+        /* 3D Card Hover & Shine */
         .card-3d { transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
         .card-3d:hover { transform: translateX(5px) scale(1.01); box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); z-index: 10; border-color: var(--neon-purple); }
         .shine {
@@ -37,13 +37,10 @@
         .glitch:hover::after { animation: glitch-anim 320ms infinite linear reverse; color: #ff00ff; left: -2px; text-shadow: 2px 0 #00ffff; }
         @keyframes glitch-anim { 0% { clip: rect(15px,9999px,35px,0); } 20% { clip: rect(55px,9999px,75px,0); } 40% { clip: rect(8px,9999px,28px,0); } 60% { clip: rect(40px,9999px,60px,0); } 80% { clip: rect(20px,9999px,40px,0); } 100% { clip: rect(60px,9999px,80px,0); } }
 
-        /* UI Utilities */
         .neon-text { text-shadow: 0 0 8px #bc13fe, 0 0 18px #bc13fe, 0 0 38px #00f0ff; }
         .glass-panel { background: rgba(10,10,10,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(188,19,254,0.3); }
-        
         #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.5; }
         
-        /* SPA Views */
         .view-section { transition: opacity 0.4s ease, transform 0.4s ease; }
         .view-hidden { opacity: 0; transform: scale(0.98) translateY(20px); pointer-events: none; position: absolute; width: 100%; visibility: hidden; }
         .view-active { opacity: 1; transform: scale(1) translateY(0); position: relative; visibility: visible; }
@@ -123,23 +120,32 @@
             <div class="w-full md:w-2/3 flex flex-col relative z-10">
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <span id="detailGenre" class="text-[10px] md:text-xs font-black tracking-widest text-black bg-[#00f0ff] px-3 py-1 rounded-full uppercase truncate max-w-full">Genre</span>
-                    <span id="detailVersion" class="text-[10px] md:text-xs font-bold text-[#bc13fe] border border-[#bc13fe] px-3 py-1 rounded-full">v1.0</span>
-                    <span id="detailProgress" class="text-[10px] md:text-xs font-bold text-yellow-400 border border-yellow-400 px-3 py-1 rounded-full"><i class="fa-solid fa-spinner mr-1"></i> Tiến độ</span>
+                    <span id="detailPlatform" class="text-[10px] md:text-xs font-bold text-gray-300 border border-gray-500 px-3 py-1 rounded-full"><i class="fa-solid fa-desktop mr-1"></i> PC</span>
+                    <span id="detailTransType" class="text-[10px] md:text-xs font-bold text-[#ff00ff] border border-[#ff00ff] px-3 py-1 rounded-full"><i class="fa-solid fa-language mr-1"></i> Dev+AI</span>
                 </div>
                 
                 <h1 id="detailTitle" class="logo-font text-3xl md:text-5xl font-black mb-3 neon-text text-white leading-tight">Title</h1>
-                <p class="text-xs md:text-sm text-gray-400 font-medium mb-1">Tác giả: <span id="detailAuthor" class="text-white font-bold">Đang cập nhật</span></p>
-                <p class="text-xs md:text-sm text-gray-400 font-medium mb-6">Nhóm dịch: <span id="detailTeam" class="text-[#bc13fe] font-bold">Team</span></p>
+                
+                <div class="flex items-center gap-2 text-xs md:text-sm text-gray-400 font-medium mb-1">
+                    <span>Tác giả: <span id="detailAuthor" class="text-white font-bold">Đang cập nhật</span></span>
+                    <span>|</span>
+                    <span>Version: <span id="detailVersion" class="text-[#bc13fe] font-bold">v1.0</span></span>
+                </div>
+                <p class="text-xs md:text-sm text-gray-400 font-medium mb-6">Nhóm dịch: <span id="detailTeam" class="text-[#bc13fe] font-bold mr-2">Team</span> <span id="detailProgress" class="font-bold text-yellow-400"><i class="fa-solid fa-spinner mr-1"></i> Tiến độ</span></p>
                 
                 <h3 class="logo-font text-lg md:text-xl font-bold mb-2 border-b border-white/10 pb-2 text-[#bc13fe]">TÓM TẮT CỐT TRUYỆN</h3>
-                <p id="detailDesc" class="text-gray-300 leading-relaxed text-sm md:text-base mb-6">Desc</p>
+                <p id="detailDesc" class="text-gray-300 leading-relaxed text-sm md:text-base mb-2">Desc</p>
+
+                <div id="detailAdminMsgBox" class="mt-4 p-4 bg-yellow-400/10 border border-yellow-400/30 rounded-xl hidden">
+                    <h4 class="font-bold text-yellow-400 text-sm mb-2 uppercase tracking-wider"><i class="fa-solid fa-bullhorn mr-2"></i>Lời Nhắn / Hướng dẫn</h4>
+                    <div id="detailAdminMsg" class="text-sm text-gray-200 whitespace-pre-line leading-relaxed"></div>
+                </div>
             </div>
         </div>
         
         <div>
             <h3 class="logo-font text-xl md:text-2xl font-bold mb-4 uppercase text-[#bc13fe]"><i class="fa-solid fa-images mr-2"></i> Ảnh Giới Thiệu</h3>
-            <div id="detailScreenshots" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                </div>
+            <div id="detailScreenshots" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"></div>
         </div>
     </div>
 
@@ -178,6 +184,17 @@
                     </div>
                 </div>
 
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Hệ Máy</label>
+                        <input id="adPlatform" required type="text" placeholder="VD: Android/PC" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Dạng Dịch</label>
+                        <input id="adTransType" required type="text" placeholder="VD: Dev+AI, Thô AI" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Thể Loại (Tags)</label>
                     <input id="adGenre" required type="text" placeholder="VD: Romance, Fantasy..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm">
@@ -198,6 +215,15 @@
                     <textarea id="adDesc" required class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none h-24 resize-none text-sm"></textarea>
                 </div>
                 
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Lời nhắn / Hướng dẫn (Bôi đen chữ & chọn màu)</label>
+                    <div class="flex items-center gap-2 mb-2 bg-black/60 p-2 rounded-lg border border-white/10 w-max">
+                        <input type="color" id="adColorPicker" value="#00f0ff" class="h-6 w-8 cursor-pointer bg-transparent border-none p-0">
+                        <button type="button" onclick="applyColorToMsg()" class="text-[10px] md:text-xs bg-zinc-800 border border-white/20 px-3 py-1 rounded hover:bg-zinc-700 transition">Tô màu chữ</button>
+                    </div>
+                    <textarea id="adMsg" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none h-24 resize-none text-sm" placeholder="VD: Nhớ cài font trước khi chơi..."></textarea>
+                </div>
+
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="ad18" class="w-4 h-4 accent-red-500">
                     <label for="ad18" class="text-red-500 font-bold text-sm">Đánh dấu 18+</label>
@@ -209,8 +235,7 @@
 
         <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-yellow-400 relative overflow-hidden">
             <h3 class="logo-font text-xl md:text-2xl font-black text-yellow-400 mb-6 uppercase tracking-wider"><i class="fa-solid fa-list mr-2"></i> Quản Lý Bài Đăng VN+</h3>
-            <div id="adminGameManageListContainer" class="flex flex-col gap-3 md:gap-4">
-                </div>
+            <div id="adminGameManageListContainer" class="flex flex-col gap-3 md:gap-4"></div>
         </div>
     </div>
 
@@ -232,11 +257,11 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // 1. DATA CƠ BẢN (Kèm tác giả, version, progress mặc định)
+        // 1. DATA CƠ BẢN
         const defaultGamesDB = [
-            { id: 1, title: "Hồng Nhãn Ma Đạo", author: "MagicVN", version: "v1.0 Final", progress: "100%", genre: "Fantasy, Romance, Visual Novel", team: "Magic Team", is18: false, cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500", desc: "Kiệt tác Fantasy, đồ họa siêu đỉnh.", screenshots: [] },
-            { id: 2, title: "Cyber Romance 2077", author: "NeoCity", version: "Ep. 3", progress: "Đang dịch", genre: "Sci-Fi, 3DCG, Dystopia", team: "VN Studio", is18: true, cover: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=500", desc: "Thành phố Cyberpunk năm 2077.", screenshots: [] },
-            { id: 3, title: "Ký Ức Đảo Ngược", author: "Unknown", version: "v0.5", progress: "Hoàn thành 50%", genre: "Mystery, Thriller", team: "Dark Night", is18: false, cover: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500", desc: "Bí ẩn rùng rợn qua chiếc điện thoại cũ.", screenshots: [] }
+            { id: 1, title: "Hồng Nhãn Ma Đạo", author: "MagicVN", version: "v1.0 Final", progress: "100%", platform: "Android/PC", transType: "Dev+AI", genre: "Fantasy, Romance, Visual Novel", team: "Magic Team", is18: false, cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500", desc: "Kiệt tác Fantasy, đồ họa siêu đỉnh.", adminMsg: "<span style='color: #00f0ff'>Game đã test kỹ trên Android 13, không lỗi vặt!</span>", screenshots: [] },
+            { id: 2, title: "Cyber Romance 2077", author: "NeoCity", version: "Ep. 3", progress: "Đang dịch", platform: "PC", transType: "Thô AI", genre: "Sci-Fi, 3DCG, Dystopia", team: "VN Studio", is18: true, cover: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=500", desc: "Thành phố Cyberpunk năm 2077.", adminMsg: "<span style='color: #ff00ff'>Cẩn thận: Dịch thô AI nên nhiều đoạn xưng hô sẽ hơi cấn nhé!</span>", screenshots: [] },
+            { id: 3, title: "Ký Ức Đảo Ngược", author: "Unknown", version: "v0.5", progress: "Hoàn thành 50%", platform: "Android", transType: "Dev+AI", genre: "Mystery, Thriller", team: "Dark Night", is18: false, cover: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500", desc: "Bí ẩn rùng rợn qua chiếc điện thoại cũ.", adminMsg: "", screenshots: [] }
         ];
 
         let gamesDB = []; 
@@ -253,33 +278,33 @@
             gamesDB = [...customGames, ...defaultGamesDB];
         }
 
-        // UPDATE: RENDER DẠNG DANH SÁCH NGANG (LIST NGANG - FIX CŨ)
         function renderGameGrid() {
             const container = document.getElementById('gameGridContainer');
             if(!container) return;
             container.innerHTML = gamesDB.map(game => `
                 <div onclick="openGameDetail('${game.id}')" class="card-3d glass-panel rounded-xl md:rounded-2xl overflow-hidden flex flex-row items-stretch h-[150px] md:h-[180px]">
-                    
                     <div class="w-32 md:w-44 flex-shrink-0 relative">
                         ${game.is18 ? `<div class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] md:text-[11px] font-bold px-2 py-0.5 rounded shadow-lg z-10 animate-pulse">18+</div>` : ''}
                         <img src="${game.cover}" class="w-full h-full object-cover cursor-pointer" onclick="event.stopPropagation(); openLightbox(this.src)">
                     </div>
-                    
                     <div class="flex-1 p-3 md:p-5 bg-[#0a0a0a] relative flex flex-col min-w-0">
                         <div class="flex items-start justify-between mb-1 gap-2 border-b border-white/5 pb-1">
                             <h3 class="logo-font font-bold text-white text-base md:text-xl truncate text-neon">${game.title}</h3>
                         </div>
-                        
                         <div class="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 truncate mb-1">
                             <span>By: <span class="text-white font-bold">${game.author || 'Unknown'}</span></span>
                             <span>|</span>
                             <span>v: <span class="text-[#bc13fe] font-bold">${game.version || 'v1.0'}</span></span>
                         </div>
-
                         <div class="text-[#00f0ff] text-[10px] md:text-xs font-black uppercase tracking-widest truncate w-full mb-1">
                             ${game.genre}
                         </div>
                         
+                        <div class="flex items-center justify-between text-[10px] md:text-xs font-bold mb-auto mt-1">
+                            <span class="text-gray-300 truncate pr-2"><i class="fa-solid fa-desktop text-[#00f0ff] mr-1"></i>${game.platform || 'Android/PC'}</span>
+                            <span class="text-[#ff00ff] flex-shrink-0"><i class="fa-solid fa-language mr-1"></i>${game.transType || 'Dev+AI'}</span>
+                        </div>
+
                         <div class="flex items-center justify-between text-[10px] md:text-sm text-gray-400 mt-auto pt-2 border-t border-white/5">
                             <span class="truncate pr-2"><i class="fa-solid fa-users text-[#bc13fe] mr-1"></i>${game.team}</span>
                             <span class="flex-shrink-0 font-bold text-yellow-400 whitespace-nowrap"><i class="fa-solid fa-spinner mr-1"></i>${game.progress || 'Đang cập nhật'}</span>
@@ -289,22 +314,15 @@
             `).join('');
         }
 
-        // UPDATE: RENDER DANH SÁCH GAME ĐỂ ADMIN SỬA/XÓA (NEW FEATURE)
         function renderAdminManageList() {
             const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
             const container = document.getElementById('adminGameManageListContainer');
             if(!container) return;
-
-            if(customGames.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Chưa có bài đăng VN+ nào của Admin.</p>';
-                return;
-            }
+            if(customGames.length === 0) { container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Chưa có bài đăng VN+ nào của Admin.</p>'; return; }
 
             container.innerHTML = customGames.map(game => `
                 <div class="card-3d glass-panel p-3 rounded-xl flex items-center h-[120px]">
-                    <div class="w-24 flex-shrink-0 relative rounded-lg overflow-hidden h-full">
-                        <img src="${game.cover}" class="w-full h-full object-cover">
-                    </div>
+                    <div class="w-24 flex-shrink-0 relative rounded-lg overflow-hidden h-full"><img src="${game.cover}" class="w-full h-full object-cover"></div>
                     <div class="flex-1 p-3 flex flex-col min-w-0 h-full justify-between">
                         <h3 class="font-bold text-white truncate text-base">${game.title}</h3>
                         <p class="text-xs text-gray-500 truncate">${game.author || 'Unknown'} | ${game.genre}</p>
@@ -317,48 +335,54 @@
             `).join('');
         }
 
-        // --- HÀM HỖ TRỢ ĐỌC FILE ẢNH THÀNH BASE64 ---
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
+        function readFileAsBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); reader.readAsDataURL(file); }); }
+
+        // TOOL TÔ MÀU CHỮ
+        function applyColorToMsg() {
+            const textarea = document.getElementById('adMsg');
+            const color = document.getElementById('adColorPicker').value;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            if (!selectedText) return showToast("Hãy bôi đen chữ cần tô màu trước!", "error");
+            
+            const wrappedText = `<span style="color: ${color}">${selectedText}</span>`;
+            textarea.value = textarea.value.substring(0, start) + wrappedText + textarea.value.substring(end);
+            
+            // Focus lại textarea
+            textarea.focus();
         }
 
-        // 3. LOGIC ADMIN POST & EDIT (UPDATE V8: Hợp nhất post/edit)
         async function handleAdminFormSubmit(e) {
             e.preventDefault();
-            
             const gameId = document.getElementById('adGameId').value;
             const title = document.getElementById('adTitle').value;
             const author = document.getElementById('adAuthor').value;
             const version = document.getElementById('adVersion').value;
             const progress = document.getElementById('adProgress').value;
+            const platform = document.getElementById('adPlatform').value;
+            const transType = document.getElementById('adTransType').value;
             const genre = document.getElementById('adGenre').value;
             const team = document.getElementById('adTeam').value;
             const desc = document.getElementById('adDesc').value;
+            const adminMsg = document.getElementById('adMsg').value;
             const is18 = document.getElementById('ad18').checked;
 
-            if(!title || !author || !genre || !team || !desc || !version || !progress) {
-                return showToast("Vui lòng điền đầy đủ chữ!");
+            if(!title || !author || !genre || !team || !desc || !version || !progress || !platform || !transType) {
+                return showToast("Vui lòng điền đầy đủ các thông tin chữ!");
             }
 
-            // Xử lý Upload Ảnh Bìa (Hỗ trợ edit không chọn ảnh bìa mới)
             const coverFileInput = document.getElementById('adCoverFile');
             let coverBase64 = "";
-
             if (coverFileInput.files.length > 0) {
                 showToast("Đang xử lý hình ảnh, chờ xíu...");
                 coverBase64 = await readFileAsBase64(coverFileInput.files[0]);
             }
 
-            // Xử lý Upload Ảnh Giới Thiệu (Hỗ trợ edit không chọn ảnh mới)
             const screenshotsInput = document.getElementById('adScreenshotsFile');
             let screenshotsArray = [];
             if (screenshotsInput.files.length > 0) {
-                showToast("Đang xử lý ảnh giới thiệu, chờ xíu...");
                 const filesToProcess = Math.min(screenshotsInput.files.length, 5);
                 for(let i = 0; i < filesToProcess; i++) {
                     const base64Img = await readFileAsBase64(screenshotsInput.files[i]);
@@ -369,227 +393,95 @@
             const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
 
             if(gameId) {
-                // ĐANG CHẾ ĐỘ SỬA GAME (EDIT)
                 const index = customGames.findIndex(g => g.id === gameId);
                 if(index === -1) return showToast("Không tìm thấy game cần sửa!", "error");
 
-                // Cập nhật các thông tin text
-                customGames[index].title = title;
-                customGames[index].author = author;
-                customGames[index].version = version;
-                customGames[index].progress = progress;
-                customGames[index].genre = genre;
-                customGames[index].team = team;
-                customGames[index].desc = desc;
-                customGames[index].is18 = is18;
-                
-                // Nếu upload ảnh mới thì thay, không thì giữ nguyên
+                customGames[index].title = title; customGames[index].author = author; customGames[index].version = version;
+                customGames[index].progress = progress; customGames[index].platform = platform; customGames[index].transType = transType;
+                customGames[index].genre = genre; customGames[index].team = team; customGames[index].desc = desc; customGames[index].adminMsg = adminMsg; customGames[index].is18 = is18;
                 if(coverBase64) customGames[index].cover = coverBase64;
                 if(screenshotsArray.length > 0) customGames[index].screenshots = screenshotsArray;
 
                 showToast("Cập nhật bài đăng thành công!");
-                
             } else {
-                // ĐANG CHẾ ĐỘ ĐĂNG MỚI (POST)
-                if(!coverBase64) return showToast("Phải upload ảnh bìa cho game mới!");
-                
-                const newGame = {
-                    id: 'custom_' + Date.now(), // ID độc nhất dựa trên time
-                    title, author, version, progress, genre, team, cover: coverBase64, desc, is18, screenshots: screenshotsArray
-                };
+                if(!coverBase64) return showToast("Phải upload ảnh bìa cho game mới!", "error");
+                const newGame = { id: 'custom_' + Date.now(), title, author, version, progress, platform, transType, genre, team, cover: coverBase64, desc, adminMsg, is18, screenshots: screenshotsArray };
                 customGames.unshift(newGame);
                 showToast("Đăng bài thành công! Đã lên Trang chủ.");
             }
 
-            // Lưu dữ liệu vào trình duyệt
             try {
                 localStorage.setItem('nv_custom_games', JSON.stringify(customGames));
-                resetAdminForm(); // Reset form, nút và ID ẩn
-                loadGamesFromStorage(); // Reload data
-                renderGameGrid(); // Reload grid trang chủ
-                renderAdminManageList(); // Reload danh sách quản trị
-                switchView('homeView'); // Về trang chủ
-            } catch (error) {
-                showToast("Lỗi: File ảnh quá nặng (vượt bộ nhớ Web)!", "error");
-            }
+                resetAdminForm(); loadGamesFromStorage(); renderGameGrid(); renderAdminManageList(); switchView('homeView');
+            } catch (error) { showToast("Lỗi: File ảnh quá nặng (vượt bộ nhớ Web)!", "error"); }
         }
 
-        // Bắt đầu chế độ sửa game (Edit Mode)
         function startEditGame(gameId) {
             const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
             const game = customGames.find(g => g.id === gameId);
             if(!game) return showToast("Lỗi: Không tìm thấy bài đăng!", "error");
 
-            // Đổ dữ liệu cũ vào form
             document.getElementById('adGameId').value = game.id;
-            document.getElementById('adTitle').value = game.title;
-            document.getElementById('adAuthor').value = game.author || "";
-            document.getElementById('adVersion').value = game.version || "";
-            document.getElementById('adProgress').value = game.progress || "";
-            document.getElementById('adGenre').value = game.genre;
-            document.getElementById('adTeam').value = game.team;
-            document.getElementById('adDesc').value = game.desc;
+            document.getElementById('adTitle').value = game.title; document.getElementById('adAuthor').value = game.author || "";
+            document.getElementById('adVersion').value = game.version || ""; document.getElementById('adProgress').value = game.progress || "";
+            document.getElementById('adPlatform').value = game.platform || ""; document.getElementById('adTransType').value = game.transType || "";
+            document.getElementById('adGenre').value = game.genre; document.getElementById('adTeam').value = game.team;
+            document.getElementById('adDesc').value = game.desc; document.getElementById('adMsg').value = game.adminMsg || "";
             document.getElementById('ad18').checked = game.is18;
-
-            // Chuyển nút submit thành "CẬP NHẬT GAME"
             document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-pen mr-2"></i> CẬP NHẬT GAME NÀY`;
-            showToast("Đã điền thông tin bài đăng, hãy sửa đổi nhé.");
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast("Đã điền thông tin bài đăng, hãy sửa đổi nhé."); window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Xóa game khỏi hệ thống (Delete)
         function deleteGame(gameId) {
             if(!confirm("Bạn có chắc chắn muốn XÓA VĨNH VIỄN bài đăng VN+ này không?")) return;
-            
             const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
-            const filteredGames = customGames.filter(g => g.id !== gameId);
-            
-            localStorage.setItem('nv_custom_games', JSON.stringify(filteredGames));
-            showToast("Đã xóa bài đăng khỏi hệ thống.");
-            
-            // Reload & quay về Home
-            loadGamesFromStorage();
-            renderGameGrid();
-            renderAdminManageList();
-            switchView('homeView');
+            localStorage.setItem('nv_custom_games', JSON.stringify(customGames.filter(g => g.id !== gameId)));
+            showToast("Đã xóa bài đăng khỏi hệ thống."); loadGamesFromStorage(); renderGameGrid(); renderAdminManageList(); switchView('homeView');
         }
 
-        function resetAdminForm() {
-            document.getElementById('adGameId').value = ""; // Xóa ID ẩn
-            document.getElementById('adminForm').reset(); // Reset fields
-            // Reset nút submit về "XUẤT BẢN GAME"
-            document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME`;
-        }
+        function resetAdminForm() { document.getElementById('adGameId').value = ""; document.getElementById('adminForm').reset(); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME`; }
 
-        // 4. NAVIGATION QUẢN LÝ CÁC TRANG (SPA ROUTING)
         function switchView(viewId) {
             const views = ['homeView', 'detailView', 'adminView'];
-            views.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                if(id === viewId) {
-                    el.classList.remove('view-hidden'); el.classList.add('view-active');
-                } else {
-                    el.classList.remove('view-active'); el.classList.add('view-hidden');
-                }
-            });
-
-            // Nếu switch sang trang Admin thì load thêm list quản lý game
-            if(viewId === 'adminView') renderAdminManageList();
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            views.forEach(id => { const el = document.getElementById(id); if(!el) return; if(id === viewId) { el.classList.remove('view-hidden'); el.classList.add('view-active'); } else { el.classList.remove('view-active'); el.classList.add('view-hidden'); } });
+            if(viewId === 'adminView') renderAdminManageList(); window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function openGameDetail(gameId) {
             const game = gamesDB.find(g => g.id == gameId);
             if(!game) return;
-            document.getElementById('detailCover').src = game.cover;
-            document.getElementById('detailTitle').innerText = game.title;
-            document.getElementById('detailAuthor').innerText = game.author || "Đang cập nhật";
-            document.getElementById('detailVersion').innerText = game.version || "v1.0";
+            document.getElementById('detailCover').src = game.cover; document.getElementById('detailTitle').innerText = game.title;
+            document.getElementById('detailAuthor').innerText = game.author || "Đang cập nhật"; document.getElementById('detailVersion').innerText = game.version || "v1.0";
             document.getElementById('detailProgress').innerHTML = `<i class="fa-solid fa-spinner mr-1"></i> ${game.progress || "Đang cập nhật"}`;
-            document.getElementById('detailGenre').innerText = game.genre;
-            document.getElementById('detailTeam').innerText = game.team;
-            document.getElementById('detailDesc').innerText = game.desc;
+            document.getElementById('detailPlatform').innerHTML = `<i class="fa-solid fa-desktop mr-1"></i> ${game.platform || "Android/PC"}`;
+            document.getElementById('detailTransType').innerHTML = `<i class="fa-solid fa-language mr-1"></i> ${game.transType || "Dev+AI"}`;
+            document.getElementById('detailGenre').innerText = game.genre; document.getElementById('detailTeam').innerText = game.team; document.getElementById('detailDesc').innerText = game.desc;
 
-            // Render Screenshots
-            const scContainer = document.getElementById('detailScreenshots');
-            if(game.screenshots && game.screenshots.length > 0) {
-                scContainer.innerHTML = game.screenshots.map(img => `
-                    <div class="rounded-xl overflow-hidden border border-white/10 aspect-video hover:border-[#bc13fe] transition shadow-lg cursor-pointer" onclick="openLightbox(this.querySelector('img').src)">
-                        <img src="${img}" class="w-full h-full object-cover">
-                    </div>
-                `).join('');
+            // Xử lý Lời Nhắn Admin
+            const adminMsgBox = document.getElementById('detailAdminMsgBox');
+            if(game.adminMsg && game.adminMsg.trim() !== "") {
+                adminMsgBox.classList.remove('hidden');
+                document.getElementById('detailAdminMsg').innerHTML = game.adminMsg;
             } else {
-                scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu cho game này.</p>';
+                adminMsgBox.classList.add('hidden');
             }
 
+            const scContainer = document.getElementById('detailScreenshots');
+            if(game.screenshots && game.screenshots.length > 0) { scContainer.innerHTML = game.screenshots.map(img => `<div class="rounded-xl overflow-hidden border border-white/10 aspect-video hover:border-[#bc13fe] transition shadow-lg cursor-pointer" onclick="openLightbox(this.querySelector('img').src)"><img src="${img}" class="w-full h-full object-cover"></div>`).join(''); } 
+            else { scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu cho game này.</p>'; }
             switchView('detailView');
         }
 
-        // UPDATE: HÀM ĐÓNG MỞ LIGHTBOX (Xem ảnh bao quát - NEW FEATURE)
-        function openLightbox(src) {
-            const lb = document.getElementById('imageLightbox');
-            const lbImg = document.getElementById('lightboxImage');
-            lbImg.src = src;
-            lb.classList.remove('hidden');
-            setTimeout(() => lb.classList.add('opacity-100'), 10);
-            document.body.style.overflow = 'hidden'; // Khóa cuộn trang khi xem ảnh
-        }
-
-        function closeLightbox() {
-            const lb = document.getElementById('imageLightbox');
-            lb.classList.remove('opacity-100');
-            setTimeout(() => {
-                lb.classList.add('hidden');
-                document.body.style.overflow = 'auto'; // Mở lại cuộn trang
-            }, 300);
-        }
-
-        function toggleDrawer() { 
-            const drawer = document.getElementById('mobileDrawer');
-            drawer.classList.toggle('translate-x-full'); drawer.classList.toggle('translate-x-0');
-        }
-
-        // 6. TÀI KHOẢN & TOAST (RÚT GỌN)
-        function toggleAuthModal(mode) { 
-            // V9 chỉ còn Đăng nhập Admin
-            const modal = document.getElementById('authModal');
-            modal.classList.remove('hidden'); 
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
-        }
+        function openLightbox(src) { const lb = document.getElementById('imageLightbox'); document.getElementById('lightboxImage').src = src; lb.classList.remove('hidden'); setTimeout(() => lb.classList.add('opacity-100'), 10); document.body.style.overflow = 'hidden'; }
+        function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); }
+        function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('translate-x-full'); document.getElementById('mobileDrawer').classList.toggle('translate-x-0'); }
+        function toggleAuthModal(mode) { const modal = document.getElementById('authModal'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); }
         function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
-        function handleAuth(e) { 
-            e.preventDefault(); 
-            // Admin đăng nhập giả lập cho mượt
-            localStorage.setItem('nv_current_user', "Admin"); 
-            document.getElementById('authForm').reset(); 
-            closeAuthModal(); 
-            checkAuthState(); 
-            showToast("Đăng nhập Admin thành công!"); 
-            switchView('adminView'); // Đăng nhập xong vào luôn trang Admin
-        }
+        function handleAuth(e) { e.preventDefault(); localStorage.setItem('nv_current_user', "Admin"); document.getElementById('authForm').reset(); closeAuthModal(); checkAuthState(); showToast("Đăng nhập Admin thành công!"); switchView('adminView'); }
         function logout() { localStorage.removeItem('nv_current_user'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }
-        function checkAuthState() {
-            const user = localStorage.getItem('nv_current_user');
-            const authC = document.getElementById('authContainer');
-            const userC = document.getElementById('userContainer');
-            if(!authC || !userC) return;
-            if(user === "Admin") {
-                authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex');
-                document.getElementById('userNameDisplay').innerText = "Admin"; 
-                document.getElementById('userAvatar').innerText = "A"; document.getElementById('userAvatar').classList.add('bg-yellow-400');
-                
-                document.getElementById('mobileAuthMenu').classList.add('hidden');
-                document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex');
-                document.getElementById('mobileUserName').innerText = "Admin";
-            } else {
-                authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden');
-                document.getElementById('mobileAuthMenu').classList.remove('hidden');
-                document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex');
-            }
-        }
-        function showToast(msg, type="success") {
-            const c = document.getElementById('toastContainer'); const t = document.createElement('div');
-            const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]";
-            t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`;
-            t.innerText = msg; c.appendChild(t);
-            setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10);
-            setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000);
-        }
-
-        // 7. HẠT PARTICLE
-        function initParticles() {
-            const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d");
-            c.width = window.innerWidth; c.height = window.innerHeight;
-            let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 });
-            function draw() {
-                ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)";
-                p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; });
-                requestAnimationFrame(draw);
-            } draw();
-        }
-
+        function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); if(!authC || !userC) return; if(user === "Admin") { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = "Admin"; document.getElementById('userAvatar').innerText = "A"; document.getElementById('userAvatar').classList.add('bg-yellow-400'); document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = "Admin"; } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); } }
+        function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]"; t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000); }
+        function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }
         window.onload = initApp;
     </script>
 </body>
