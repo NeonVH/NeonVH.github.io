@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V8</title>
+    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -19,7 +19,7 @@
             filter: blur(8px); transform: scale(1.05); 
         }
 
-        /* 3D Card Hover & Shine (Sửa lại cho thẻ ngang) */
+        /* 3D Card Hover & Shine (Giữ nguyên hiệu ứng ngang mượt) */
         .card-3d { transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
         .card-3d:hover { transform: translateX(5px) scale(1.01); box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); z-index: 10; border-color: var(--neon-purple); }
         .shine {
@@ -27,7 +27,7 @@
             background: linear-gradient(135deg, transparent, rgba(255,255,255,0.3), transparent);
             transform: skewX(-30deg); opacity: 0; pointer-events: none; z-index: 20;
         }
-        .card-3d:hover .shine { opacity: 1; animation: shine 1s forwards; }
+        .card-3d:hover .shine { opacity: 1; animation: shine 1.2s forwards; }
         @keyframes shine { 0% { transform: translateX(-200%) skewX(-30deg); } 100% { transform: translateX(400%) skewX(-30deg); } }
 
         /* Glitch Text */
@@ -105,7 +105,6 @@
             <div class="flex justify-between items-end mb-6">
                 <h2 class="logo-font text-xl md:text-2xl font-bold uppercase tracking-wider"><i class="fa-solid fa-bolt text-[#bc13fe] mr-2"></i> Mới Cập Nhật</h2>
             </div>
-            
             <div id="gameGridContainer" class="flex flex-col gap-3 md:gap-4"></div>
         </div>
     </div>
@@ -117,7 +116,7 @@
         <div class="glass-panel rounded-2xl md:rounded-3xl p-5 md:p-10 flex flex-col md:flex-row gap-6 md:gap-12 relative overflow-hidden mb-8">
             <div class="w-full md:w-1/3 flex flex-col gap-4 md:gap-6 relative z-10">
                 <div class="rounded-xl overflow-hidden shadow-[0_0_30px_rgba(188,19,254,0.3)] border border-white/10 relative">
-                    <img id="detailCover" src="" class="w-full aspect-[3/4] object-cover" alt="Cover">
+                    <img id="detailCover" src="" class="w-full aspect-[3/4] object-cover cursor-pointer hover:scale-105 transition" onclick="openLightbox(this.src)" alt="Cover">
                 </div>
                 <button class="w-full py-4 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white font-black rounded-xl hover:shadow-[0_0_25px_#bc13fe] transition-all flex items-center justify-center gap-2 text-sm md:text-lg"><i class="fa-solid fa-cloud-arrow-down"></i> TẢI XUỐNG</button>
             </div>
@@ -145,11 +144,13 @@
     </div>
 
     <div id="adminView" class="view-section view-hidden max-w-screen-md mx-auto px-4 md:px-6 pt-28 pb-20">
-        <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-yellow-400 relative overflow-hidden">
+        <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-yellow-400 relative overflow-hidden mb-8">
             <h2 class="logo-font text-2xl md:text-3xl font-black text-yellow-400 mb-2"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> KHU VỰC ADMIN</h2>
-            <p class="text-gray-400 mb-6 text-sm">Thêm game mới vào hệ thống trực tiếp từ thiết bị.</p>
+            <p class="text-gray-400 mb-6 text-sm">Thêm và quản lý bài đăng VN+ trực tiếp từ thiết bị.</p>
             
             <form id="adminForm" class="space-y-5">
+                <input type="hidden" id="adGameId" value="">
+
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Tên Game</label>
                     <input id="adTitle" required type="text" placeholder="VD: My Bully Is My Love" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm">
@@ -179,12 +180,12 @@
 
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Thể Loại (Tags)</label>
-                    <input id="adGenre" required type="text" placeholder="VD: 3DCG, Romance, Fantasy..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm">
+                    <input id="adGenre" required type="text" placeholder="VD: Romance, Fantasy..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Ảnh Bìa (Upload File)</label>
-                    <input id="adCoverFile" required type="file" accept="image/*" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-yellow-400 file:text-black hover:file:bg-yellow-300 transition cursor-pointer text-sm">
+                    <input id="adCoverFile" type="file" accept="image/*" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-yellow-400 file:text-black hover:file:bg-yellow-300 transition cursor-pointer text-sm">
                 </div>
 
                 <div>
@@ -202,19 +203,29 @@
                     <label for="ad18" class="text-red-500 font-bold text-sm">Đánh dấu 18+</label>
                 </div>
                 
-                <button type="button" onclick="postNewGame(event)" class="w-full py-4 bg-yellow-400 text-black font-black rounded-xl hover:shadow-[0_0_20px_#facc15] transition-all text-base md:text-lg mt-2"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME</button>
+                <button type="button" onclick="handleAdminFormSubmit(event)" id="adminSubmitBtn" class="w-full py-4 bg-yellow-400 text-black font-black rounded-xl hover:shadow-[0_0_20px_#facc15] transition-all text-base md:text-lg mt-2"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME</button>
             </form>
         </div>
+
+        <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-yellow-400 relative overflow-hidden">
+            <h3 class="logo-font text-xl md:text-2xl font-black text-yellow-400 mb-6 uppercase tracking-wider"><i class="fa-solid fa-list mr-2"></i> Quản Lý Bài Đăng VN+</h3>
+            <div id="adminGameManageListContainer" class="flex flex-col gap-3 md:gap-4">
+                </div>
+        </div>
+    </div>
+
+    <div id="imageLightbox" class="fixed inset-0 z-[100000] flex items-center justify-center bg-black/95 transition-opacity duration-300 hidden opacity-0" onclick="closeLightbox()">
+        <img id="lightboxImage" src="" class="max-w-full max-h-full object-contain shadow-2xl animate-[zoomIn_0.3s_ease]" alt="Lightbox">
     </div>
 
     <div id="authModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
         <div class="glass-panel rounded-3xl p-8 max-w-sm w-[90%] relative border-t-2 border-[#bc13fe]">
             <button onclick="closeAuthModal()" class="absolute top-5 right-6 text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="logo-font text-2xl md:text-3xl font-black text-center mb-6 neon-text text-white">ĐĂNG NHẬP</h2>
+            <h2 class="logo-font text-2xl md:text-3xl font-black text-center mb-6 neon-text text-white">ĐĂNG NHẬP ADMIN</h2>
             <form id="authForm" onsubmit="handleAuth(event)">
-                <input id="authUsername" type="text" required placeholder="Tên tài khoản" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-4 text-sm">
+                <input id="authUsername" type="text" required placeholder="Tên" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-4 text-sm">
                 <input id="authPassword" type="password" required placeholder="Mật khẩu" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-6 text-sm">
-                <button type="submit" class="w-full py-3 bg-[#bc13fe] text-white font-black rounded-xl hover:shadow-[0_0_20px_#bc13fe] transition text-sm">VÀO HỆ THỐNG</button>
+                <button type="submit" class="w-full py-3 bg-[#bc13fe] text-white font-black rounded-xl hover:shadow-[0_0_20px_#bc13fe] transition text-sm">VÀO</button>
             </form>
         </div>
     </div>
@@ -242,40 +253,71 @@
             gamesDB = [...customGames, ...defaultGamesDB];
         }
 
-        // UPDATE: RENDER DẠNG DANH SÁCH NGANG (HORIZONTAL LIST)
+        // UPDATE: RENDER DẠNG DANH SÁCH NGANG (LIST NGANG - FIX CŨ)
         function renderGameGrid() {
             const container = document.getElementById('gameGridContainer');
+            if(!container) return;
             container.innerHTML = gamesDB.map(game => `
-                <div onclick="openGameDetail('${game.id}')" class="card-3d glass-panel rounded-xl md:rounded-2xl overflow-hidden flex flex-row items-stretch h-[110px] md:h-[140px]">
+                <div onclick="openGameDetail('${game.id}')" class="card-3d glass-panel rounded-xl md:rounded-2xl overflow-hidden flex flex-row items-stretch h-[150px] md:h-[180px]">
                     
-                    <div class="w-24 md:w-36 flex-shrink-0 relative">
-                        ${game.is18 ? `<div class="absolute top-1 left-1 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded shadow-lg z-10 animate-pulse">18+</div>` : ''}
-                        <img src="${game.cover}" class="w-full h-full object-cover">
+                    <div class="w-32 md:w-44 flex-shrink-0 relative">
+                        ${game.is18 ? `<div class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] md:text-[11px] font-bold px-2 py-0.5 rounded shadow-lg z-10 animate-pulse">18+</div>` : ''}
+                        <img src="${game.cover}" class="w-full h-full object-cover cursor-pointer" onclick="event.stopPropagation(); openLightbox(this.src)">
                     </div>
                     
-                    <div class="flex-1 p-3 md:p-4 bg-[#0a0a0a] relative flex flex-col min-w-0">
-                        <div class="flex items-start justify-between mb-1 gap-2">
-                            <h3 class="logo-font font-bold text-white text-sm md:text-lg truncate">${game.title}</h3>
-                            <span class="text-[9px] md:text-[10px] font-bold text-[#bc13fe] whitespace-nowrap border border-[#bc13fe]/50 px-1.5 py-0.5 rounded flex-shrink-0">${game.version || 'v1.0'}</span>
+                    <div class="flex-1 p-3 md:p-5 bg-[#0a0a0a] relative flex flex-col min-w-0">
+                        <div class="flex items-start justify-between mb-1 gap-2 border-b border-white/5 pb-1">
+                            <h3 class="logo-font font-bold text-white text-base md:text-xl truncate text-neon">${game.title}</h3>
                         </div>
                         
-                        <div class="text-[#00f0ff] text-[9px] md:text-xs font-black uppercase tracking-widest truncate w-full mb-1">
+                        <div class="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 truncate mb-1">
+                            <span>By: <span class="text-white font-bold">${game.author || 'Unknown'}</span></span>
+                            <span>|</span>
+                            <span>v: <span class="text-[#bc13fe] font-bold">${game.version || 'v1.0'}</span></span>
+                        </div>
+
+                        <div class="text-[#00f0ff] text-[10px] md:text-xs font-black uppercase tracking-widest truncate w-full mb-1">
                             ${game.genre}
                         </div>
                         
-                        <div class="text-[10px] md:text-xs text-gray-400 truncate mb-auto">
-                            By: <span class="text-gray-200">${game.author || 'Unknown'}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between text-[9px] md:text-xs text-gray-400 mt-2">
+                        <div class="flex items-center justify-between text-[10px] md:text-sm text-gray-400 mt-auto pt-2 border-t border-white/5">
                             <span class="truncate pr-2"><i class="fa-solid fa-users text-[#bc13fe] mr-1"></i>${game.team}</span>
-                            <span class="flex-shrink-0 font-bold text-yellow-400"><i class="fa-solid fa-spinner mr-1"></i>${game.progress || 'Đang cập nhật'}</span>
+                            <span class="flex-shrink-0 font-bold text-yellow-400 whitespace-nowrap"><i class="fa-solid fa-spinner mr-1"></i>${game.progress || 'Đang cập nhật'}</span>
                         </div>
                     </div>
                 </div>
             `).join('');
         }
 
+        // UPDATE: RENDER DANH SÁCH GAME ĐỂ ADMIN SỬA/XÓA (NEW FEATURE)
+        function renderAdminManageList() {
+            const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
+            const container = document.getElementById('adminGameManageListContainer');
+            if(!container) return;
+
+            if(customGames.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Chưa có bài đăng VN+ nào của Admin.</p>';
+                return;
+            }
+
+            container.innerHTML = customGames.map(game => `
+                <div class="card-3d glass-panel p-3 rounded-xl flex items-center h-[120px]">
+                    <div class="w-24 flex-shrink-0 relative rounded-lg overflow-hidden h-full">
+                        <img src="${game.cover}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 p-3 flex flex-col min-w-0 h-full justify-between">
+                        <h3 class="font-bold text-white truncate text-base">${game.title}</h3>
+                        <p class="text-xs text-gray-500 truncate">${game.author || 'Unknown'} | ${game.genre}</p>
+                        <div class="flex gap-2 mt-auto">
+                            <button onclick="startEditGame('${game.id}')" class="flex-1 py-1.5 bg-yellow-400 text-black rounded-lg text-xs font-bold transition">Sửa</button>
+                            <button onclick="deleteGame('${game.id}')" class="flex-1 py-1.5 border border-red-500 text-red-500 rounded-lg text-xs font-bold transition hover:bg-red-500 hover:text-white">Xóa</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- HÀM HỖ TRỢ ĐỌC FILE ẢNH THÀNH BASE64 ---
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -285,9 +327,11 @@
             });
         }
 
-        async function postNewGame(e) {
+        // 3. LOGIC ADMIN POST & EDIT (UPDATE V8: Hợp nhất post/edit)
+        async function handleAdminFormSubmit(e) {
             e.preventDefault();
             
+            const gameId = document.getElementById('adGameId').value;
             const title = document.getElementById('adTitle').value;
             const author = document.getElementById('adAuthor').value;
             const version = document.getElementById('adVersion').value;
@@ -301,16 +345,20 @@
                 return showToast("Vui lòng điền đầy đủ chữ!");
             }
 
+            // Xử lý Upload Ảnh Bìa (Hỗ trợ edit không chọn ảnh bìa mới)
             const coverFileInput = document.getElementById('adCoverFile');
-            if (coverFileInput.files.length === 0) return showToast("Vui lòng Upload 1 Ảnh Bìa!");
-            
-            showToast("Đang xử lý hình ảnh, chờ xíu...");
-            
-            const coverBase64 = await readFileAsBase64(coverFileInput.files[0]);
+            let coverBase64 = "";
 
+            if (coverFileInput.files.length > 0) {
+                showToast("Đang xử lý hình ảnh, chờ xíu...");
+                coverBase64 = await readFileAsBase64(coverFileInput.files[0]);
+            }
+
+            // Xử lý Upload Ảnh Giới Thiệu (Hỗ trợ edit không chọn ảnh mới)
             const screenshotsInput = document.getElementById('adScreenshotsFile');
             let screenshotsArray = [];
             if (screenshotsInput.files.length > 0) {
+                showToast("Đang xử lý ảnh giới thiệu, chờ xíu...");
                 const filesToProcess = Math.min(screenshotsInput.files.length, 5);
                 for(let i = 0; i < filesToProcess; i++) {
                     const base64Img = await readFileAsBase64(screenshotsInput.files[i]);
@@ -318,34 +366,117 @@
                 }
             }
 
-            const newGame = {
-                id: 'custom_' + Date.now(),
-                title, author, version, progress, genre, team, cover: coverBase64, desc, is18, screenshots: screenshotsArray
-            };
+            const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
 
-            try {
-                const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
+            if(gameId) {
+                // ĐANG CHẾ ĐỘ SỬA GAME (EDIT)
+                const index = customGames.findIndex(g => g.id === gameId);
+                if(index === -1) return showToast("Không tìm thấy game cần sửa!", "error");
+
+                // Cập nhật các thông tin text
+                customGames[index].title = title;
+                customGames[index].author = author;
+                customGames[index].version = version;
+                customGames[index].progress = progress;
+                customGames[index].genre = genre;
+                customGames[index].team = team;
+                customGames[index].desc = desc;
+                customGames[index].is18 = is18;
+                
+                // Nếu upload ảnh mới thì thay, không thì giữ nguyên
+                if(coverBase64) customGames[index].cover = coverBase64;
+                if(screenshotsArray.length > 0) customGames[index].screenshots = screenshotsArray;
+
+                showToast("Cập nhật bài đăng thành công!");
+                
+            } else {
+                // ĐANG CHẾ ĐỘ ĐĂNG MỚI (POST)
+                if(!coverBase64) return showToast("Phải upload ảnh bìa cho game mới!");
+                
+                const newGame = {
+                    id: 'custom_' + Date.now(), // ID độc nhất dựa trên time
+                    title, author, version, progress, genre, team, cover: coverBase64, desc, is18, screenshots: screenshotsArray
+                };
                 customGames.unshift(newGame);
-                localStorage.setItem('nv_custom_games', JSON.stringify(customGames));
-                
                 showToast("Đăng bài thành công! Đã lên Trang chủ.");
-                document.getElementById('adminForm').reset();
-                
-                loadGamesFromStorage();
-                renderGameGrid();
-                switchView('homeView');
+            }
+
+            // Lưu dữ liệu vào trình duyệt
+            try {
+                localStorage.setItem('nv_custom_games', JSON.stringify(customGames));
+                resetAdminForm(); // Reset form, nút và ID ẩn
+                loadGamesFromStorage(); // Reload data
+                renderGameGrid(); // Reload grid trang chủ
+                renderAdminManageList(); // Reload danh sách quản trị
+                switchView('homeView'); // Về trang chủ
             } catch (error) {
-                showToast("Lỗi: File ảnh quá nặng (Hết bộ nhớ trình duyệt)!");
+                showToast("Lỗi: File ảnh quá nặng (vượt bộ nhớ Web)!", "error");
             }
         }
 
+        // Bắt đầu chế độ sửa game (Edit Mode)
+        function startEditGame(gameId) {
+            const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
+            const game = customGames.find(g => g.id === gameId);
+            if(!game) return showToast("Lỗi: Không tìm thấy bài đăng!", "error");
+
+            // Đổ dữ liệu cũ vào form
+            document.getElementById('adGameId').value = game.id;
+            document.getElementById('adTitle').value = game.title;
+            document.getElementById('adAuthor').value = game.author || "";
+            document.getElementById('adVersion').value = game.version || "";
+            document.getElementById('adProgress').value = game.progress || "";
+            document.getElementById('adGenre').value = game.genre;
+            document.getElementById('adTeam').value = game.team;
+            document.getElementById('adDesc').value = game.desc;
+            document.getElementById('ad18').checked = game.is18;
+
+            // Chuyển nút submit thành "CẬP NHẬT GAME"
+            document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-pen mr-2"></i> CẬP NHẬT GAME NÀY`;
+            showToast("Đã điền thông tin bài đăng, hãy sửa đổi nhé.");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Xóa game khỏi hệ thống (Delete)
+        function deleteGame(gameId) {
+            if(!confirm("Bạn có chắc chắn muốn XÓA VĨNH VIỄN bài đăng VN+ này không?")) return;
+            
+            const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
+            const filteredGames = customGames.filter(g => g.id !== gameId);
+            
+            localStorage.setItem('nv_custom_games', JSON.stringify(filteredGames));
+            showToast("Đã xóa bài đăng khỏi hệ thống.");
+            
+            // Reload & quay về Home
+            loadGamesFromStorage();
+            renderGameGrid();
+            renderAdminManageList();
+            switchView('homeView');
+        }
+
+        function resetAdminForm() {
+            document.getElementById('adGameId').value = ""; // Xóa ID ẩn
+            document.getElementById('adminForm').reset(); // Reset fields
+            // Reset nút submit về "XUẤT BẢN GAME"
+            document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME`;
+        }
+
+        // 4. NAVIGATION QUẢN LÝ CÁC TRANG (SPA ROUTING)
         function switchView(viewId) {
             const views = ['homeView', 'detailView', 'adminView'];
             views.forEach(id => {
                 const el = document.getElementById(id);
-                if(id === viewId) { el.classList.remove('view-hidden'); el.classList.add('view-active'); } 
-                else { el.classList.remove('view-active'); el.classList.add('view-hidden'); }
+                if(!el) return;
+                if(id === viewId) {
+                    el.classList.remove('view-hidden'); el.classList.add('view-active');
+                } else {
+                    el.classList.remove('view-active'); el.classList.add('view-hidden');
+                }
             });
+
+            // Nếu switch sang trang Admin thì load thêm list quản lý game
+            if(viewId === 'adminView') renderAdminManageList();
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -361,17 +492,38 @@
             document.getElementById('detailTeam').innerText = game.team;
             document.getElementById('detailDesc').innerText = game.desc;
 
+            // Render Screenshots
             const scContainer = document.getElementById('detailScreenshots');
             if(game.screenshots && game.screenshots.length > 0) {
                 scContainer.innerHTML = game.screenshots.map(img => `
-                    <div class="rounded-xl overflow-hidden border border-white/10 aspect-video hover:border-[#bc13fe] transition shadow-lg">
+                    <div class="rounded-xl overflow-hidden border border-white/10 aspect-video hover:border-[#bc13fe] transition shadow-lg cursor-pointer" onclick="openLightbox(this.querySelector('img').src)">
                         <img src="${img}" class="w-full h-full object-cover">
                     </div>
                 `).join('');
             } else {
                 scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu cho game này.</p>';
             }
+
             switchView('detailView');
+        }
+
+        // UPDATE: HÀM ĐÓNG MỞ LIGHTBOX (Xem ảnh bao quát - NEW FEATURE)
+        function openLightbox(src) {
+            const lb = document.getElementById('imageLightbox');
+            const lbImg = document.getElementById('lightboxImage');
+            lbImg.src = src;
+            lb.classList.remove('hidden');
+            setTimeout(() => lb.classList.add('opacity-100'), 10);
+            document.body.style.overflow = 'hidden'; // Khóa cuộn trang khi xem ảnh
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('imageLightbox');
+            lb.classList.remove('opacity-100');
+            setTimeout(() => {
+                lb.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Mở lại cuộn trang
+            }, 300);
         }
 
         function toggleDrawer() { 
@@ -379,29 +531,56 @@
             drawer.classList.toggle('translate-x-full'); drawer.classList.toggle('translate-x-0');
         }
 
-        function toggleAuthModal() { document.getElementById('authModal').classList.remove('hidden'); setTimeout(() => document.getElementById('authModal').classList.add('opacity-100'), 10); }
+        // 6. TÀI KHOẢN & TOAST (RÚT GỌN)
+        function toggleAuthModal(mode) { 
+            // V9 chỉ còn Đăng nhập Admin
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('hidden'); 
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
         function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
-        function handleAuth(e) { e.preventDefault(); localStorage.setItem('nv_current_user', document.getElementById('authUsername').value); document.getElementById('authForm').reset(); closeAuthModal(); checkAuthState(); showToast("Đăng nhập thành công!"); }
-        function logout() { localStorage.removeItem('nv_current_user'); checkAuthState(); showToast("Đã đăng xuất!"); }
+        function handleAuth(e) { 
+            e.preventDefault(); 
+            // Admin đăng nhập giả lập cho mượt
+            localStorage.setItem('nv_current_user', "Admin"); 
+            document.getElementById('authForm').reset(); 
+            closeAuthModal(); 
+            checkAuthState(); 
+            showToast("Đăng nhập Admin thành công!"); 
+            switchView('adminView'); // Đăng nhập xong vào luôn trang Admin
+        }
+        function logout() { localStorage.removeItem('nv_current_user'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }
         function checkAuthState() {
             const user = localStorage.getItem('nv_current_user');
-            if(user) {
-                document.getElementById('authContainer').classList.replace('md:flex', 'hidden'); document.getElementById('userContainer').classList.replace('hidden', 'md:flex');
-                document.getElementById('userNameDisplay').innerText = user; document.getElementById('userAvatar').innerText = user[0].toUpperCase();
+            const authC = document.getElementById('authContainer');
+            const userC = document.getElementById('userContainer');
+            if(!authC || !userC) return;
+            if(user === "Admin") {
+                authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex');
+                document.getElementById('userNameDisplay').innerText = "Admin"; 
+                document.getElementById('userAvatar').innerText = "A"; document.getElementById('userAvatar').classList.add('bg-yellow-400');
+                
+                document.getElementById('mobileAuthMenu').classList.add('hidden');
+                document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex');
+                document.getElementById('mobileUserName').innerText = "Admin";
             } else {
-                document.getElementById('authContainer').classList.replace('hidden', 'md:flex'); document.getElementById('userContainer').classList.replace('md:flex', 'hidden');
+                authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden');
+                document.getElementById('mobileAuthMenu').classList.remove('hidden');
+                document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex');
             }
         }
-        function showToast(msg) {
+        function showToast(msg, type="success") {
             const c = document.getElementById('toastContainer'); const t = document.createElement('div');
-            t.className = `glass-panel px-5 py-3 rounded-xl border border-[#00f0ff] shadow-[0_0_15px_#00f0ff] font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90 text-[#00f0ff]`;
+            const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]";
+            t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`;
             t.innerText = msg; c.appendChild(t);
             setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10);
             setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000);
         }
 
+        // 7. HẠT PARTICLE
         function initParticles() {
-            const c = document.getElementById("particleCanvas"); const ctx = c.getContext("2d");
+            const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d");
             c.width = window.innerWidth; c.height = window.innerHeight;
             let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 });
             function draw() {
