@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V6</title>
+    <title>NEONVERSE • HỆ SINH THÁI TỐI THƯỢNG V7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -16,8 +16,7 @@
         .hero-bg-static {
             background-image: url('https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&token-time=1774915200');
             background-size: cover; background-position: center; 
-            filter: blur(8px); /* FIX YÊU CẦU 2: Giảm mờ từ 18px xuống 8px */
-            transform: scale(1.05); /* Zoom nhẹ để viền không bị trắng khi blur */
+            filter: blur(8px); transform: scale(1.05); 
         }
 
         /* 3D Card Hover & Shine */
@@ -54,7 +53,9 @@
 
     <canvas id="particleCanvas"></canvas>
     <div class="fixed inset-0 hero-bg-static z-[-2]"></div>
-    <div class="fixed inset-0 bg-black/60 z-[-1]"></div> <nav class="fixed top-0 left-0 right-0 glass-panel border-b-0 z-50 transition-all duration-300" id="navbar">
+    <div class="fixed inset-0 bg-black/60 z-[-1]"></div> 
+
+    <nav class="fixed top-0 left-0 right-0 glass-panel border-b-0 z-50 transition-all duration-300" id="navbar">
         <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
             <div onclick="switchView('homeView')" class="logo-font text-xl md:text-2xl tracking-[6px] text-white cursor-pointer glitch" data-text="NEONVERSE">NEONVERSE</div>
             <div class="hidden md:flex items-center gap-8 text-sm font-bold tracking-wider">
@@ -80,12 +81,10 @@
 
     <div id="mobileDrawer" class="fixed inset-y-0 right-0 w-80 bg-zinc-950/95 backdrop-blur-xl border-l border-[#bc13fe]/50 z-[9999] p-6 transform translate-x-full transition-transform duration-300">
         <div class="flex justify-end mb-8"><button onclick="toggleDrawer()" class="text-2xl text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button></div>
-        
         <div class="flex flex-col gap-4 mb-8">
             <button onclick="switchView('homeView'); toggleDrawer()" class="w-full text-left font-bold text-lg hover:text-[#bc13fe]">TRANG CHỦ</button>
             <button onclick="switchView('adminView'); toggleDrawer()" class="w-full text-left font-bold text-lg text-yellow-400 hover:text-white"><i class="fa-solid fa-lock mr-2"></i> TRANG ADMIN</button>
         </div>
-
         <div id="mobileAuthMenu" class="flex flex-col gap-4 mb-8">
             <button onclick="toggleAuthModal('login'); toggleDrawer()" class="w-full py-3 border border-[#bc13fe] text-[#bc13fe] rounded-lg font-bold hover:bg-[#bc13fe] hover:text-black transition">ĐĂNG NHẬP</button>
         </div>
@@ -102,7 +101,6 @@
             <p class="text-gray-300 max-w-lg mx-auto mb-10 text-sm md:text-base leading-relaxed">Hành trình cứu thế giới ảo bằng tình yêu cấm kỵ giữa ma nữ và kiếm sĩ nhân loại. Quyết định vận mệnh của Neonverse ngay trên trình duyệt.</p>
             <button onclick="openGameDetail(1)" class="px-10 py-4 bg-white text-black font-black rounded-full hover:bg-[#bc13fe] hover:text-white hover:shadow-[0_0_30px_#bc13fe] transition-all transform hover:scale-105 uppercase tracking-wider"><i class="fa-solid fa-play mr-2"></i> Chơi ngay</button>
         </div>
-
         <div class="max-w-screen-xl mx-auto px-6 py-16">
             <div class="flex justify-between items-end mb-8">
                 <h2 class="logo-font text-2xl font-bold uppercase tracking-wider"><i class="fa-solid fa-bolt text-[#bc13fe] mr-2"></i> Kho Game Nổi Bật</h2>
@@ -115,7 +113,7 @@
         <button onclick="switchView('homeView')" class="mb-8 text-gray-400 hover:text-[#bc13fe] transition font-bold flex items-center gap-2 group">
             <i class="fa-solid fa-arrow-left transform group-hover:-translate-x-2 transition"></i> QUAY LẠI
         </button>
-        <div class="glass-panel rounded-3xl p-6 md:p-10 flex flex-col md:flex-row gap-8 lg:gap-12 relative overflow-hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-10 flex flex-col md:flex-row gap-8 lg:gap-12 relative overflow-hidden mb-10">
             <div class="w-full md:w-1/3 flex flex-col gap-6 relative z-10">
                 <div class="rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(188,19,254,0.3)] border border-white/10 relative">
                     <img id="detailCover" src="" class="w-full aspect-[3/4] object-cover" alt="Cover">
@@ -125,37 +123,55 @@
             <div class="w-full md:w-2/3 flex flex-col relative z-10">
                 <div class="flex items-center gap-3 mb-4"><span id="detailGenre" class="text-xs font-black tracking-widest text-black bg-[#00f0ff] px-3 py-1 rounded-full uppercase">Genre</span></div>
                 <h1 id="detailTitle" class="logo-font text-4xl md:text-5xl font-black mb-4 neon-text text-white">Title</h1>
-                <p class="text-gray-400 font-medium mb-6">Nhóm dịch: <span id="detailTeam" class="text-[#bc13fe]">Team</span></p>
+                <p class="text-gray-400 font-medium mb-1">Tác giả: <span id="detailAuthor" class="text-white font-bold">Đang cập nhật</span></p>
+                <p class="text-gray-400 font-medium mb-6">Nhóm dịch: <span id="detailTeam" class="text-[#bc13fe] font-bold">Team</span></p>
                 <h3 class="logo-font text-xl font-bold mb-3 border-b border-white/10 pb-2 text-[#bc13fe]">TÓM TẮT CỐT TRUYỆN</h3>
                 <p id="detailDesc" class="text-gray-300 leading-relaxed text-sm md:text-base mb-8">Desc</p>
             </div>
+        </div>
+        
+        <div>
+            <h3 class="logo-font text-2xl font-bold mb-4 uppercase text-[#bc13fe]"><i class="fa-solid fa-images mr-2"></i> Ảnh Giới Thiệu</h3>
+            <div id="detailScreenshots" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                </div>
         </div>
     </div>
 
     <div id="adminView" class="view-section view-hidden max-w-screen-md mx-auto px-6 pt-32 pb-20">
         <div class="glass-panel rounded-3xl p-8 border-t-4 border-yellow-400 relative overflow-hidden">
             <h2 class="logo-font text-3xl font-black text-yellow-400 mb-2"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> KHU VỰC ADMIN</h2>
-            <p class="text-gray-400 mb-8 text-sm">Thêm game mới vào hệ thống trực tiếp từ trình duyệt.</p>
+            <p class="text-gray-400 mb-8 text-sm">Thêm game mới vào hệ thống trực tiếp từ thiết bị.</p>
             
-            <form id="adminForm" onsubmit="postNewGame(event)" class="space-y-6">
+            <form id="adminForm" class="space-y-6">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Tên Game</label>
-                    <input id="adTitle" required type="text" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
+                    <input id="adTitle" required type="text" placeholder="VD: Học Viện Tình Yêu" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
                 </div>
-                <div class="flex gap-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Tác Giả</label>
+                        <input id="adAuthor" required type="text" placeholder="VD: KaiStudio" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
+                    </div>
                     <div class="flex-1">
                         <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Thể Loại</label>
                         <input id="adGenre" required type="text" placeholder="VD: Romance, Fantasy..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
                     </div>
-                    <div class="flex-1">
-                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Nhóm Dịch</label>
-                        <input id="adTeam" required type="text" placeholder="VD: VN Studio" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
-                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Link Ảnh Bìa (URL)</label>
-                    <input id="adCover" required type="url" placeholder="https://..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Nhóm Dịch</label>
+                    <input id="adTeam" required type="text" placeholder="VD: VN Studio" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none">
                 </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Ảnh Bìa (Upload File)</label>
+                    <input id="adCoverFile" required type="file" accept="image/*" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-yellow-400 file:text-black hover:file:bg-yellow-300 transition cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Ảnh Giới Thiệu (Chọn 4-5 tấm cùng lúc)</label>
+                    <input id="adScreenshotsFile" type="file" accept="image/*" multiple class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-[#bc13fe] file:text-white hover:file:bg-[#ff00ff] transition cursor-pointer">
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Nội dung tóm tắt</label>
                     <textarea id="adDesc" required class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none h-32 resize-none"></textarea>
@@ -165,7 +181,7 @@
                     <label for="ad18" class="text-red-500 font-bold text-sm">Đánh dấu 18+</label>
                 </div>
                 
-                <button type="submit" class="w-full py-4 bg-yellow-400 text-black font-black rounded-xl hover:shadow-[0_0_20px_#facc15] transition-all text-lg">XUẤT BẢN GAME NÀY</button>
+                <button type="button" onclick="postNewGame(event)" class="w-full py-4 bg-yellow-400 text-black font-black rounded-xl hover:shadow-[0_0_20px_#facc15] transition-all text-lg"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> XUẤT BẢN GAME NÀY</button>
             </form>
         </div>
     </div>
@@ -184,16 +200,15 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // 1. DATA CƠ BẢN
+        // 1. DATA CƠ BẢN (Kèm tác giả mặc định)
         const defaultGamesDB = [
-            { id: 1, title: "Hồng Nhãn Ma Đạo", genre: "Fantasy", team: "Magic Team", is18: false, cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500", desc: "Kiệt tác Fantasy, đồ họa siêu đỉnh." },
-            { id: 2, title: "Cyber Romance", genre: "Sci-Fi", team: "VN Studio", is18: true, cover: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=500", desc: "Thành phố Cyberpunk năm 2077." },
-            { id: 3, title: "Ký Ức Đảo Ngược", genre: "Mystery", team: "Dark Night", is18: false, cover: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500", desc: "Bí ẩn rùng rợn qua chiếc điện thoại cũ." }
+            { id: 1, title: "Hồng Nhãn Ma Đạo", author: "MagicVN", genre: "Fantasy", team: "Magic Team", is18: false, cover: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500", desc: "Kiệt tác Fantasy, đồ họa siêu đỉnh.", screenshots: [] },
+            { id: 2, title: "Cyber Romance", author: "NeoCity", genre: "Sci-Fi", team: "VN Studio", is18: true, cover: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=500", desc: "Thành phố Cyberpunk năm 2077.", screenshots: [] },
+            { id: 3, title: "Ký Ức Đảo Ngược", author: "Unknown", genre: "Mystery", team: "Dark Night", is18: false, cover: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500", desc: "Bí ẩn rùng rợn qua chiếc điện thoại cũ.", screenshots: [] }
         ];
 
-        let gamesDB = []; // Sẽ chứa cả game mặc định và game do Admin post
+        let gamesDB = []; 
 
-        // 2. KHỞI TẠO APP
         function initApp() {
             loadGamesFromStorage();
             renderGameGrid();
@@ -201,14 +216,11 @@
             initParticles();
         }
 
-        // Tải game từ localStorage (Admin đăng bài)
         function loadGamesFromStorage() {
             const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
-            // Gộp game do Admin tạo lên đầu tiên, sau đó đến game mặc định
             gamesDB = [...customGames, ...defaultGamesDB];
         }
 
-        // Cập nhật lại HTML lưới thẻ game
         function renderGameGrid() {
             const container = document.getElementById('gameGridContainer');
             container.innerHTML = gamesDB.map(game => `
@@ -228,48 +240,86 @@
             `).join('');
         }
 
-        // 3. LOGIC ADMIN ĐĂNG BÀI (NEW FEATURE)
-        function postNewGame(e) {
+        // --- HÀM HỖ TRỢ ĐỌC FILE ẢNH THÀNH BASE64 ---
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 3. LOGIC ADMIN ĐĂNG BÀI UPLOAD ẢNH (UPDATE V7)
+        async function postNewGame(e) {
             e.preventDefault();
+            
+            // Lấy dữ liệu Text
             const title = document.getElementById('adTitle').value;
+            const author = document.getElementById('adAuthor').value;
             const genre = document.getElementById('adGenre').value;
             const team = document.getElementById('adTeam').value;
-            const cover = document.getElementById('adCover').value;
             const desc = document.getElementById('adDesc').value;
             const is18 = document.getElementById('ad18').checked;
 
+            if(!title || !author || !genre || !team || !desc) {
+                return showToast("Vui lòng điền đầy đủ các thông tin chữ!");
+            }
+
+            // Xử lý Upload Ảnh Bìa
+            const coverFileInput = document.getElementById('adCoverFile');
+            if (coverFileInput.files.length === 0) {
+                return showToast("Vui lòng chọn 1 Ảnh Bìa!");
+            }
+            showToast("Đang xử lý hình ảnh, chờ xíu...");
+            
+            // Chuyển ảnh bìa sang chuỗi Base64 để lưu vô LocalStorage
+            const coverBase64 = await readFileAsBase64(coverFileInput.files[0]);
+
+            // Xử lý Upload Ảnh Giới Thiệu (Lấy tối đa 5 ảnh)
+            const screenshotsInput = document.getElementById('adScreenshotsFile');
+            let screenshotsArray = [];
+            if (screenshotsInput.files.length > 0) {
+                const filesToProcess = Math.min(screenshotsInput.files.length, 5); // Tối đa 5
+                for(let i = 0; i < filesToProcess; i++) {
+                    const base64Img = await readFileAsBase64(screenshotsInput.files[i]);
+                    screenshotsArray.push(base64Img);
+                }
+            }
+
+            // Đóng gói Game Mới
             const newGame = {
-                id: 'custom_' + Date.now(), // Tạo ID độc nhất
-                title, genre, team, cover, desc, is18
+                id: 'custom_' + Date.now(),
+                title, author, genre, team, cover: coverBase64, desc, is18, screenshots: screenshotsArray
             };
 
-            // Lấy danh sách game tự tạo cũ ra
-            const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
-            // Thêm game mới vào đầu danh sách
-            customGames.unshift(newGame);
-            // Lưu lại vào trình duyệt
-            localStorage.setItem('nv_custom_games', JSON.stringify(customGames));
-
-            showToast("Đăng bài thành công! Đã lên Trang chủ.");
-            document.getElementById('adminForm').reset();
-            
-            // Reload lại grid và quay ra trang chủ
-            loadGamesFromStorage();
-            renderGameGrid();
-            switchView('homeView');
+            // Lưu vào DB
+            try {
+                const customGames = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
+                customGames.unshift(newGame);
+                localStorage.setItem('nv_custom_games', JSON.stringify(customGames));
+                
+                showToast("Đăng bài thành công! Đã lên Trang chủ.");
+                document.getElementById('adminForm').reset();
+                
+                // Reload & Về Home
+                loadGamesFromStorage();
+                renderGameGrid();
+                switchView('homeView');
+            } catch (error) {
+                showToast("Lỗi: File ảnh quá nặng (vượt quá 5MB bộ nhớ Web)!");
+            }
         }
 
-        // 4. NAVIGATION QUẢN LÝ CÁC TRANG (SPA ROUTING)
+        // 4. NAVIGATION & DETAILS
         function switchView(viewId) {
             const views = ['homeView', 'detailView', 'adminView'];
             views.forEach(id => {
                 const el = document.getElementById(id);
                 if(id === viewId) {
-                    el.classList.remove('view-hidden');
-                    el.classList.add('view-active');
+                    el.classList.remove('view-hidden'); el.classList.add('view-active');
                 } else {
-                    el.classList.remove('view-active');
-                    el.classList.add('view-hidden');
+                    el.classList.remove('view-active'); el.classList.add('view-hidden');
                 }
             });
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -280,21 +330,32 @@
             if(!game) return;
             document.getElementById('detailCover').src = game.cover;
             document.getElementById('detailTitle').innerText = game.title;
+            document.getElementById('detailAuthor').innerText = game.author || "Đang cập nhật";
             document.getElementById('detailGenre').innerText = game.genre;
             document.getElementById('detailTeam').innerText = game.team;
             document.getElementById('detailDesc').innerText = game.desc;
+
+            // Render Screenshots
+            const scContainer = document.getElementById('detailScreenshots');
+            if(game.screenshots && game.screenshots.length > 0) {
+                scContainer.innerHTML = game.screenshots.map(img => `
+                    <div class="rounded-xl overflow-hidden border border-white/10 aspect-video hover:border-[#bc13fe] transition shadow-lg">
+                        <img src="${img}" class="w-full h-full object-cover">
+                    </div>
+                `).join('');
+            } else {
+                scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu cho game này.</p>';
+            }
+
             switchView('detailView');
         }
 
-        // 5. MOBILE DRAWER FIX LỖI CLASS
         function toggleDrawer() { 
             const drawer = document.getElementById('mobileDrawer');
-            // Dùng translate-x-full (100%) để ẩn ra lề phải, translate-x-0 để hiện
-            drawer.classList.toggle('translate-x-full');
-            drawer.classList.toggle('translate-x-0');
+            drawer.classList.toggle('translate-x-full'); drawer.classList.toggle('translate-x-0');
         }
 
-        // 6. TÀI KHOẢN & TOAST (RÚT GỌN)
+        // 6. TÀI KHOẢN & TOAST
         function toggleAuthModal() { document.getElementById('authModal').classList.remove('hidden'); setTimeout(() => document.getElementById('authModal').classList.add('opacity-100'), 10); }
         function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
         function handleAuth(e) { e.preventDefault(); localStorage.setItem('nv_current_user', document.getElementById('authUsername').value); document.getElementById('authForm').reset(); closeAuthModal(); checkAuthState(); showToast("Đăng nhập thành công!"); }
@@ -309,15 +370,14 @@
             }
         }
         function showToast(msg) {
-            const c = document.getElementById('toastContainer');
-            const t = document.createElement('div');
+            const c = document.getElementById('toastContainer'); const t = document.createElement('div');
             t.className = `glass-panel px-5 py-3 rounded-xl border border-[#00f0ff] shadow-[0_0_15px_#00f0ff] font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90 text-[#00f0ff]`;
             t.innerText = msg; c.appendChild(t);
             setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10);
             setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000);
         }
 
-        // 7. HẠT PARTICLE NỀN
+        // 7. HẠT PARTICLE
         function initParticles() {
             const c = document.getElementById("particleCanvas"); const ctx = c.getContext("2d");
             c.width = window.innerWidth; c.height = window.innerHeight;
