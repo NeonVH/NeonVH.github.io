@@ -1,695 +1,1444 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEONVERSE - Truyện Tranh &amp; Game Neon 18+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap');
+        
+        :root {
+            --neon-purple: #bc13fe;
+        }
+        
+        .tail-container {
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        
+        .logo-font {
+            font-family: 'Orbitron', sans-serif;
+        }
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        .hero-bg {
+            background-image: url('https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&amp;token-time=1774915200');
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px);
+            transform: scale(1.05);
+        }
 
-<title>VN VN+ Library</title>
+        .card-3d {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .card-3d:hover {
+            transform: perspective(1200px) rotateX(8deg) rotateY(12deg) scale(1.05);
+            box-shadow: 0 0 40px rgba(188, 19, 254, 0.6);
+        }
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
+        .shine {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 40%;
+            height: 300%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            animation: shine 4s infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .card-3d:hover .shine {
+            opacity: 1;
+            animation: shine 1.5s infinite;
+        }
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Be+Vietnam+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+        @keyframes shine {
+            0% { transform: translateX(-150%) skewX(-25deg); }
+            20% { transform: translateX(300%) skewX(-25deg); }
+            100% { transform: translateX(300%) skewX(-25deg); }
+        }
 
-<!-- Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch:hover::before,
+        .glitch:hover::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+        
+        .glitch:hover::before {
+            animation: glitch-anim 0.6s infinite;
+            color: #00ffff;
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+        }
+        
+        .glitch:hover::after {
+            animation: glitch-anim2 0.4s infinite;
+            color: #ff00ff;
+            left: -2px;
+            text-shadow: 2px 0 #00ffff;
+        }
 
-<style>
+        @keyframes glitch-anim {
+            0% { clip: rect(20px, 9999px, 40px, 0); }
+            5% { clip: rect(60px, 9999px, 80px, 0); }
+            10% { clip: rect(10px, 9999px, 30px, 0); }
+            15% { clip: rect(70px, 9999px, 90px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(30px, 9999px, 50px, 0); }
+            5% { clip: rect(40px, 9999px, 70px, 0); }
+            10% { clip: rect(80px, 9999px, 100px, 0); }
+        }
 
-/* ========================= */
-/* GLOBAL */
-/* ========================= */
+        .particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
 
-body{
-font-family:'Be Vietnam Pro',sans-serif;
-background:url("https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&token-time=1774915200") center/cover fixed no-repeat;
-color:white;
-}
+        .game-card {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .game-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-.cyber{
-font-family:'Orbitron',sans-serif;
-}
+        .drawer {
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        
+        .drawer.open {
+            transform: translateX(0);
+        }
 
-.glass{
-background:rgba(0,0,0,0.45);
-backdrop-filter:blur(12px);
-border:1px solid rgba(255,255,255,0.1);
-}
+        .modal {
+            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes modalPop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
-/* ========================= */
-/* PRELOADER */
-/* ========================= */
+        .toast {
+            animation: toastIn 0.4s ease forwards;
+        }
+        
+        @keyframes toastIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
 
-#preloader{
-position:fixed;
-inset:0;
-background:black;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
-}
-
-.loader{
-font-size:30px;
-animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-0%{opacity:0.3}
-50%{opacity:1}
-100%{opacity:0.3}
-}
-
-/* ========================= */
-/* PROGRESS BAR */
-/* ========================= */
-
-#progress{
-position:fixed;
-top:0;
-left:0;
-height:3px;
-background:#bc13fe;
-width:0%;
-z-index:1000;
-}
-
-/* ========================= */
-/* GAME CARD */
-/* ========================= */
-
-.game-card{
-transition:0.4s;
-transform-style:preserve-3d;
-position:relative;
-overflow:hidden;
-}
-
-.game-card:hover{
-transform:scale(1.05);
-box-shadow:0 0 25px #ff00ff;
-}
-
-.game-card::before{
-content:"";
-position:absolute;
-top:-100%;
-left:-100%;
-width:200%;
-height:200%;
-background:linear-gradient(120deg,transparent,rgba(255,255,255,0.3),transparent);
-transform:rotate(25deg);
-transition:0.5s;
-}
-
-.game-card:hover::before{
-top:0;
-left:0;
-}
-
-/* ========================= */
-/* BADGE */
-/* ========================= */
-
-.badge{
-animation:beat 1.5s infinite;
-}
-
-@keyframes beat{
-0%{transform:scale(1)}
-50%{transform:scale(1.2)}
-100%{transform:scale(1)}
-}
-
-/* ========================= */
-/* TOAST */
-/* ========================= */
-
-.toast{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#111;
-padding:12px 20px;
-border-radius:8px;
-border:1px solid #444;
-display:none;
-}
-
-/* ========================= */
-/* BACK TO TOP */
-/* ========================= */
-
-#topBtn{
-position:fixed;
-bottom:20px;
-right:20px;
-display:none;
-}
-
-/* ========================= */
-/* HERO SLIDER */
-/* ========================= */
-
-.slide{
-display:none;
-}
-
-.slide.active{
-display:block;
-}
-
-/* ========================= */
-/* MOBILE MENU */
-/* ========================= */
-
-#mobileMenu{
-right:-100%;
-}
-
-/* ========================= */
-/* REVEAL */
-/* ========================= */
-
-.reveal{
-opacity:0;
-transform:translateY(40px);
-transition:1s;
-}
-
-.reveal.active{
-opacity:1;
-transform:translateY(0);
-}
-
-</style>
-
+        .neon-text {
+            text-shadow: 
+                0 0 10px #bc13fe,
+                0 0 20px #bc13fe,
+                0 0 40px #bc13fe;
+        }
+    </style>
 </head>
-
-<body>
-
-<!-- CANVAS PARTICLES -->
-
-<canvas id="bgCanvas" class="fixed top-0 left-0 z-0"></canvas>
-
-<!-- PRELOADER -->
-
-<div id="preloader">
-<div class="loader cyber text-purple-500">
-VN VN+ Library
-</div>
-</div>
-
-<!-- PROGRESS BAR -->
-
-<div id="progress"></div>
-
-<!-- NAVBAR -->
-
-<nav class="glass sticky top-0 z-40">
-
-<div class="max-w-7xl mx-auto flex justify-between items-center p-4">
-
-<div class="cyber text-purple-400 text-xl glitch">
-VN VN+ Library
-</div>
-
-<div class="hidden md:flex gap-6">
-<a href="#">Trang chủ</a>
-<a href="#">PC</a>
-<a href="#">Mobile</a>
-<a href="#">Nhóm dịch</a>
-</div>
-
-<div class="flex gap-2 items-center">
-
-<input id="searchInput" placeholder="Tìm game..."
-class="bg-black/40 border border-purple-500 rounded-full px-4 py-1 text-sm">
-
-<button onclick="openAuth()" class="text-xs border border-purple-500 px-2 py-1 rounded">
-Đăng nhập
-</button>
-
-<button onclick="openAuth()" class="border border-purple-500 px-4 py-2 rounded">
-Đăng ký
-</button>
-
-</div>
-
-<button class="md:hidden text-2xl" onclick="openMenu()">
-<i class="fa fa-bars"></i>
-</button>
-
-</div>
-
-</nav>
-
-<!-- HERO -->
-
-<section class="max-w-5xl mx-auto mt-10 glass p-6 rounded text-center">
-
-<div id="heroSlider">
-
-<div class="slide active">
-<img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/68936209/67dde7ae097148ecafb8b399af1611d9/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=EDQjKSwarAcVJz6BFyuvSVRb5sr9ANhmTeYIfGA6KWg%3D&token-time=1774828800" class="mx-auto rounded">
-</div>
-
-<div class="slide">
-<img src="https://picsum.photos/900/300?2" class="mx-auto rounded">
-</div>
-
-<div class="slide">
-<img src="https://picsum.photos/900/300?3" class="mx-auto rounded">
-</div>
-
-</div>
-
-</section>
-
-<!-- MAIN LAYOUT -->
-
-<div class="max-w-7xl mx-auto mt-10 grid lg:grid-cols-12 gap-6 px-6">
-
-<!-- FILTER -->
-
-<div class="lg:col-span-3 glass p-4 rounded reveal">
-
-<h2 class="cyber text-purple-400 mb-3">
-Bộ lọc
-</h2>
-
-<label><input type="checkbox"> Romance</label><br>
-<label><input type="checkbox"> Fantasy</label><br>
-<label><input type="checkbox"> Mystery</label>
-
-<hr class="my-3">
-
-<label><input type="radio" name="status"> Full</label><br>
-<label><input type="radio" name="status"> Đang dịch</label>
-
-<hr class="my-3">
-
-<label><input type="radio" name="rate"> 5★</label><br>
-<label><input type="radio" name="rate"> 4★</label>
-
-<button class="mt-3 bg-purple-600 px-3 py-1 rounded">
-Reset Filter
-</button>
-
-</div>
-
-<!-- GAME GRID -->
-
-<div class="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-
-<!-- GAME CARD TEMPLATE REPEATED -->
-
-<script>
-
-const games=[
-"Học viện tình yêu",
-"Bí ẩn học đường",
-"Thế giới phép thuật",
-"Đêm định mệnh",
-"Harem School",
-"Mystic Dream",
-"Summer Love",
-"Dark Night",
-"Dream Story",
-"Lost Memory",
-"Magic Tale",
-"Secret Heart"
-]
-
-for(let i=0;i<games.length;i++){
-
-document.write(`
-
-<div class="game-card glass rounded overflow-hidden reveal">
-
-<div class="relative">
-
-<img src="https://picsum.photos/300/40${i}" class="w-full">
-
-<span class="badge absolute top-2 left-2 bg-red-600 text-xs px-2 py-1 rounded">
-NEW
-</span>
-
-<button onclick="bookmark(${i})" class="absolute top-2 right-2 text-white">
-<i class="fa fa-heart"></i>
-</button>
-
-</div>
-
-<div class="p-2">
-
-<h3 class="cyber text-sm">
-${games[i]}
-</h3>
-
-<p class="text-xs text-purple-400">
-VN Team
-</p>
-
-<button onclick="openQuick(${i})" class="mt-2 w-full bg-purple-600 text-xs py-1 rounded">
-Quick View
-</button>
-
-</div>
-
-</div>
-
-`)
-
-}
-
-</script>
-
-</div>
-
-<!-- SIDEBAR -->
-
-<div class="lg:col-span-3 glass p-4 rounded reveal">
-
-<h2 class="cyber text-purple-400 mb-3">
-Bảng xếp hạng nhóm
-</h2>
-
-<div class="space-y-3">
-
-<div>
-VN Team
-<div class="w-full bg-gray-700 h-2 rounded">
-<div class="bg-purple-600 h-2 w-4/5"></div>
-</div>
-</div>
-
-<div>
-Night VN
-<div class="w-full bg-gray-700 h-2 rounded">
-<div class="bg-purple-600 h-2 w-3/5"></div>
-</div>
-</div>
-
-<div>
-Dream VN
-<div class="w-full bg-gray-700 h-2 rounded">
-<div class="bg-purple-600 h-2 w-2/5"></div>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- PAGINATION -->
-
-<div class="text-center mt-10">
-
-<button class="px-3 py-1 border">1</button>
-<button class="px-3 py-1 border">2</button>
-<button class="px-3 py-1 border">3</button>
-<button class="px-3 py-1 border">Next</button>
-
-</div>
-
-<!-- QUICK VIEW MODAL -->
-
-<div id="quickModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center">
-
-<div class="glass p-6 rounded w-96 text-center">
-
-<h2 id="quickTitle" class="cyber text-purple-400 mb-3"></h2>
-
-<img id="quickImg" class="mx-auto mb-3">
-
-<p class="text-sm">
-Tóm tắt cốt truyện demo Visual Novel.
-</p>
-
-<div class="flex justify-center gap-3 mt-3">
-
-<button onclick="copyLink()" class="border px-3 py-1">
-Copy Link
-</button>
-
-<button class="border px-3 py-1">
-Facebook
-</button>
-
-<button class="border px-3 py-1">
-Twitter
-</button>
-
-</div>
-
-<div class="mt-4 text-left">
-
-<h3 class="cyber text-purple-400 text-sm">
-Comments
-</h3>
-
-<p class="text-xs text-gray-300">
-User1: Game rất hay
-</p>
-
-<p class="text-xs text-gray-300">
-User2: Đang chờ bản cập nhật
-</p>
-
-</div>
-
-<button onclick="closeQuick()" class="mt-4 text-red-400">
-Đóng
-</button>
-
-</div>
-
-</div>
-
-<!-- AUTH MODAL -->
-
-<div id="authModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center">
-
-<div class="glass p-6 rounded w-96">
-
-<h2 class="cyber text-purple-400 mb-3">
-Đăng nhập
-</h2>
-
-<input placeholder="Email" class="w-full mb-3 p-2 bg-black/40 border rounded">
-
-<input placeholder="Password" type="password" class="w-full mb-3 p-2 bg-black/40 border rounded">
-
-<button class="w-full bg-purple-600 py-2 rounded">
-Login
-</button>
-
-<p class="text-xs mt-2 cursor-pointer">
-Chưa có tài khoản? Đăng ký
-</p>
-
-</div>
-
-</div>
-
-<!-- TOAST -->
-
-<div id="toast" class="toast">
-Saved
-</div>
-
-<!-- BACK TO TOP -->
-
-<button id="topBtn" onclick="topPage()" class="bg-purple-600 p-3 rounded">
-↑
-</button>
-
-<!-- AUDIO -->
-
-<audio id="bgm" loop>
-<source src="">
-</audio>
-
-<button onclick="toggleAudio()" class="fixed bottom-20 left-5 bg-purple-600 p-3 rounded">
-<i class="fa fa-volume-up"></i>
-</button>
-
-<script>
-
-/* PRELOADER */
-
-setTimeout(()=>{
-document.getElementById("preloader").style.display="none"
-},2000)
-
-/* HERO SLIDER */
-
-let slides=document.querySelectorAll(".slide")
-let index=0
-
-setInterval(()=>{
-slides[index].classList.remove("active")
-index=(index+1)%slides.length
-slides[index].classList.add("active")
-},4000)
-
-/* SCROLL PROGRESS */
-
-window.onscroll=function(){
-
-let winScroll=document.body.scrollTop||document.documentElement.scrollTop
-let height=document.documentElement.scrollHeight-document.documentElement.clientHeight
-let scrolled=(winScroll/height)*100
-
-document.getElementById("progress").style.width=scrolled+"%"
-
-if(winScroll>300){
-topBtn.style.display="block"
-}else{
-topBtn.style.display="none"
-}
-
-}
-
-/* BACK TO TOP */
-
-function topPage(){
-window.scrollTo({top:0,behavior:"smooth"})
-}
-
-/* BOOKMARK */
-
-function bookmark(id){
-
-let list=JSON.parse(localStorage.getItem("fav")||"[]")
-
-if(!list.includes(id))list.push(id)
-
-localStorage.setItem("fav",JSON.stringify(list))
-
-toast("Đã lưu game")
-
-}
-
-/* QUICK VIEW */
-
-function openQuick(id){
-
-quickTitle.innerText=games[id]
-quickImg.src="https://picsum.photos/400/30"+id
-
-quickModal.classList.remove("hidden")
-
-}
-
-function closeQuick(){
-quickModal.classList.add("hidden")
-}
-
-/* COPY */
-
-function copyLink(){
-
-navigator.clipboard.writeText(location.href)
-
-toast("Đã copy link")
-
-}
-
-/* TOAST */
-
-function toast(msg){
-
-let t=document.getElementById("toast")
-
-t.innerText=msg
-
-t.style.display="block"
-
-setTimeout(()=>t.style.display="none",3000)
-
-}
-
-/* AUTH */
-
-function openAuth(){
-authModal.classList.remove("hidden")
-}
-
-/* AUDIO */
-
-function toggleAudio(){
-
-let a=document.getElementById("bgm")
-
-if(a.paused){
-a.play()
-}else{
-a.pause()
-}
-
-}
-
-/* PARTICLE BACKGROUND */
-
-const canvas=document.getElementById("bgCanvas")
-const ctx=canvas.getContext("2d")
-
-canvas.width=window.innerWidth
-canvas.height=window.innerHeight
-
-let particles=[]
-
-for(let i=0;i<70;i++){
-particles.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-vx:(Math.random()-0.5),
-vy:(Math.random()-0.5)
-})
-}
-
-function animate(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-particles.forEach(p=>{
-
-p.x+=p.vx
-p.y+=p.vy
-
-ctx.fillStyle="#bc13fe"
-ctx.fillRect(p.x,p.y,2,2)
-
-})
-
-requestAnimationFrame(animate)
-
-}
-
-animate()
-
-/* SCROLL REVEAL */
-
-const observer=new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){
-entry.target.classList.add("active")
-}
-})
-})
-
-document.querySelectorAll(".reveal").forEach(el=>{
-observer.observe(el)
-})
-
-</script>
-
+<body class="tail-container bg-black text-white overflow-x-hidden">
+    <!-- PRELOADER -->
+    <div id="preloader" class="fixed inset-0 bg-black z-[9999] flex items-center justify-center">
+        <div class="text-center">
+            <div class="logo-font text-7xl tracking-widest neon-text mb-6 flex items-center justify-center gap-3">
+                <span class="text-[#bc13fe]">N</span>
+                <span class="text-white">EON</span>
+                <span class="text-[#bc13fe]">VERSE</span>
+            </div>
+            <div class="w-16 h-1 bg-[#bc13fe] mx-auto rounded-full animate-pulse"></div>
+            <p class="mt-8 text-sm tracking-[4px] text-gray-400">ĐANG TẢI THẾ GIỚI NEON...</p>
+        </div>
+    </div>
+
+    <!-- PARTICLE CANVAS -->
+    <canvas id="particleCanvas" class="particle-canvas"></canvas>
+
+    <!-- BACKGROUND OVERLAY -->
+    <div class="fixed inset-0 hero-bg z-[-2]"></div>
+    <div class="fixed inset-0 bg-black/60 z-[-1]"></div>
+
+    <!-- SCROLL PROGRESS BAR -->
+    <div id="progressBar" class="fixed top-0 left-0 h-1 bg-[#bc13fe] z-[999] transition-all duration-100" style="width: 0%"></div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 left-0 right-0 bg-black/80 backdrop-blur-lg border-b border-[#bc13fe]/30 z-50">
+        <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- LOGO -->
+            <div onclick="window.location.reload()" class="logo-font text-3xl tracking-[6px] neon-text flex items-center gap-2 cursor-pointer glitch" data-text="NEONVERSE">
+                NEONVERSE
+            </div>
+
+            <!-- DESKTOP MENU -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#" class="hover:text-[#bc13fe] transition-colors">TRANG CHỦ</a>
+                <a href="#" class="hover:text-[#bc13fe] transition-colors">THỂ LOẠI</a>
+                <a href="#" class="hover:text-[#bc13fe] transition-colors">XẾP HẠNG</a>
+                <a href="#" class="hover:text-[#bc13fe] transition-colors">TIN TỨC</a>
+                <a href="#" class="hover:text-[#bc13fe] transition-colors">NHÓM DỊCH</a>
+            </div>
+
+            <!-- DESKTOP SEARCH + AUTH -->
+            <div class="hidden md:flex items-center gap-4">
+                <div class="relative">
+                    <input id="desktopSearch" 
+                           onkeyup="liveSearch(this)"
+                           type="text" 
+                           placeholder="Tìm truyện hoặc game..." 
+                           class="bg-zinc-900 border border-[#bc13fe]/30 focus:border-[#bc13fe] rounded-2xl px-5 py-2 w-80 text-sm outline-none transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute right-5 top-3 text-[#bc13fe]"></i>
+                </div>
+                
+                <button onclick="showAuthModal()" 
+                        class="px-6 py-2 border border-[#bc13fe] hover:bg-[#bc13fe] hover:text-black transition-all rounded-2xl text-sm font-medium">
+                    ĐĂNG NHẬP
+                </button>
+                <button onclick="showAuthModal(true)" 
+                        class="px-8 py-2 bg-[#bc13fe] hover:bg-[#d92eff] text-black font-semibold rounded-2xl text-sm transition-all">
+                    ĐĂNG KÝ
+                </button>
+            </div>
+
+            <!-- MOBILE HAMBURGER -->
+            <button onclick="toggleDrawer()" 
+                    class="md:hidden flex flex-col gap-1.5">
+                <span class="w-7 h-0.5 bg-white"></span>
+                <span class="w-7 h-0.5 bg-white"></span>
+                <span class="w-7 h-0.5 bg-white"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MOBILE DRAWER -->
+    <div id="mobileDrawer" 
+         class="drawer fixed top-0 left-0 h-screen w-80 bg-zinc-950 border-r border-[#bc13fe]/40 z-[999] pt-20 px-6 overflow-y-auto">
+        
+        <!-- DRAWER SEARCH -->
+        <div class="relative mb-8">
+            <input id="drawerSearch" 
+                   onkeyup="liveSearch(this)"
+                   type="text" 
+                   placeholder="Tìm kiếm nhanh..." 
+                   class="w-full bg-zinc-900 border border-[#bc13fe]/30 rounded-2xl px-5 py-3 text-sm">
+        </div>
+
+        <!-- AUTH IN DRAWER -->
+        <div class="flex gap-3 mb-8">
+            <button onclick="showAuthModal();toggleDrawer()" 
+                    class="flex-1 py-3 border border-[#bc13fe] text-[#bc13fe] rounded-2xl text-sm font-medium">ĐĂNG NHẬP</button>
+            <button onclick="showAuthModal(true);toggleDrawer()" 
+                    class="flex-1 py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold">ĐĂNG KÝ</button>
+        </div>
+
+        <!-- FILTERS INSIDE DRAWER (MOBILE ONLY) -->
+        <div class="md:hidden">
+            <h3 class="text-[#bc13fe] text-xs tracking-widest mb-4">BỘ LỌC</h3>
+            <div class="space-y-6">
+                <!-- GENRE FILTERS -->
+                <div>
+                    <p class="text-xs text-gray-400 mb-2">THỂ LOẠI</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="toggleFilter(this)" data-filter="romance" 
+                                class="genre-btn px-4 py-1 text-xs rounded-3xl border border-white/30 hover:border-[#bc13fe]">Lãng Mạn</button>
+                        <button onclick="toggleFilter(this)" data-filter="fantasy" 
+                                class="genre-btn px-4 py-1 text-xs rounded-3xl border border-white/30 hover:border-[#bc13fe]">Huyền Ảo</button>
+                        <button onclick="toggleFilter(this)" data-filter="mystery" 
+                                class="genre-btn px-4 py-1 text-xs rounded-3xl border border-white/30 hover:border-[#bc13fe]">Kinh Dị</button>
+                        <button onclick="toggleFilter(this)" data-filter="action" 
+                                class="genre-btn px-4 py-1 text-xs rounded-3xl border border-white/30 hover:border-[#bc13fe]">Hành Động</button>
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div>
+                    <p class="text-xs text-gray-400 mb-2">TRẠNG THÁI</p>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" onchange="applyFilters()" class="status-check accent-[#bc13fe]" data-status="full"> Hoàn thành
+                        </label>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" onchange="applyFilters()" class="status-check accent-[#bc13fe]" data-status="ongoing"> Đang dịch
+                        </label>
+                    </div>
+                </div>
+
+                <!-- RATING -->
+                <div>
+                    <p class="text-xs text-gray-400 mb-3">ĐÁNH GIÁ TỐI THIỂU</p>
+                    <select onchange="applyFilters()" id="mobileRatingFilter"
+                            class="bg-zinc-900 border border-[#bc13fe]/30 rounded-2xl w-full py-3 px-4 text-sm">
+                        <option value="0">Tất cả</option>
+                        <option value="4">4.0+</option>
+                        <option value="4.5">4.5+</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-20"></div>
+    </div>
+
+    <!-- HERO SLIDER -->
+    <div class="relative h-screen pt-16 flex items-center overflow-hidden">
+        <div id="heroSlider" class="relative w-full h-full">
+            <!-- SLIDE 1 -->
+            <div id="slide1" class="slider-slide absolute inset-0 flex items-center justify-center opacity-100 transition-opacity duration-700">
+                <img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=PDeMat4p4rsSodoqScK3-GdxP-P-lL178dyo6oUK3uY%3D&amp;token-time=1774915200" 
+                     class="absolute inset-0 w-full h-full object-cover" alt="Slide 1">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+                <div class="relative z-10 max-w-2xl px-8 text-left">
+                    <div class="inline-block px-6 py-1 bg-[#bc13fe] text-black text-xs font-bold tracking-widest mb-6">MỚI CẬP NHẬT</div>
+                    <h1 class="logo-font text-6xl leading-none mb-4">HỒNG NHÃN MA ĐẠO</h1>
+                    <p class="text-xl text-gray-200 mb-8 max-w-md">Câu chuyện tình yêu cấm kỵ giữa ma nữ và kiếm sĩ nhân loại.</p>
+                    <button onclick="quickView(1)" 
+                            class="px-10 py-4 bg-white text-black font-semibold rounded-3xl flex items-center gap-3 hover:scale-105 transition">
+                        <i class="fa-solid fa-play"></i>
+                        XEM NGAY
+                    </button>
+                </div>
+            </div>
+
+            <!-- SLIDE 2 -->
+            <div id="slide2" class="slider-slide absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-700">
+                <img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&amp;token-time=1774915200" 
+                     class="absolute inset-0 w-full h-full object-cover" alt="Slide 2">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+                <div class="relative z-10 max-w-2xl px-8 text-left">
+                    <div class="inline-block px-6 py-1 bg-[#bc13fe] text-black text-xs font-bold tracking-widest mb-6">HOT NHẤT</div>
+                    <h1 class="logo-font text-6xl leading-none mb-4">VŨ TRỤ NEON</h1>
+                    <p class="text-xl text-gray-200 mb-8 max-w-md">Hành trình cứu thế giới ảo bằng tình yêu và công nghệ.</p>
+                    <button onclick="quickView(2)" 
+                            class="px-10 py-4 bg-white text-black font-semibold rounded-3xl flex items-center gap-3 hover:scale-105 transition">
+                        <i class="fa-solid fa-play"></i>
+                        XEM NGAY
+                    </button>
+                </div>
+            </div>
+
+            <!-- SLIDE 3 -->
+            <div id="slide3" class="slider-slide absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-700">
+                <img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/150092125/19922e99dbfb4f8780662cfde8b6408b/eyJ3IjoxMDgwfQ%3D%3D/1.JPG?token-hash=8UPbE0N1jV4OPGtlz6tvoYaEQrHM5thcho7AaeqjMR8%3D&amp;token-time=1774915200" 
+                     class="absolute inset-0 w-full h-full object-cover" alt="Slide 3">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+                <div class="relative z-10 max-w-2xl px-8 text-left">
+                    <div class="inline-block px-6 py-1 bg-[#bc13fe] text-black text-xs font-bold tracking-widest mb-6">18+</div>
+                    <h1 class="logo-font text-6xl leading-none mb-4">BÍ MẬT CỦA NỮ HOÀNG</h1>
+                    <p class="text-xl text-gray-200 mb-8 max-w-md">Thế giới harem đầy dục vọng và quyền lực.</p>
+                    <button onclick="quickView(3)" 
+                            class="px-10 py-4 bg-white text-black font-semibold rounded-3xl flex items-center gap-3 hover:scale-105 transition">
+                        <i class="fa-solid fa-play"></i>
+                        XEM NGAY
+                    </button>
+                </div>
+            </div>
+
+            <!-- SLIDER CONTROLS -->
+            <div class="absolute bottom-12 left-1/2 flex gap-4 z-20">
+                <button onclick="prevSlide()" 
+                        class="w-12 h-12 rounded-2xl border border-white/30 hover:border-[#bc13fe] flex items-center justify-center transition">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button onclick="nextSlide()" 
+                        class="w-12 h-12 rounded-2xl border border-white/30 hover:border-[#bc13fe] flex items-center justify-center transition">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- DOTS -->
+            <div id="sliderDots" class="absolute bottom-8 left-1/2 flex gap-3"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="max-w-screen-2xl mx-auto px-6 pt-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- LEFT SIDEBAR FILTER (DESKTOP ONLY) -->
+        <div class="lg:col-span-2 hidden lg:block">
+            <div class="sticky top-24 bg-zinc-950 border border-[#bc13fe]/20 rounded-3xl p-6">
+                <h2 class="text-[#bc13fe] text-sm tracking-[2px] mb-6">BỘ LỌC NÂNG CAO</h2>
+                
+                <!-- GENRES -->
+                <div class="mb-8">
+                    <p class="uppercase text-xs text-gray-400 mb-4">Thể loại</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="toggleFilter(this)" data-filter="romance" 
+                                class="genre-btn text-left px-5 py-3 text-sm rounded-2xl border border-white/20 hover:border-[#bc13fe] flex items-center gap-2">
+                            <i class="fa-solid fa-heart text-pink-400"></i> Lãng Mạn
+                        </button>
+                        <button onclick="toggleFilter(this)" data-filter="fantasy" 
+                                class="genre-btn text-left px-5 py-3 text-sm rounded-2xl border border-white/20 hover:border-[#bc13fe] flex items-center gap-2">
+                            <i class="fa-solid fa-dragon"></i> Huyền Ảo
+                        </button>
+                        <button onclick="toggleFilter(this)" data-filter="mystery" 
+                                class="genre-btn text-left px-5 py-3 text-sm rounded-2xl border border-white/20 hover:border-[#bc13fe] flex items-center gap-2">
+                            <i class="fa-solid fa-mask"></i> Kinh Dị
+                        </button>
+                        <button onclick="toggleFilter(this)" data-filter="action" 
+                                class="genre-btn text-left px-5 py-3 text-sm rounded-2xl border border-white/20 hover:border-[#bc13fe] flex items-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> Hành Động
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="mb-8">
+                    <p class="uppercase text-xs text-gray-400 mb-4">Trạng thái</p>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" onchange="applyFilters()" class="status-check w-5 h-5 accent-[#bc13fe]" data-status="full">
+                            <span class="text-sm">Hoàn thành</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" onchange="applyFilters()" class="status-check w-5 h-5 accent-[#bc13fe]" data-status="ongoing">
+                            <span class="text-sm">Đang dịch</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- RATING -->
+                <div>
+                    <p class="uppercase text-xs text-gray-400 mb-4">Đánh giá</p>
+                    <select id="ratingFilter" onchange="applyFilters()" 
+                            class="w-full bg-zinc-900 border border-[#bc13fe]/30 rounded-2xl py-4 px-5 text-sm">
+                        <option value="0">Tất cả sao</option>
+                        <option value="3">3.0 ★ trở lên</option>
+                        <option value="4">4.0 ★ trở lên</option>
+                        <option value="4.5">4.5 ★ trở lên</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME GRID -->
+        <div class="lg:col-span-7">
+            <!-- HEADER -->
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-semibold logo-font tracking-wider">KHÁM PHÁ NEONVERSE</h2>
+                
+                <!-- SORT -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-gray-400">SẮP XẾP:</span>
+                    <select id="sortSelect" onchange="sortGames()" 
+                            class="bg-zinc-900 border border-[#bc13fe]/30 rounded-2xl px-6 py-2 text-sm">
+                        <option value="new">Mới nhất</option>
+                        <option value="popular">Phổ biến</option>
+                        <option value="rating">Đánh giá cao</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- GAMES GRID -->
+            <div id="gamesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                
+                <!-- GAME CARD 1 -->
+                <div data-id="1" data-genre="romance" data-status="full" data-rating="4.8" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=PDeMat4p4rsSodoqScK3-GdxP-P-lL178dyo6oUK3uY%3D&amp;token-time=1774915200" 
+                             class="w-full aspect-[4/3] object-cover" alt="Hồng Nhãn">
+                        <div class="shine"></div>
+                        <div class="absolute top-3 left-3 bg-black/70 px-3 py-1 text-[10px] rounded-2xl font-bold">18+</div>
+                        <div onclick="toggleBookmark(this)" 
+                             class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Hồng Nhãn Ma Đạo</h3>
+                                <p class="text-xs text-gray-400 mt-1">Lãng Mạn • Hoàn thành</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.8</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(1)" 
+                                class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 2 -->
+                <div data-id="2" data-genre="fantasy" data-status="ongoing" data-rating="4.6" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1015/600/400" class="w-full aspect-[4/3] object-cover" alt="Vũ Trụ Neon">
+                        <div class="shine"></div>
+                        <div class="absolute top-3 left-3 bg-red-500 px-3 py-1 text-[10px] rounded-2xl font-bold animate-pulse">NEW</div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Vũ Trụ Neon 2077</h3>
+                                <p class="text-xs text-gray-400 mt-1">Huyền Ảo • Đang dịch</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.6</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(2)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 3 -->
+                <div data-id="3" data-genre="mystery" data-status="full" data-rating="4.9" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/201/600/400" class="w-full aspect-[4/3] object-cover" alt="Bí Mật">
+                        <div class="shine"></div>
+                        <div class="absolute top-3 left-3 bg-black/70 px-3 py-1 text-[10px] rounded-2xl font-bold">HOT</div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Bí Mật Của Nữ Hoàng</h3>
+                                <p class="text-xs text-gray-400 mt-1">Kinh Dị • Hoàn thành</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★★</div>
+                                <span class="text-[#bc13fe] text-xs">4.9</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(3)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 4 -->
+                <div data-id="4" data-genre="action" data-status="ongoing" data-rating="4.3" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/29/600/400" class="w-full aspect-[4/3] object-cover" alt="Chiến Binh">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Chiến Binh Bóng Tối</h3>
+                                <p class="text-xs text-gray-400 mt-1">Hành Động • Đang dịch</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.3</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(4)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 5 -->
+                <div data-id="5" data-genre="romance" data-status="full" data-rating="4.7" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/160/600/400" class="w-full aspect-[4/3] object-cover" alt="Tình Yêu">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Ánh Trăng Tình Yêu</h3>
+                                <p class="text-xs text-gray-400 mt-1">Lãng Mạn • Hoàn thành</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.7</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(5)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 6 -->
+                <div data-id="6" data-genre="fantasy" data-status="ongoing" data-rating="4.4" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/201/600/400" class="w-full aspect-[4/3] object-cover" alt="Rồng">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Rồng Vàng Huyền Thoại</h3>
+                                <p class="text-xs text-gray-400 mt-1">Huyền Ảo • Đang dịch</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.4</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(6)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 7 -->
+                <div data-id="7" data-genre="mystery" data-status="full" data-rating="4.5" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/29/600/400" class="w-full aspect-[4/3] object-cover" alt="Ma Ám">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Lời Nguyền Ma Ám</h3>
+                                <p class="text-xs text-gray-400 mt-1">Kinh Dị • Hoàn thành</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.5</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(7)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 8 -->
+                <div data-id="8" data-genre="action" data-status="ongoing" data-rating="4.2" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/160/600/400" class="w-full aspect-[4/3] object-cover" alt="Samurai">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Samurai Neon</h3>
+                                <p class="text-xs text-gray-400 mt-1">Hành Động • Đang dịch</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.2</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(8)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 9 -->
+                <div data-id="9" data-genre="romance" data-status="full" data-rating="4.9" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1015/600/400" class="w-full aspect-[4/3] object-cover" alt="Cô Dâu">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Cô Dâu Ma Quái</h3>
+                                <p class="text-xs text-gray-400 mt-1">Lãng Mạn • Hoàn thành</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★★</div>
+                                <span class="text-[#bc13fe] text-xs">4.9</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(9)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 10 -->
+                <div data-id="10" data-genre="fantasy" data-status="ongoing" data-rating="4.1" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/201/600/400" class="w-full aspect-[4/3] object-cover" alt="Pháp Sư">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Pháp Sư Neon</h3>
+                                <p class="text-xs text-gray-400 mt-1">Huyền Ảo • Đang dịch</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.1</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(10)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 11 -->
+                <div data-id="11" data-genre="mystery" data-status="full" data-rating="4.7" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/29/600/400" class="w-full aspect-[4/3] object-cover" alt="Ám Ảnh">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Ám Ảnh Trong Gương</h3>
+                                <p class="text-xs text-gray-400 mt-1">Kinh Dị • Hoàn thành</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★☆</div>
+                                <span class="text-[#bc13fe] text-xs">4.7</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(11)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+
+                <!-- GAME CARD 12 -->
+                <div data-id="12" data-genre="action" data-status="ongoing" data-rating="4.8" 
+                     class="game-card bg-zinc-900 rounded-3xl overflow-hidden card-3d relative group">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/160/600/400" class="w-full aspect-[4/3] object-cover" alt="Cyber">
+                        <div class="shine"></div>
+                        <div onclick="toggleBookmark(this)" class="absolute top-3 right-3 w-8 h-8 bg-black/60 rounded-2xl flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-heart text-white"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg leading-tight">Cyber Samurai 2088</h3>
+                                <p class="text-xs text-gray-400 mt-1">Hành Động • Đang dịch</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex text-amber-400 text-xs">★★★★★</div>
+                                <span class="text-[#bc13fe] text-xs">4.8</span>
+                            </div>
+                        </div>
+                        <button onclick="quickView(12)" class="mt-6 w-full py-3 bg-[#bc13fe] text-black rounded-2xl text-sm font-semibold hover:bg-white transition">XEM NHANH</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="flex justify-center gap-3 mt-12">
+                <button onclick="changePage(1)" 
+                        class="w-10 h-10 flex items-center justify-center border border-[#bc13fe]/30 hover:border-[#bc13fe] rounded-2xl">1</button>
+                <button onclick="changePage(2)" 
+                        class="w-10 h-10 flex items-center justify-center border border-[#bc13fe]/30 hover:border-[#bc13fe] rounded-2xl">2</button>
+                <button onclick="changePage(3)" 
+                        class="w-10 h-10 flex items-center justify-center border border-[#bc13fe]/30 hover:border-[#bc13fe] rounded-2xl">3</button>
+                <button class="px-5 text-[#bc13fe]">...</button>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="lg:col-span-3 space-y-10">
+            
+            <!-- RANKING -->
+            <div class="bg-zinc-950 border border-[#bc13fe]/20 rounded-3xl p-6">
+                <h3 class="flex items-center gap-2 text-[#bc13fe] mb-6">
+                    <i class="fa-solid fa-trophy"></i>
+                    BẢNG XẾP HẠNG NHÓM DỊCH
+                </h3>
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 bg-[#bc13fe] rounded-2xl flex items-center justify-center text-xs font-bold">1</div>
+                        <div class="flex-1">
+                            <p class="font-medium">Shadow Team</p>
+                            <p class="text-xs text-gray-400">248 truyện • 4.9★</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 bg-[#bc13fe]/70 rounded-2xl flex items-center justify-center text-xs font-bold">2</div>
+                        <div class="flex-1">
+                            <p class="font-medium">Neon Knights</p>
+                            <p class="text-xs text-gray-400">189 truyện • 4.8★</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 bg-[#bc13fe]/40 rounded-2xl flex items-center justify-center text-xs font-bold">3</div>
+                        <div class="flex-1">
+                            <p class="font-medium">Phantom Translators</p>
+                            <p class="text-xs text-gray-400">156 truyện • 4.7★</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIN TỨC -->
+            <div class="bg-zinc-950 border border-[#bc13fe]/20 rounded-3xl p-6">
+                <h3 class="text-[#bc13fe] mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-newspaper"></i>
+                    TIN TỨC MỚI
+                </h3>
+                <div class="space-y-8 text-sm">
+                    <div class="flex gap-4">
+                        <img src="https://picsum.photos/id/29/80/80" class="w-16 h-16 object-cover rounded-2xl" alt="">
+                        <div>
+                            <p class="line-clamp-2">Cập nhật chương 245 của Hồng Nhãn Ma Đạo – Cảnh nóng nhất từ trước đến nay!</p>
+                            <p class="text-[#bc13fe] text-xs mt-2">2 giờ trước</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <img src="https://picsum.photos/id/160/80/80" class="w-16 h-16 object-cover rounded-2xl" alt="">
+                        <div>
+                            <p class="line-clamp-2">Neonverse chính thức mở server mới cho game Vũ Trụ Neon</p>
+                            <p class="text-[#bc13fe] text-xs mt-2">Hôm qua</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUDIO TOGGLE -->
+            <div onclick="toggleAudio()" 
+                 id="audioBtn"
+                 class="bg-zinc-950 border border-[#bc13fe]/20 hover:border-[#bc13fe] rounded-3xl p-5 flex items-center justify-between cursor-pointer transition-all">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-music text-[#bc13fe]"></i>
+                    <span class="text-sm">Nhạc nền Neon</span>
+                </div>
+                <div id="audioStatus" class="text-xs bg-[#bc13fe] text-black px-4 py-1 rounded-3xl">ĐANG BẬT</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING ACTION BUTTON -->
+    <button onclick="scrollToTop()" 
+            class="fixed bottom-8 right-8 w-14 h-14 bg-[#bc13fe] text-black rounded-3xl shadow-2xl flex items-center justify-center text-2xl hover:rotate-12 transition z-[999]">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- QUICK VIEW MODAL -->
+    <div id="quickViewModal" onclick="if(event.target.id==='quickViewModal') hideQuickView()" 
+         class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]">
+        <div onclick="event.stopImmediatePropagation()" 
+             class="modal bg-zinc-950 max-w-4xl w-full mx-4 rounded-3xl overflow-hidden">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- LEFT IMAGE -->
+                <div id="modalImageContainer" class="relative">
+                    <img id="modalImage" src="" class="w-full h-full object-cover" alt="">
+                </div>
+                
+                <!-- RIGHT INFO -->
+                <div class="p-8 flex flex-col">
+                    <div class="flex justify-between">
+                        <div id="modalTitle" class="text-3xl font-semibold"></div>
+                        <button onclick="hideQuickView()" class="text-4xl leading-none text-gray-400">×</button>
+                    </div>
+                    
+                    <div id="modalGenre" class="text-xs text-[#bc13fe] mt-2"></div>
+                    
+                    <div class="flex-1 py-8 text-sm text-gray-300" id="modalSynopsis">
+                        <!-- filled by JS -->
+                    </div>
+                    
+                    <!-- RATING + BUTTONS -->
+                    <div class="flex items-center justify-between border-t border-white/10 pt-6">
+                        <div>
+                            <button onclick="addToBookmarkFromModal()" 
+                                    class="flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-heart"></i>
+                                <span>Yêu thích</span>
+                            </button>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="shareToTwitter()" 
+                                    class="w-9 h-9 border border-white/30 rounded-2xl flex items-center justify-center">
+                                <i class="fa-brands fa-twitter"></i>
+                            </button>
+                            <button onclick="shareToFacebook()" 
+                                    class="w-9 h-9 border border-white/30 rounded-2xl flex items-center justify-center">
+                                <i class="fa-brands fa-facebook"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="fakeDownload()" 
+                            class="mt-6 py-4 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-black font-bold rounded-3xl flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-download"></i>
+                        TẢI VỀ NGAY (Miễn phí)
+                    </button>
+                    
+                    <!-- COMMENT SECTION -->
+                    <div class="mt-10">
+                        <p class="text-xs uppercase tracking-widest mb-3">Bình luận (12)</p>
+                        <div class="max-h-48 overflow-y-auto text-xs space-y-5">
+                            <div class="flex gap-3">
+                                <div class="w-7 h-7 bg-gray-700 rounded-full"></div>
+                                <div>
+                                    <p class="font-medium">@user69</p>
+                                    <p class="text-gray-400">Tuyệt vời! Cốt truyện đỉnh cao 🔥</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <div class="w-7 h-7 bg-gray-700 rounded-full"></div>
+                                <div>
+                                    <p class="font-medium">@animefan</p>
+                                    <p class="text-gray-400">Chờ phần 2 quá lâu rồi...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" onclick="if(event.target.id==='authModal') hideAuthModal()" 
+         class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-[99999]">
+        <div class="modal bg-zinc-950 w-full max-w-md rounded-3xl p-8">
+            <div class="flex justify-between items-center mb-8">
+                <div id="authTitle" class="text-2xl font-semibold">Đăng nhập</div>
+                <button onclick="hideAuthModal()" class="text-3xl">×</button>
+            </div>
+            
+            <input type="text" placeholder="Tên đăng nhập hoặc email" 
+                   class="block w-full mb-4 bg-zinc-900 border border-white/20 rounded-2xl px-6 py-5">
+            <input type="password" placeholder="Mật khẩu" 
+                   class="block w-full mb-8 bg-zinc-900 border border-white/20 rounded-2xl px-6 py-5">
+            
+            <button onclick="fakeLogin()" 
+                    class="w-full py-5 bg-[#bc13fe] text-black font-bold rounded-3xl">ĐĂNG NHẬP</button>
+            
+            <div onclick="switchAuthMode()" id="switchText"
+                 class="text-center mt-8 text-xs text-[#bc13fe] cursor-pointer">
+                Chưa có tài khoản? Đăng ký ngay
+            </div>
+        </div>
+    </div>
+
+    <!-- AGE GATE MODAL -->
+    <div id="ageGateModal" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[99999]">
+        <div class="max-w-md text-center px-8">
+            <div class="logo-font text-5xl mb-10 neon-text">NEONVERSE</div>
+            <div class="text-4xl mb-8">Bạn đã đủ 18 tuổi?</div>
+            <div class="flex gap-6 justify-center">
+                <button onclick="confirmAge(true)" 
+                        class="px-14 py-6 bg-white text-black font-bold rounded-3xl text-xl">CÓ, TÔI ĐÃ 18+</button>
+                <button onclick="confirmAge(false)" 
+                        class="px-14 py-6 border border-white/50 text-white font-bold rounded-3xl text-xl">CHƯA</button>
+            </div>
+            <p class="text-xs text-gray-400 mt-16">Nội dung chỉ dành cho người trưởng thành.<br>Chúng tôi tôn trọng luật pháp.</p>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-8 left-8 space-y-3 z-[99999]"></div>
+
+    <script>
+        // TAILWIND INIT
+        function initTailwind() {
+            document.documentElement.style.setProperty('--tw-ring-color', '#bc13fe');
+        }
+
+        // PRELOADER
+        function hidePreloader() {
+            const preloader = document.getElementById('preloader');
+            preloader.style.transition = 'opacity 1.2s ease';
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 1200);
+        }
+
+        // PARTICLES
+        let particles = [];
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.speedY = Math.random() * 0.6 - 0.3;
+                this.opacity = Math.random() * 0.6 + 0.3;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#bc13fe';
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#bc13fe';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 180; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        // HERO SLIDER
+        let currentSlide = 0;
+        const slides = [1, 2, 3];
+
+        function showSlide(n) {
+            document.querySelectorAll('.slider-slide').forEach((slide, i) => {
+                slide.style.opacity = (i === n) ? '1' : '0';
+            });
+            currentSlide = n;
+            updateDots();
+        }
+
+        function updateDots() {
+            let dotsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                dotsHTML += `<button onclick="showSlide(${i})" 
+                    class="w-3 h-3 rounded-full transition-all ${i === currentSlide ? 'bg-[#bc13fe] scale-125' : 'bg-white/30'}"></button>`;
+            }
+            document.getElementById('sliderDots').innerHTML = dotsHTML;
+        }
+
+        function nextSlide() {
+            let next = (currentSlide + 1) % 3;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            let prev = (currentSlide - 1 + 3) % 3;
+            showSlide(prev);
+        }
+
+        let sliderInterval;
+
+        function startSlider() {
+            sliderInterval = setInterval(() => {
+                nextSlide();
+            }, 5200);
+        }
+
+        // SCROLL PROGRESS
+        function updateProgressBar() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        }
+
+        // AGE GATE
+        function confirmAge(isAdult) {
+            if (isAdult) {
+                localStorage.setItem('ageVerified', 'true');
+                document.getElementById('ageGateModal').style.display = 'none';
+            } else {
+                window.location.href = 'https://www.google.com';
+            }
+        }
+
+        // FILTER SYSTEM
+        let activeFilters = [];
+
+        function toggleFilter(btn) {
+            const filter = btn.getAttribute('data-filter');
+            if (activeFilters.includes(filter)) {
+                activeFilters = activeFilters.filter(f => f !== filter);
+                btn.classList.remove('border-[#bc13fe]', 'bg-[#bc13fe]', 'text-black');
+            } else {
+                activeFilters.push(filter);
+                btn.classList.add('border-[#bc13fe]', 'bg-[#bc13fe]', 'text-black');
+            }
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const cards = document.querySelectorAll('.game-card');
+            const minRating = parseFloat(document.getElementById('ratingFilter').value) || 0;
+            
+            cards.forEach(card => {
+                const genre = card.getAttribute('data-genre');
+                const statusChecks = document.querySelectorAll('.status-check:checked');
+                let statusMatch = true;
+                
+                if (statusChecks.length > 0) {
+                    statusMatch = false;
+                    statusChecks.forEach(check => {
+                        if (card.getAttribute('data-status') === check.getAttribute('data-status')) {
+                            statusMatch = true;
+                        }
+                    });
+                }
+                
+                const cardRating = parseFloat(card.getAttribute('data-rating'));
+                
+                const genreMatch = activeFilters.length === 0 || activeFilters.includes(genre);
+                const ratingMatch = cardRating >= minRating;
+                
+                if (genreMatch && statusMatch && ratingMatch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // LIVE SEARCH
+        function liveSearch(input) {
+            const term = input.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.game-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(term)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // SORTING
+        function sortGames() {
+            const container = document.getElementById('gamesGrid');
+            const cards = Array.from(container.children);
+            const sortMode = document.getElementById('sortSelect').value;
+            
+            cards.sort((a, b) => {
+                if (sortMode === 'new') {
+                    return parseInt(b.getAttribute('data-id')) - parseInt(a.getAttribute('data-id'));
+                }
+                if (sortMode === 'rating') {
+                    return parseFloat(b.getAttribute('data-rating')) - parseFloat(a.getAttribute('data-rating'));
+                }
+                // popular = random for demo
+                return Math.random() - 0.5;
+            });
+            
+            cards.forEach(card => container.appendChild(card));
+        }
+
+        // BOOKMARK
+        let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+
+        function toggleBookmark(el) {
+            const card = el.closest('.game-card');
+            const id = card.getAttribute('data-id');
+            
+            if (bookmarks.includes(id)) {
+                bookmarks = bookmarks.filter(b => b !== id);
+                el.querySelector('i').classList.remove('text-red-500');
+            } else {
+                bookmarks.push(id);
+                el.querySelector('i').classList.add('text-red-500');
+                showToast('Đã thêm vào yêu thích ❤️');
+            }
+            
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        }
+
+        function addToBookmarkFromModal() {
+            hideQuickView();
+            showToast('Đã lưu vào danh sách yêu thích!');
+        }
+
+        // QUICK VIEW
+        function quickView(id) {
+            const modal = document.getElementById('quickViewModal');
+            const img = document.getElementById('modalImage');
+            const titleEl = document.getElementById('modalTitle');
+            const genreEl = document.getElementById('modalGenre');
+            const synopsisEl = document.getElementById('modalSynopsis');
+            
+            // Demo data
+            const demoData = {
+                1: {
+                    title: "Hồng Nhãn Ma Đạo",
+                    img: "https://c10.patreonusercontent.com/4/patreon-media/p/post/134027967/e8a22d1f218a46158ed74b9e2461b65c/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=PDeMat4p4rsSodoqScK3-GdxP-P-lL178dyo6oUK3uY%3D&token-time=1774915200",
+                    genre: "Lãng Mạn • 18+",
+                    synopsis: "Cô gái ma tộc với đôi mắt đỏ rực đã rơi vào lưới tình với kiếm sĩ nhân loại. Một câu chuyện đầy dục vọng, máu và tình yêu cấm kỵ."
+                },
+                2: {
+                    title: "Vũ Trụ Neon 2077",
+                    img: "https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&token-time=1774915200",
+                    genre: "Huyền Ảo • NEW",
+                    synopsis: "Trong năm 2077, nhân loại sống trong thế giới ảo. Một hacker trẻ phát hiện bí mật về nguồn gốc của chính mình."
+                }
+            };
+            
+            const data = demoData[id] || {
+                title: "Truyện #" + id,
+                img: "https://picsum.photos/id/" + (100 + parseInt(id)) + "/800/600",
+                genre: "Hành Động • 18+",
+                synopsis: "Mô tả chi tiết cốt truyện dài dòng cho demo. Nội dung dành cho người lớn."
+            };
+            
+            img.src = data.img;
+            titleEl.textContent = data.title;
+            genreEl.textContent = data.genre;
+            synopsisEl.textContent = data.synopsis;
+            
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+
+        function hideQuickView() {
+            document.getElementById('quickViewModal').classList.add('hidden');
+        }
+
+        // SHARE
+        function shareToTwitter() {
+            showToast('Đã chia sẻ lên Twitter (demo)');
+        }
+        
+        function shareToFacebook() {
+            showToast('Đã chia sẻ lên Facebook (demo)');
+        }
+
+        // FAKE DOWNLOAD
+        function fakeDownload() {
+            showToast('Đang tải về... 100% ✓');
+            setTimeout(() => hideQuickView(), 800);
+        }
+
+        // TOAST
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast bg-zinc-900 border-l-4 border-[#bc13fe] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 max-w-xs`;
+            toast.innerHTML = `
+                <i class="fa-solid fa-check-circle text-[#bc13fe]"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.4s';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 2800);
+        }
+
+        // AUDIO TOGGLE
+        let audioEnabled = true;
+        let audio = null;
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const status = document.getElementById('audioStatus');
+            if (audioEnabled) {
+                status.textContent = 'ĐANG BẬT';
+                status.classList.add('bg-[#bc13fe]', 'text-black');
+                if (!audio) {
+                    // Demo audio - public domain or placeholder
+                    audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+                    audio.loop = true;
+                    audio.volume = 0.2;
+                }
+                audio.play().catch(() => {});
+            } else {
+                status.textContent = 'TẮT';
+                status.classList.remove('bg-[#bc13fe]', 'text-black');
+                if (audio) audio.pause();
+            }
+        }
+
+        // SCROLL TO TOP
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // SCROLL REVEAL
+        function initScrollReveal() {
+            const cards = document.querySelectorAll('.game-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.15 });
+            
+            cards.forEach(card => observer.observe(card));
+        }
+
+        // 3D TILT ALREADY IN CSS + HOVER
+
+        // GLITCH ON LOGO - already in CSS
+
+        // AUTH MODAL
+        let isRegister = false;
+
+        function showAuthModal(register = false) {
+            isRegister = register;
+            const modal = document.getElementById('authModal');
+            document.getElementById('authTitle').textContent = register ? 'Đăng ký' : 'Đăng nhập';
+            document.getElementById('switchText').textContent = register ? 'Đã có tài khoản? Đăng nhập' : 'Chưa có tài khoản? Đăng ký ngay';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function switchAuthMode() {
+            isRegister = !isRegister;
+            showAuthModal(isRegister);
+        }
+
+        function fakeLogin() {
+            hideAuthModal();
+            showToast('Đăng nhập thành công! Chào mừng bạn ❤️');
+            // Simulate logged in state
+        }
+
+        // DRAWER
+        function toggleDrawer() {
+            const drawer = document.getElementById('mobileDrawer');
+            drawer.classList.toggle('open');
+        }
+
+        // MOBILE RESPONSIVE HANDLER
+        function handleMobile() {
+            const drawer = document.getElementById('mobileDrawer');
+            if (window.innerWidth < 1024) {
+                // filters already moved to drawer
+            }
+        }
+
+        // KEYBOARD ESC
+        function handleEsc(e) {
+            if (e.key === 'Escape') {
+                const qv = document.getElementById('quickViewModal');
+                const auth = document.getElementById('authModal');
+                if (!qv.classList.contains('hidden')) hideQuickView();
+                else if (!auth.classList.contains('hidden')) hideAuthModal();
+                else {
+                    const drawer = document.getElementById('mobileDrawer');
+                    if (drawer.classList.contains('open')) toggleDrawer();
+                }
+            }
+        }
+
+        // CHANGE PAGE (demo)
+        function changePage(page) {
+            showToast(`Chuyển sang trang ${page} (demo)`);
+        }
+
+        // MAIN INIT
+        function initializeApp() {
+            initTailwind();
+            
+            // Hide preloader
+            setTimeout(hidePreloader, 1850);
+            
+            // Canvas
+            resizeCanvas();
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initParticles();
+            });
+            initParticles();
+            animateParticles();
+            
+            // Slider
+            updateDots();
+            startSlider();
+            
+            // Scroll progress
+            window.addEventListener('scroll', updateProgressBar);
+            
+            // Age gate check
+            const verified = localStorage.getItem('ageVerified');
+            if (!verified) {
+                document.getElementById('ageGateModal').style.display = 'flex';
+            } else {
+                document.getElementById('ageGateModal').style.display = 'none';
+            }
+            
+            // Scroll reveal
+            initScrollReveal();
+            
+            // Keyboard
+            document.addEventListener('keydown', handleEsc);
+            
+            // Mobile handler
+            handleMobile();
+            window.addEventListener('resize', handleMobile);
+            
+            // Fake logged user dropdown simulation (click logo again)
+            console.log('%cNEONVERSE 18+ FULLY LOADED - 1248 LINES', 'color:#bc13fe; font-family:monospace');
+            
+            // Show welcome toast
+            setTimeout(() => {
+                showToast('Chào mừng đến với NEONVERSE 18+');
+            }, 2800);
+        }
+
+        // BOOT
+        window.onload = initializeApp;
+    </script>
 </body>
 </html>
