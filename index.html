@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TOÀN CẦU V27</title>
+    <title>NEONVH • HỆ SINH THÁI TOÀN CẦU V29 (ANTI-BOT)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -13,7 +13,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
         :root { --neon-purple: #bc13fe; --neon-cyan: #00f0ff; --neon-pink: #ff00ff; }
-        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; scroll-behavior: smooth; }
+        /* TẮT TÍNH NĂNG BÔI ĐEN VĂN BẢN ĐỂ CHỐNG COPY */
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; scroll-behavior: smooth; user-select: none; -webkit-user-select: none; }
         .logo-font { font-family: 'Orbitron', sans-serif; }
         .hero-bg-static { background-image: url('https://c10.patreonusercontent.com/4/patreon-media/p/post/150765348/ad9f53cd292849189563a7cdcab6d7ba/eyJ3IjoxMDgwfQ%3D%3D/1.png?token-hash=AUExMqv41paQJ19kzOiW8qHME1xUGCfq6Tv-mJtI4Dw%3D&token-time=1774915200'); background-size: cover; background-position: center; filter: blur(8px); transform: scale(1.05); }
         .card-3d { transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
@@ -287,6 +288,18 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
+        // ==========================================
+        // KHÓA CHUỘT PHẢI & CHỐNG SO SOI CODE (F12) 
+        // ==========================================
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) { return false; } // Khóa F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } // Khóa Ctrl+Shift+I
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } // Khóa Ctrl+U
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyASYEtwTigOgBuL62xPr1qxNfh_ptO6dM4", 
             authDomain: "neonverse-69f48.firebaseapp.com",
@@ -298,19 +311,22 @@
 
         const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' font-weight='bold' fill='%23bc13fe' text-anchor='middle' dominant-baseline='middle'%3EL%E1%BB%97i Link %E1%BA%A2nh%3C/text%3E%3C/svg%3E";
         const SECRET_ADMIN_USER = "Admin"; const SECRET_ADMIN_PASS = "Admin123";
-        
-        // THỜI GIAN 30 NGÀY CHO BOT CẮT CỔ
         const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
         let gamesDB = []; let isLoginMode = true; 
         let db = null; let isOnline = false;
+        
+        // BIẾN CHỐNG SPAM BOT CLICK LIÊN TỤC
+        let lastActionTime = 0; 
+        const COOLDOWN_MS = 3000; // Nghỉ 3 giây mỗi lần thao tác
 
         if(firebaseConfig.apiKey !== "ĐIỀN_API_KEY_CỦA_BRO_VÀO_ĐÂY") {
             try { 
                 firebase.initializeApp(firebaseConfig); 
                 db = firebase.firestore(); 
+                db.settings({ experimentalForceLongPolling: true, merge: true });
                 isOnline = true; 
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Lỗi Firebase:", e); }
         }
 
         // HÀM LẤY IP CỦA NGƯỜI DÙNG
@@ -364,7 +380,6 @@
             } renderAdminUserList();
         }
 
-        // CẬP NHẬT TÍNH NĂNG BOT XÓA 30 NGÀY + SOI IP
         async function renderAdminUserList() {
             let users = [];
             const now = Date.now();
@@ -377,7 +392,6 @@
                     let uData = doc.data();
                     let dbId = doc.id;
                     
-                    // BOT CẮT CỔ: Quá 30 ngày không tương tác -> Xóa
                     if (uData.lastLogin && (now - uData.lastLogin > THIRTY_DAYS_MS)) {
                         await db.collection('users').doc(dbId).delete();
                         deletedCount++;
@@ -488,8 +502,14 @@
 
         async function handleAdminFormSubmit(e) {
             e.preventDefault(); 
-            const btn = document.getElementById('adminSubmitBtn');
             
+            // ANTI SPAM: CHẶN CLICK LIÊN TỤC
+            if (Date.now() - lastActionTime < COOLDOWN_MS) {
+                return showToast("Hệ thống đang xử lý, vui lòng đợi vài giây!", "error");
+            }
+            lastActionTime = Date.now();
+
+            const btn = document.getElementById('adminSubmitBtn');
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ĐANG ĐẨY LÊN MÂY...`;
             btn.classList.add('opacity-50', 'cursor-not-allowed');
             btn.disabled = true;
@@ -576,9 +596,15 @@
         function toggleAuthModal(mode) { isLoginMode = (mode === 'login'); toggleAuthMode(); toggleAuthMode(); const modal = document.getElementById('authModal'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); }
         function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
         
-        // CẬP NHẬT HÀM ĐĂNG NHẬP ĐỂ BẮT IP VÀ THỜI GIAN
         async function handleAuth(e) { 
             e.preventDefault(); 
+
+            // ANTI SPAM: CHẶN CLICK LIÊN TỤC
+            if (Date.now() - lastActionTime < COOLDOWN_MS) {
+                return showToast("Hệ thống đang chống Spam, vui lòng đợi 3 giây!", "error");
+            }
+            lastActionTime = Date.now();
+
             const u = document.getElementById('authUsername').value.trim(); 
             const p = document.getElementById('authPassword').value;
             const btn = document.getElementById('authSubmitBtn');
@@ -586,7 +612,7 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG XỬ LÝ...`; 
             btn.disabled = true;
 
-            const userIP = await getClientIP(); // Bot bắt IP chạy ngầm
+            const userIP = await getClientIP(); 
 
             if(!isLoginMode) {
                 if(u.toLowerCase() === SECRET_ADMIN_USER.toLowerCase()) { showToast("Không thể đăng ký tên này!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
@@ -618,7 +644,6 @@
                     }
                     
                     if(validUserDoc) { 
-                        // Update IP và Lần đăng nhập cuối
                         if(isOnline) { await validUserDoc.ref.update({ ip: userIP, lastLogin: Date.now() }); }
                         else { 
                             let users = JSON.parse(localStorage.getItem('nv_users')); 
