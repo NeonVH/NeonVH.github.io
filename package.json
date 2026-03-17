@@ -1,9 +1,5 @@
 {
   "name": "neonvh-backend",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "node api/get-config.js"
-  },
   "dependencies": {
     "crypto-js": "^4.2.0"
   }
