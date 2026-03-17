@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEONVH • HỆ SINH THÁI TOÀN CẦU (MAX SECURITY)</title>
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https: wss:;">
+    
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <style id="anti-clickjack">body{display:none !important;}</style>
+    <script type="text/javascript">
+        if (self === top) {
+            var antiClickjack = document.getElementById("anti-clickjack");
+            if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
+        } else {
+            top.location = self.location; // Nếu bị nhúng, tự động phá lồng bay ra ngoài
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -278,7 +292,7 @@
             <h2 id="authTitle" class="logo-font text-2xl md:text-3xl font-black text-center mb-6 neon-text text-white">ĐĂNG NHẬP</h2>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <input id="authUsername" type="text" required placeholder="Tên tài khoản" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-4 text-sm">
-                <input id="authPassword" type="password" required placeholder="                <input id="authPassword" type="password" required placeholder="Mật khẩu" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-6 text-sm">
+                <input id="authPassword" type="password" required placeholder="Mật khẩu" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-6 text-sm">
                 <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-[#bc13fe] text-white font-black rounded-xl hover:shadow-[0_0_20px_#bc13fe] transition text-sm">VÀO HỆ THỐNG</button>
             </form>
             <div class="mt-6 text-center text-xs text-gray-400"><span id="authSwitchText">Chưa có tài khoản?</span> <button onclick="toggleAuthMode()" id="authSwitchBtn" class="text-[#00f0ff] font-bold hover:underline ml-1">Đăng ký ngay</button></div>
@@ -610,30 +624,8 @@
         }
 
         function resetAdminForm() { document.getElementById('adGameId').value = ""; document.getElementById('adminForm').reset(); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> LƯU LÊN MÁY CHỦ`; }
-        
-        function switchView(viewId) { 
-            localStorage.setItem('nv_current_view', viewId); 
-            const views = ['homeView', 'detailView', 'adminView', 'profileView']; 
-            views.forEach(id => { 
-                const el = document.getElementById(id); 
-                if(!el) return; 
-                if(id === viewId) { 
-                    el.classList.remove('view-hidden'); 
-                    el.classList.add('view-active'); 
-                } else { 
-                    el.classList.remove('view-active'); 
-                    el.classList.add('view-hidden'); 
-                } 
-            }); 
-            if(viewId === 'adminView') renderAdminManageList(); 
-            if(viewId === 'profileView') updateProfileView(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        function renderLinkButton(url, name, bgClass, iconClass) { 
-            if(!url) return ''; 
-            return `<a href="${url}" target="_blank" class="w-full py-3 md:py-3.5 ${bgClass} text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-80 hover:shadow-lg transition transform hover:-translate-y-1 text-sm"><i class="${iconClass}"></i> Tải qua ${name}</a>`; 
-        }
+        function switchView(viewId) { localStorage.setItem('nv_current_view', viewId); const views = ['homeView', 'detailView', 'adminView', 'profileView']; views.forEach(id => { const el = document.getElementById(id); if(!el) return; if(id === viewId) { el.classList.remove('view-hidden'); el.classList.add('view-active'); } else { el.classList.remove('view-active'); el.classList.add('view-hidden'); } }); if(viewId === 'adminView') renderAdminManageList(); if(viewId === 'profileView') updateProfileView(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function renderLinkButton(url, name, bgClass, iconClass) { if(!url) return ''; return `<a href="${url}" target="_blank" class="w-full py-3 md:py-3.5 ${bgClass} text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-80 hover:shadow-lg transition transform hover:-translate-y-1 text-sm"><i class="${iconClass}"></i> Tải qua ${name}</a>`; }
 
         function openGameDetail(gameId) {
             const game = gamesDB.find(g => g.id == gameId); if(!game) return; localStorage.setItem('nv_current_game', gameId);
@@ -780,9 +772,4 @@
         function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); }
         function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('translate-x-full'); document.getElementById('mobileDrawer').classList.toggle('translate-x-0'); }
         function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]"; t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000); }
-        function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }
-        window.onload = initApp;
-    </script>
-</body>
-</html>
- 
+        function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle
