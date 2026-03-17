@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TOÀN CẦU V26</title>
+    <title>NEONVH • HỆ SINH THÁI TOÀN CẦU V28</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -42,7 +42,7 @@
 
     <nav class="fixed top-0 left-0 right-0 glass-panel border-b-0 z-50 transition-all duration-300" id="navbar">
         <div class="max-w-screen-2xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
-            <div onclick="switchView('homeView')" class="logo-font text-xl md:text-2xl tracking-[6px] text-white cursor-pointer glitch" data-text="NEONVERSE">NEONVERSE</div>
+            <div onclick="switchView('homeView')" class="logo-font text-xl md:text-2xl tracking-[6px] text-white cursor-pointer glitch" data-text="NEONVH">NEONVH</div>
             
             <div class="hidden md:flex items-center gap-6 text-sm font-bold tracking-wider">
                 <a href="#" onclick="switchView('homeView')" class="hover:text-[#bc13fe] transition">TRANG CHỦ</a>
@@ -245,7 +245,8 @@
         </div>
 
         <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-red-500 relative overflow-hidden">
-            <h3 class="logo-font text-xl md:text-2xl font-black text-red-500 mb-6 uppercase tracking-wider"><i class="fa-solid fa-users mr-2"></i> Quản Lý Tài Khoản & VIP</h3>
+            <h3 class="logo-font text-xl md:text-2xl font-black text-red-500 mb-6 uppercase tracking-wider"><i class="fa-solid fa-users mr-2"></i> Quản Lý Tài Khoản & Kiểm Tra IP</h3>
+            <p class="text-xs text-gray-400 mb-4">*Hệ thống tự động quét và xóa acc không đăng nhập quá 30 ngày.</p>
             <div id="adminUserManageListContainer" class="flex flex-col gap-3 md:gap-4"></div>
         </div>
     </div>
@@ -300,6 +301,8 @@
 
         const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' font-weight='bold' fill='%23bc13fe' text-anchor='middle' dominant-baseline='middle'%3EL%E1%BB%97i Link %E1%BA%A2nh%3C/text%3E%3C/svg%3E";
         const SECRET_ADMIN_USER = "Admin"; const SECRET_ADMIN_PASS = "Admin123";
+        const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
         let gamesDB = []; let isLoginMode = true; 
         let db = null; let isOnline = false;
 
@@ -309,7 +312,16 @@
             db = firebase.firestore(); 
             db.settings({ experimentalForceLongPolling: true, merge: true });
             isOnline = true; 
-        } catch(e) { console.error("Lỗi khởi tạo:", e); }
+        } catch(e) { console.error("Lỗi Firebase:", e); }
+
+        // HÀM LẤY IP CỦA NGƯỜI DÙNG
+        async function getClientIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip;
+            } catch(e) { return "Không xác định"; }
+        }
 
         async function initApp() {
             document.getElementById('networkStatus').innerText = isOnline ? "☁️ Online" : "⚠️ Offline Local";
@@ -350,39 +362,84 @@
             const container = document.getElementById('adminGameManageListContainer'); if(!container) return;
             if(gamesDB.length === 0) { container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Chưa có bài đăng VN+ nào của Admin.</p>'; } else {
                 container.innerHTML = gamesDB.map(game => `<div class="card-3d glass-panel p-3 rounded-xl flex items-center h-[120px]"><div class="w-24 flex-shrink-0 relative rounded-lg overflow-hidden h-full"><img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-full h-full object-cover"></div><div class="flex-1 p-3 flex flex-col min-w-0 h-full justify-between"><h3 class="font-bold text-white truncate text-base">${game.title}</h3><p class="text-xs text-gray-500 truncate">${game.author || 'Unknown'} | ${game.genre}</p><div class="flex gap-2 mt-auto"><button onclick="startEditGame('${game.id}')" class="flex-1 py-1.5 bg-yellow-400 text-black rounded-lg text-xs font-bold transition">Sửa</button><button onclick="deleteGame('${game.id}')" class="flex-1 py-1.5 border border-red-500 text-red-500 rounded-lg text-xs font-bold transition hover:bg-red-500 hover:text-white">Xóa</button></div></div></div>`).join('');
-            } renderAdminUserList();
+            } 
+            renderAdminUserList(); // Gọi render User list
         }
 
+        // V28: TÍNH NĂNG AUTO XÓA ACC 30 NGÀY + HIỆN IP/MẬT KHẨU
         async function renderAdminUserList() {
             let users = [];
-            if(isOnline) { const snap = await db.collection('users').get(); users = snap.docs.map(d => ({ dbId: d.id, ...d.data() })); } 
-            else { users = JSON.parse(localStorage.getItem('nv_users')) || []; }
+            const now = Date.now();
+            let deletedCount = 0;
+
+            if(isOnline) { 
+                const snap = await db.collection('users').get(); 
+                
+                for(let doc of snap.docs) {
+                    let uData = doc.data();
+                    let dbId = doc.id;
+                    
+                    // BOT CẮT CỔ: Quá 30 ngày không tương tác -> Xóa
+                    if (uData.lastLogin && (now - uData.lastLogin > THIRTY_DAYS_MS)) {
+                        await db.collection('users').doc(dbId).delete();
+                        deletedCount++;
+                        continue; // Không nhét vào mảng hiển thị nữa
+                    }
+                    users.push({ dbId: dbId, ...uData });
+                }
+                
+                if (deletedCount > 0) showToast(`Hệ thống đã tự động dọn dẹp ${deletedCount} tài khoản bỏ hoang quá 30 ngày!`);
+
+            } else { 
+                let localUsers = JSON.parse(localStorage.getItem('nv_users')) || []; 
+                users = localUsers.filter(u => {
+                    if (u.lastLogin && (now - u.lastLogin > THIRTY_DAYS_MS)) { deletedCount++; return false; }
+                    return true;
+                });
+                if(deletedCount > 0) {
+                    localStorage.setItem('nv_users', JSON.stringify(users));
+                    showToast(`Đã tự động xóa ${deletedCount} acc quá 30 ngày (Local)!`);
+                }
+            }
+
             const container = document.getElementById('adminUserManageListContainer'); if(!container) return;
             if(users.length === 0) { container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Chưa có người chơi nào đăng ký.</p>'; return; }
             
-            container.innerHTML = users.map(u => `
-                <div class="card-3d glass-panel p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#bc13fe] to-[#00f0ff] flex items-center justify-center text-black font-bold overflow-hidden">
+            container.innerHTML = users.map(u => {
+                let dateStr = "Chưa rõ";
+                if(u.lastLogin) {
+                    let d = new Date(u.lastLogin);
+                    dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`;
+                }
+
+                return `
+                <div class="card-3d glass-panel p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-l-2 ${u.vipLevel === 'vvip' ? 'border-yellow-400' : u.vipLevel === 'vip' ? 'border-[#bc13fe]' : 'border-gray-500'}">
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#bc13fe] to-[#00f0ff] flex items-center justify-center text-black font-bold overflow-hidden flex-shrink-0">
                             ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : u.u[0].toUpperCase()}
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <h4 class="font-bold text-white text-sm md:text-base">${u.u}</h4>
-                            <p class="text-[10px] ${u.vipLevel === 'vvip' ? 'text-yellow-400 font-bold' : u.vipLevel === 'vip' ? 'text-[#ff00ff] font-bold' : 'text-gray-500'}">
+                            <p class="text-[10px] ${u.vipLevel === 'vvip' ? 'text-yellow-400 font-bold' : u.vipLevel === 'vip' ? 'text-[#ff00ff] font-bold' : 'text-gray-400'}">
                                 ${u.vipLevel === 'vvip' ? '💎 VVIP PREMIUM' : u.vipLevel === 'vip' ? '✨ VIP' : 'Thành viên'}
                             </p>
+                            <div class="text-[10px] text-gray-400 mt-1 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                                <span><i class="fa-solid fa-key mr-1"></i> Pass: <span class="text-white">${u.p}</span></span>
+                                <span><i class="fa-solid fa-network-wired mr-1"></i> IP: <span class="text-[#00f0ff]">${u.ip || 'Chưa có'}</span></span>
+                                <span class="col-span-full mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Online: ${dateStr}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 w-full md:w-auto">
-                        <select onchange="changeUserVip('${u.u}', this.value)" class="bg-black/60 border border-white/20 text-xs text-white p-1.5 rounded focus:border-yellow-400 outline-none">
+                    <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                        <select onchange="changeUserVip('${u.u}', this.value)" class="flex-1 md:flex-none bg-black/60 border border-white/20 text-xs text-white p-1.5 rounded focus:border-yellow-400 outline-none">
                             <option value="none" ${(!u.vipLevel || u.vipLevel === 'none') ? 'selected' : ''}>Thường</option>
                             <option value="vip" ${u.vipLevel === 'vip' ? 'selected' : ''}>VIP</option>
                             <option value="vvip" ${u.vipLevel === 'vvip' ? 'selected' : ''}>VVIP PREMIUM</option>
                         </select>
-                        <button onclick="deleteUserAccount('${u.u}')" class="px-3 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded text-xs font-bold transition">Xóa</button>
+                        <button onclick="deleteUserAccount('${u.u}')" class="px-3 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded text-xs font-bold transition flex-shrink-0"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         async function changeUserVip(username, newVip) {
@@ -522,17 +579,24 @@
         function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }
         
         async function handleAuth(e) { 
-            e.preventDefault(); const u = document.getElementById('authUsername').value.trim(); const p = document.getElementById('authPassword').value;
+            e.preventDefault(); 
+            const u = document.getElementById('authUsername').value.trim(); 
+            const p = document.getElementById('authPassword').value;
+            const btn = document.getElementById('authSubmitBtn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG XỬ LÝ...`; btn.disabled = true;
+
+            const userIP = await getClientIP(); // Bắt IP người dùng
+
             if(!isLoginMode) {
-                if(u.toLowerCase() === SECRET_ADMIN_USER.toLowerCase()) return showToast("Không thể đăng ký tên này!", "error");
+                if(u.toLowerCase() === SECRET_ADMIN_USER.toLowerCase()) { showToast("Không thể đăng ký tên này!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
                 if(isOnline) {
                     const snap = await db.collection('users').where('u', '==', u).get();
-                    if(!snap.empty) return showToast("Tài khoản đã tồn tại!", "error");
-                    await db.collection('users').add({u, p, avatar: '', vipLevel: 'none'});
+                    if(!snap.empty) { showToast("Tài khoản đã tồn tại!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
+                    await db.collection('users').add({u, p, avatar: '', vipLevel: 'none', ip: userIP, lastLogin: Date.now()});
                 } else {
                     let users = JSON.parse(localStorage.getItem('nv_users')) || [];
-                    if(users.find(x => x.u.toLowerCase() === u.toLowerCase())) return showToast("Tài khoản đã tồn tại!", "error");
-                    users.push({u, p, avatar: '', vipLevel: 'none'}); localStorage.setItem('nv_users', JSON.stringify(users));
+                    if(users.find(x => x.u.toLowerCase() === u.toLowerCase())) { showToast("Tài khoản đã tồn tại!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
+                    users.push({u, p, avatar: '', vipLevel: 'none', ip: userIP, lastLogin: Date.now()}); localStorage.setItem('nv_users', JSON.stringify(users));
                 }
                 showToast("Đăng ký thành công! Hãy đăng nhập."); toggleAuthMode();
             } else {
@@ -540,17 +604,36 @@
                     localStorage.setItem('nv_current_user', 'Admin'); localStorage.setItem('nv_role', 'admin');
                     showToast("Đặc quyền Admin mở khóa!"); closeAuthModal(); checkAuthState(); switchView('adminView');
                 } else {
-                    let valid = false;
+                    let validUserDoc = null;
+                    let isLocal = false;
+                    
                     if(isOnline) {
                         const snap = await db.collection('users').where('u', '==', u).where('p', '==', p).get();
-                        valid = !snap.empty;
-                    } else { let users = JSON.parse(localStorage.getItem('nv_users')) || []; valid = users.find(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p); }
+                        if(!snap.empty) validUserDoc = snap.docs[0];
+                    } else { 
+                        let users = JSON.parse(localStorage.getItem('nv_users')) || []; 
+                        const foundIndex = users.findIndex(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p);
+                        if(foundIndex > -1) { validUserDoc = users[foundIndex]; isLocal = true; validUserDoc.localIndex = foundIndex; }
+                    }
                     
-                    if(valid) { localStorage.setItem('nv_current_user', u); localStorage.setItem('nv_role', 'user'); showToast(`Chào mừng ${u}!`); closeAuthModal(); checkAuthState(); switchView('profileView'); } 
-                    else { showToast("Sai tài khoản hoặc mật khẩu!", "error"); }
+                    if(validUserDoc) { 
+                        // Update IP và Lần đăng nhập cuối
+                        if(isOnline) { await validUserDoc.ref.update({ ip: userIP, lastLogin: Date.now() }); }
+                        else { 
+                            let users = JSON.parse(localStorage.getItem('nv_users')); 
+                            users[validUserDoc.localIndex].ip = userIP; users[validUserDoc.localIndex].lastLogin = Date.now();
+                            localStorage.setItem('nv_users', JSON.stringify(users));
+                        }
+
+                        localStorage.setItem('nv_current_user', u); localStorage.setItem('nv_role', 'user'); 
+                        showToast(`Chào mừng ${u}!`); closeAuthModal(); checkAuthState(); switchView('profileView'); 
+                    } else { 
+                        showToast("Sai tài khoản hoặc mật khẩu!", "error"); 
+                    }
                 }
             }
             document.getElementById('authForm').reset();
+            btn.innerHTML = isLoginMode ? "VÀO HỆ THỐNG" : "TẠO TÀI KHOẢN"; btn.disabled = false;
         }
 
         function logout() { localStorage.removeItem('nv_current_user'); localStorage.removeItem('nv_role'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }
@@ -572,29 +655,4 @@
             if(role === 'admin') {
                 badge.innerText = 'BẤT TỬ (ADMIN)'; badge.className = 'px-4 py-1 bg-yellow-400/20 text-yellow-400 border border-yellow-400 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-[0_0_10px_#facc15]';
                 card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';
-                document.getElementById('stat1-value').innerText = gamesDB.length; document.getElementById('stat1-label').innerText = "Đã đăng"; document.getElementById('stat2-value').innerText = "99+"; document.getElementById('stat2-label').innerText = "Tương tác";
-                if(isOnline) { const snap = await db.collection('users').get(); document.getElementById('stat3-value').innerText = snap.size; } else { const usersList = JSON.parse(localStorage.getItem('nv_users')) || []; document.getElementById('stat3-value').innerText = usersList.length; } document.getElementById('stat3-label').innerText = "Người chơi";
-            } else {
-                if(vipLevel === 'vvip') {
-                    badge.innerText = '💎 VVIP PREMIUM'; badge.className = 'px-4 py-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white border-0 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_#facc15] animate-pulse';
-                    card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';
-                } else if(vipLevel === 'vip') {
-                    badge.innerText = '✨ VIP MEMBER'; badge.className = 'px-4 py-1 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white border-0 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_#bc13fe]';
-                    card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#bc13fe] mb-8';
-                } else {
-                    badge.innerText = 'THÀNH VIÊN VÀNG'; badge.className = 'px-4 py-1 bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] rounded-full text-xs font-bold uppercase tracking-widest mb-6';
-                    card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8';
-                }
-                document.getElementById('stat1-value').innerText = "0"; document.getElementById('stat1-label').innerText = "Đã tải"; document.getElementById('stat2-value').innerText = "0"; document.getElementById('stat2-label').innerText = "Yêu thích"; document.getElementById('stat3-value').innerText = "0"; document.getElementById('stat3-label').innerText = "Bình luận";
-            } updateAvatarUI();
-        }
-
-        function openLightbox(src) { const lb = document.getElementById('imageLightbox'); document.getElementById('lightboxImage').src = src; lb.classList.remove('hidden'); setTimeout(() => lb.classList.add('opacity-100'), 10); document.body.style.overflow = 'hidden'; }
-        function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); }
-        function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('translate-x-full'); document.getElementById('mobileDrawer').classList.toggle('translate-x-0'); }
-        function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]"; t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000); }
-        function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }
-        window.onload = initApp;
-    </script>
-</body>
-</html>
+                document.getElementById('stat1-value').innerText = gamesDB.length; document.getElementById('
