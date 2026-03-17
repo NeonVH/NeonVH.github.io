@@ -84,7 +84,7 @@
         function renderGameGrid(data = gamesDB) {
             const container = document.getElementById('gameGridContainer'); if(!container) return;
             if(data.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-10 italic">Không tìm thấy game nào phù hợp.</p>'; return; }
-            container.innerHTML = data.map(game => `
+            container.innerText = data.map(game => `
                 <div onclick="openGameDetail('${game.id}')" class="card-3d glass-panel rounded-xl md:rounded-2xl overflow-hidden flex flex-row items-stretch h-[150px] md:h-[180px]">
                     <div class="w-32 md:w-44 flex-shrink-0 relative">${game.is18 ? `<div class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] md:text-[11px] font-bold px-2 py-0.5 rounded shadow-lg z-10 animate-pulse">18+</div>` : ''}<img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-full h-full object-cover cursor-pointer" onclick="event.stopPropagation(); openLightbox(this.src)"></div>
                     <div class="flex-1 p-3 md:p-5 bg-[#0a0a0a] relative flex flex-col min-w-0">
