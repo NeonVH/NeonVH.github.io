@@ -1,97 +1,77 @@
-// =========================================================================
-// NEONVH BACKEND CORE v30 - MAXIMUM SECURITY (DO NOT MODIFY)
-// =========================================================================
-const crypto = require('crypto');
+/**
+ * CORE SECURITY INDEX - NEONVH ECOSYSTEM
+ * Version: 2.0.4 - Max Security Mode
+ * Developer: NeonVH Core Team
+ */
 
-// Băm mật khẩu Admin bằng thuật toán SHA-256 (Hacker dò bằng niềm tin)
-// Đang đặt mặc định ứng với tài khoản cũ của bro (Admin / Admin123)
-const ADMIN_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; 
-
-// Bộ nhớ đệm chặn Spam (Chống DDoS cục bộ)
-const ipCache = new Map();
+const security = require('./security');
+const config = require('./config');
+const auth = require('./auth');
+const logger = require('./logger'); // File log mới
+const crypto = require('./crypto');
 
 export default async function handler(req, res) {
-    // 1. LẤY IP CỦA KẺ TRUY CẬP
-    const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress || "Unknown";
-    const origin = req.headers.origin || req.headers.referer || "";
+    const startTime = Date.now();
+    const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // ---------------------------------------------------------------------
-    // KHIÊN 1: ANTI-DDOS (Chặn gọi liên tục)
-    // ---------------------------------------------------------------------
-    const now = Date.now();
-    if (ipCache.has(clientIP)) {
-        const lastRequestTime = ipCache.get(clientIP);
-        if (now - lastRequestTime < 2000) { // Gọi lại dưới 2 giây -> Chặn
-            return res.status(429).json({ error: "Bị chặn bởi Anti-Spam Bot." });
-        }
-    }
-    ipCache.set(clientIP, now); // Lưu lại thời gian gọi
+    // 1. THIẾT LẬP HEADER BẢO MẬT TUYỆT ĐỐI
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Content-Security-Policy', "default-src 'self'");
 
-    // ---------------------------------------------------------------------
-    // KHIÊN 2: CORS FIREWALL (Chỉ cho web của bro đi qua)
-    // ---------------------------------------------------------------------
-    const ALLOWED_DOMAIN = "https://neonvh.github.io"; // Tên miền chính chủ
-
-    // Nếu không xuất phát từ web của bro -> Đuổi cổ
-    if (origin && !origin.startsWith(ALLOWED_DOMAIN)) {
-        return res.status(403).json({ error: "Access Denied. Mạng lưới đã khóa IP của bạn." });
-    }
-
-    // Cấp phép thông hành cho web của bro
-    res.setHeader('Access-Control-Allow-Origin', ALLOWED_DOMAIN);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    // ---------------------------------------------------------------------
-    // LẤY CHÌA KHÓA TỪ KÉT SẮT VERCEL (An toàn tuyệt đối)
-    // ---------------------------------------------------------------------
-    const secureConfig = {
-        apiKey: process.env.FB_API_KEY,
-        projectId: process.env.FB_PROJECT_ID,
-        appId: process.env.FB_APP_ID,
-        authDomain: process.env.FB_AUTH_DOMAIN,
-        storageBucket: process.env.FB_STORAGE_BUCKET,
-        messagingSenderId: process.env.FB_MSG_ID
-    };
-
-    // ---------------------------------------------------------------------
-    // XỬ LÝ YÊU CẦU TỪ FRONTEND
-    // ---------------------------------------------------------------------
     try {
-        const { type, u, p } = req.query;
-
-        // 1. Web xin chìa khóa để chạy giao diện
-        if (type === "get_gate") {
-            if (!secureConfig.apiKey) {
-                return res.status(500).json({ error: "Lỗi: Máy chủ Vercel chưa có Biến Môi Trường!" });
-            }
-            return res.status(200).json(secureConfig);
+        // 2. LỚP BẢO VỆ SỐ 1: CHỐNG DDOS & RATE LIMIT
+        const rateCheck = await security.isRateLimited(clientIP);
+        if (rateCheck) {
+            await logger.logIncident('DDOS_ATTEMPT', clientIP, req.headers);
+            return res.status(429).json({ 
+                code: "ERR_TOO_MANY_REQUESTS",
+                msg: "Hệ thống phát hiện hành vi spam. IP của bạn đã bị đưa vào danh sách theo dõi." 
+            });
         }
 
-        // 2. Yêu cầu kiểm tra quyền Admin
-        if (type === "admin_verify") {
-            if (!u || !p) return res.status(400).json({ error: "Thiếu dữ liệu" });
-
-            // Thuật toán gộp tài khoản + mật khẩu rồi băm nát
-            const hashInput = crypto.createHash('sha256').update(u + p).digest('hex');
-            
-            if (hashInput === ADMIN_HASH) {
-                return res.status(200).json({ role: "admin", ip: clientIP, msg: "Verified" });
-            }
-            return res.status(403).json({ role: "none", msg: "Cảnh báo xâm nhập." });
+        // 3. LỚP BẢO VỆ SỐ 2: KIỂM TRA TÍNH TOÀN VẸN CỦA HEADER (ANTI-BOT)
+        const headerIntegrity = security.verifyHeaders(req.headers);
+        if (!headerIntegrity.valid) {
+            await logger.logIncident('INVALID_HEADERS', clientIP, headerIntegrity.reason);
+            return res.status(403).json({ error: "Access Denied: Protocol Violation." });
         }
 
-        // Mặc định
-        return res.status(200).json({ 
-            status: "Server Secured and Online.", 
-            your_ip: clientIP 
+        // 4. LỚP BẢO VỆ SỐ 3: KIỂM TRA MẬT MÃ HỆ THỐNG (SYSTEM SECRET)
+        const systemSecret = req.headers['x-neon-secret'];
+        if (!systemSecret || systemSecret !== process.env.SYSTEM_SECRET) {
+            await logger.logIncident('SECRET_MISMATCH', clientIP);
+            return res.status(401).json({ error: "Unauthorized: Invalid System Key." });
+        }
+
+        // 5. PHÂN LUỒNG XỬ LÝ
+        const { type } = req.query;
+
+        switch (type) {
+            case 'get_gate':
+                // Trả về Config Firebase đã được mã hóa AES-256 + IV
+                return await config.fetchSecureConfig(req, res);
+
+            case 'admin_verify':
+                // Xác thực quyền Boss thông qua băm SHA-512
+                return await auth.processAdminAuth(req, res);
+
+            case 'heartbeat':
+                // Kiểm tra trạng thái máy chủ
+                return res.status(200).json({ status: "Online", latency: `${Date.now() - startTime}ms` });
+
+            default:
+                await logger.logIncident('UNKNOWN_ENDPOINT', clientIP, { type });
+                return res.status(404).json({ error: "Endpoint not found." });
+        }
+
+    } catch (fatalError) {
+        // LOG LỖI TOÀN CỤC - KHÔNG ĐƯỢC HIỆN CHI TIẾT LỖI RA NGOÀI (TRÁNH EXPLOIT)
+        await logger.logError(fatalError, clientIP);
+        return res.status(500).json({ 
+            error: "Internal Server Error", 
+            traceId: crypto.generateShortId() 
         });
-
-    } catch (error) {
-        return res.status(500).json({ error: "Lỗi hệ thống máy chủ." });
     }
 }
