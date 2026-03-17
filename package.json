@@ -1,0 +1,8 @@
+{
+  "name": "neonvh-server",
+  "version": "1.0.0",
+  "description": "Backend cho NeonVH",
+  "scripts": {
+    "start": "node api/index.js"
+  }
+}
