@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEONVERSE • HỆ SINH THÁI TOÀN CẦU V18</title>
+    <title>NEONVERSE • HỆ SINH THÁI TOÀN CẦU V19</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -186,7 +186,7 @@
                     <div class="flex-1"><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Tiến Độ</label><input id="adProgress" required type="text" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm"></div>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1"><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Hệ Máy</label><input id="adPlatform" required type="text" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm"></div>
+                    <div class="flex-1"><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Hệ Máy (Chung)</label><input id="adPlatform" required type="text" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm"></div>
                     <div class="flex-1"><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Dạng Dịch</label><input id="adTransType" required type="text" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm"></div>
                     <div class="flex-1"><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Dung Lượng</label><input id="adSize" required type="text" class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm"></div>
                 </div>
@@ -245,14 +245,14 @@
         </div>
 
         <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-red-500 relative overflow-hidden">
-            <h3 class="logo-font text-xl md:text-2xl font-black text-red-500 mb-6 uppercase tracking-wider"><i class="fa-solid fa-users mr-2"></i> Quản Lý Tài Khoản</h3>
+            <h3 class="logo-font text-xl md:text-2xl font-black text-red-500 mb-6 uppercase tracking-wider"><i class="fa-solid fa-users mr-2"></i> Quản Lý Tài Khoản & VIP</h3>
             <div id="adminUserManageListContainer" class="flex flex-col gap-3 md:gap-4"></div>
         </div>
     </div>
 
     <div id="profileView" class="view-section view-hidden max-w-screen-md mx-auto px-4 md:px-6 pt-32 pb-20">
-        <div class="glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8">
-            <div class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-[#bc13fe] to-[#00f0ff] flex items-center justify-center text-4xl text-black font-black mb-4 shadow-[0_0_30px_#bc13fe] cursor-pointer group" onclick="document.getElementById('profileAvatarInput').click()" title="Đổi Avatar">
+        <div class="glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8" id="profileContainerCard">
+            <div class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-[#bc13fe] to-[#00f0ff] flex items-center justify-center text-4xl text-black font-black mb-4 shadow-[0_0_30px_#bc13fe] cursor-pointer group" onclick="document.getElementById('profileAvatarInput').click()" title="Đổi Avatar" id="profileAvatarWrapper">
                 <img id="profileAvatarImg" src="" class="w-full h-full rounded-full object-cover hidden">
                 <span id="profileAvatarText">U</span>
                 <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-camera text-white text-xl"></i></div>
@@ -305,7 +305,6 @@
         let db = null;
         let isOnline = false;
 
-        // KIỂM TRA ĐÃ DÁN CONFIG CHƯA
         if(firebaseConfig.apiKey !== "ĐIỀN_API_KEY_CỦA_BRO_VÀO_ĐÂY") {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
@@ -327,13 +326,8 @@
                 try {
                     const snapshot = await db.collection('games').orderBy('createdAt', 'desc').get();
                     gamesDB = snapshot.docs.map(doc => ({ dbId: doc.id, ...doc.data() }));
-                } catch(e) {
-                    console.log("Firebase Error:", e);
-                    gamesDB = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
-                }
-            } else {
-                gamesDB = JSON.parse(localStorage.getItem('nv_custom_games')) || [];
-            }
+                } catch(e) { gamesDB = JSON.parse(localStorage.getItem('nv_custom_games')) || []; }
+            } else { gamesDB = JSON.parse(localStorage.getItem('nv_custom_games')) || []; }
         }
 
         function renderGameGrid(data = gamesDB) {
@@ -362,6 +356,7 @@
             } renderAdminUserList();
         }
 
+        // UPDATE V19: RENDER ADMIN USER LIST VỚI MENU CHỌN VIP
         async function renderAdminUserList() {
             let users = [];
             if(isOnline) {
@@ -372,18 +367,50 @@
             }
             const container = document.getElementById('adminUserManageListContainer'); if(!container) return;
             if(users.length === 0) { container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Chưa có người chơi nào đăng ký.</p>'; return; }
-            container.innerHTML = users.map(u => `<div class="card-3d glass-panel p-3 md:p-4 rounded-xl flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#bc13fe] to-[#00f0ff] flex items-center justify-center text-black font-bold overflow-hidden">${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : u.u[0].toUpperCase()}</div><div><h4 class="font-bold text-white text-sm md:text-base">${u.u}</h4><p class="text-[10px] text-gray-500">Thành viên</p></div></div><button onclick="deleteUserAccount('${u.u}')" class="px-3 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded text-xs font-bold transition">Xóa</button></div>`).join('');
+            
+            container.innerHTML = users.map(u => `
+                <div class="card-3d glass-panel p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#bc13fe] to-[#00f0ff] flex items-center justify-center text-black font-bold overflow-hidden">
+                            ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : u.u[0].toUpperCase()}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm md:text-base">${u.u}</h4>
+                            <p class="text-[10px] ${u.vipLevel === 'vvip' ? 'text-yellow-400 font-bold' : u.vipLevel === 'vip' ? 'text-[#ff00ff] font-bold' : 'text-gray-500'}">
+                                ${u.vipLevel === 'vvip' ? '💎 VVIP PREMIUM' : u.vipLevel === 'vip' ? '✨ VIP' : 'Thành viên'}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <select onchange="changeUserVip('${u.u}', this.value)" class="bg-black/60 border border-white/20 text-xs text-white p-1.5 rounded focus:border-yellow-400 outline-none">
+                            <option value="none" ${(!u.vipLevel || u.vipLevel === 'none') ? 'selected' : ''}>Thường</option>
+                            <option value="vip" ${u.vipLevel === 'vip' ? 'selected' : ''}>VIP</option>
+                            <option value="vvip" ${u.vipLevel === 'vvip' ? 'selected' : ''}>VVIP PREMIUM</option>
+                        </select>
+                        <button onclick="deleteUserAccount('${u.u}')" class="px-3 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded text-xs font-bold transition">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // UPDATE V19: HÀM CẬP NHẬT VIP CHO USER
+        async function changeUserVip(username, newVip) {
+            if(isOnline) {
+                const snap = await db.collection('users').where('u', '==', username).get();
+                snap.forEach(doc => doc.ref.update({ vipLevel: newVip }));
+            } else {
+                let users = JSON.parse(localStorage.getItem('nv_users')) || [];
+                const index = users.findIndex(u => u.u === username);
+                if(index > -1) { users[index].vipLevel = newVip; localStorage.setItem('nv_users', JSON.stringify(users)); }
+            }
+            showToast(`Đã đổi quyền ${newVip.toUpperCase()} cho ${username}!`);
+            renderAdminUserList();
         }
 
         async function deleteUserAccount(username) {
             if(!confirm(`XÓA vĩnh viễn tài khoản: ${username}?`)) return;
-            if(isOnline) {
-                const snap = await db.collection('users').where('u', '==', username).get();
-                snap.forEach(doc => doc.ref.delete());
-            } else {
-                let users = JSON.parse(localStorage.getItem('nv_users')) || [];
-                localStorage.setItem('nv_users', JSON.stringify(users.filter(u => u.u !== username)));
-            }
+            if(isOnline) { const snap = await db.collection('users').where('u', '==', username).get(); snap.forEach(doc => doc.ref.delete()); } 
+            else { let users = JSON.parse(localStorage.getItem('nv_users')) || []; localStorage.setItem('nv_users', JSON.stringify(users.filter(u => u.u !== username))); }
             showToast(`Đã xóa ${username}!`); renderAdminUserList(); if(localStorage.getItem('nv_current_view') === 'profileView') updateProfileView();
         }
 
@@ -396,13 +423,8 @@
                 showToast("Đang cập nhật Avatar..."); const base64 = await readFileAsBase64(file); const user = localStorage.getItem('nv_current_user');
                 if(user === "Admin") { localStorage.setItem('nv_admin_avatar', base64); } 
                 else {
-                    if(isOnline) {
-                        const snap = await db.collection('users').where('u', '==', user).get();
-                        snap.forEach(doc => doc.ref.update({ avatar: base64 }));
-                    } else {
-                        let users = JSON.parse(localStorage.getItem('nv_users')) || [];
-                        const index = users.findIndex(x => x.u === user); if(index > -1) { users[index].avatar = base64; localStorage.setItem('nv_users', JSON.stringify(users)); }
-                    }
+                    if(isOnline) { const snap = await db.collection('users').where('u', '==', user).get(); snap.forEach(doc => doc.ref.update({ avatar: base64 })); } 
+                    else { let users = JSON.parse(localStorage.getItem('nv_users')) || []; const index = users.findIndex(x => x.u === user); if(index > -1) { users[index].avatar = base64; localStorage.setItem('nv_users', JSON.stringify(users)); } }
                 }
                 updateAvatarUI(); showToast("Đổi Avatar thành công!");
             } catch(err) { showToast("Lỗi: Ảnh quá nặng!", "error"); }
@@ -411,12 +433,8 @@
         async function updateAvatarUI() {
             const user = localStorage.getItem('nv_current_user'); if(!user) return; let avatarData = null;
             if(user === "Admin") { avatarData = localStorage.getItem('nv_admin_avatar'); } else {
-                if(isOnline) {
-                    const snap = await db.collection('users').where('u', '==', user).get();
-                    if(!snap.empty) avatarData = snap.docs[0].data().avatar;
-                } else {
-                    const users = JSON.parse(localStorage.getItem('nv_users')) || []; const uObj = users.find(x => x.u === user); if(uObj && uObj.avatar) avatarData = uObj.avatar;
-                }
+                if(isOnline) { const snap = await db.collection('users').where('u', '==', user).get(); if(!snap.empty) avatarData = snap.docs[0].data().avatar; } 
+                else { const users = JSON.parse(localStorage.getItem('nv_users')) || []; const uObj = users.find(x => x.u === user); if(uObj && uObj.avatar) avatarData = uObj.avatar; }
             }
             const navAv = document.getElementById('userAvatar');
             if(avatarData) { navAv.innerHTML = `<img src="${avatarData}" class="w-full h-full rounded-full object-cover">`; navAv.classList.remove('bg-gradient-to-r', 'from-[#bc13fe]', 'to-[#00f0ff]'); } 
@@ -426,15 +444,8 @@
         }
 
         async function handleAdminFormSubmit(e) {
-            e.preventDefault();
-            document.getElementById('adminSubmitBtn').innerText = "ĐANG LƯU DỮ LIỆU...";
-            const gameId = document.getElementById('adGameId').value;
-            const title = document.getElementById('adTitle').value; const author = document.getElementById('adAuthor').value;
-            const version = document.getElementById('adVersion').value; const progress = document.getElementById('adProgress').value;
-            const platform = document.getElementById('adPlatform').value; const transType = document.getElementById('adTransType').value;
-            const size = document.getElementById('adSize').value; const genre = document.getElementById('adGenre').value;
-            const team = document.getElementById('adTeam').value; const desc = document.getElementById('adDesc').value;
-            const adminMsg = document.getElementById('adMsg').value; const is18 = document.getElementById('ad18').checked;
+            e.preventDefault(); document.getElementById('adminSubmitBtn').innerText = "ĐANG LƯU DỮ LIỆU...";
+            const gameId = document.getElementById('adGameId').value; const title = document.getElementById('adTitle').value; const author = document.getElementById('adAuthor').value; const version = document.getElementById('adVersion').value; const progress = document.getElementById('adProgress').value; const platform = document.getElementById('adPlatform').value; const transType = document.getElementById('adTransType').value; const size = document.getElementById('adSize').value; const genre = document.getElementById('adGenre').value; const team = document.getElementById('adTeam').value; const desc = document.getElementById('adDesc').value; const adminMsg = document.getElementById('adMsg').value; const is18 = document.getElementById('ad18').checked;
             const links = { android: { terabox: document.getElementById('adLinkAndTerabox').value.trim(), mediafire: document.getElementById('adLinkAndMediafire').value.trim(), drive: document.getElementById('adLinkAndDrive').value.trim() }, pc: { terabox: document.getElementById('adLinkPcTerabox').value.trim(), mediafire: document.getElementById('adLinkPcMediafire').value.trim(), drive: document.getElementById('adLinkPcDrive').value.trim() } };
 
             const coverFileInput = document.getElementById('adCoverFile'); const coverUrlInput = document.getElementById('adCoverUrl'); let coverData = coverUrlInput.value.trim(); 
@@ -449,32 +460,15 @@
 
             try {
                 if(isOnline) {
-                    if(gameId) {
-                        const dbId = gamesDB.find(g => g.id === gameId).dbId;
-                        await db.collection('games').doc(dbId).update(gameData);
-                        showToast("Cập nhật bài viết lên Cloud thành công!");
-                    } else {
-                        gameData.id = 'cloud_' + Date.now();
-                        await db.collection('games').add(gameData);
-                        showToast("Đã lưu bài viết lên Cloud!");
-                    }
+                    if(gameId) { const dbId = gamesDB.find(g => g.id === gameId).dbId; await db.collection('games').doc(dbId).update(gameData); showToast("Cập nhật bài viết lên Cloud thành công!"); } 
+                    else { gameData.id = 'cloud_' + Date.now(); await db.collection('games').add(gameData); showToast("Đã lưu bài viết lên Cloud!"); }
                 } else {
-                    if(gameId) {
-                        const index = gamesDB.findIndex(g => g.id === gameId);
-                        gamesDB[index] = { ...gamesDB[index], ...gameData };
-                        showToast("Đã cập nhật (Local)!");
-                    } else {
-                        gameData.id = 'local_' + Date.now();
-                        gamesDB.unshift(gameData);
-                        showToast("Đã đăng bài (Local)!");
-                    }
+                    if(gameId) { const index = gamesDB.findIndex(g => g.id === gameId); gamesDB[index] = { ...gamesDB[index], ...gameData }; showToast("Đã cập nhật (Local)!"); } 
+                    else { gameData.id = 'local_' + Date.now(); gamesDB.unshift(gameData); showToast("Đã đăng bài (Local)!"); }
                     localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB));
                 }
                 resetAdminForm(); await loadGamesFromStorage(); renderGameGrid(); renderAdminManageList(); switchView('homeView');
-            } catch (error) { 
-                showToast("Lỗi tải lên! Thử dán Link URL thay vì Upload ảnh.", "error"); 
-                document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> THỬ LẠI`;
-            }
+            } catch (error) { showToast("Lỗi tải lên! Thử dán Link URL thay vì Upload ảnh.", "error"); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> THỬ LẠI`; }
         }
 
         function startEditGame(gameId) {
@@ -488,12 +482,8 @@
 
         async function deleteGame(gameId) {
             if(!confirm("XÓA VĨNH VIỄN bài đăng này?")) return;
-            if(isOnline) {
-                const dbId = gamesDB.find(g => g.id === gameId).dbId;
-                await db.collection('games').doc(dbId).delete();
-            } else {
-                gamesDB = gamesDB.filter(g => g.id !== gameId); localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB));
-            }
+            if(isOnline) { const dbId = gamesDB.find(g => g.id === gameId).dbId; await db.collection('games').doc(dbId).delete(); } 
+            else { gamesDB = gamesDB.filter(g => g.id !== gameId); localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB)); }
             showToast("Đã xóa bài đăng."); await loadGamesFromStorage(); renderGameGrid(); renderAdminManageList(); switchView('homeView');
         }
 
@@ -522,11 +512,12 @@
                 if(isOnline) {
                     const snap = await db.collection('users').where('u', '==', u).get();
                     if(!snap.empty) return showToast("Tài khoản đã tồn tại!", "error");
-                    await db.collection('users').add({u, p, avatar: ''});
+                    // UPDATE V19: THÊM vipLevel KHI ĐĂNG KÝ
+                    await db.collection('users').add({u, p, avatar: '', vipLevel: 'none'});
                 } else {
                     let users = JSON.parse(localStorage.getItem('nv_users')) || [];
                     if(users.find(x => x.u.toLowerCase() === u.toLowerCase())) return showToast("Tài khoản đã tồn tại!", "error");
-                    users.push({u, p, avatar: ''}); localStorage.setItem('nv_users', JSON.stringify(users));
+                    users.push({u, p, avatar: '', vipLevel: 'none'}); localStorage.setItem('nv_users', JSON.stringify(users));
                 }
                 showToast("Đăng ký thành công! Hãy đăng nhập."); toggleAuthMode();
             } else {
@@ -538,10 +529,8 @@
                     if(isOnline) {
                         const snap = await db.collection('users').where('u', '==', u).where('p', '==', p).get();
                         valid = !snap.empty;
-                    } else {
-                        let users = JSON.parse(localStorage.getItem('nv_users')) || [];
-                        valid = users.find(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p);
-                    }
+                    } else { let users = JSON.parse(localStorage.getItem('nv_users')) || []; valid = users.find(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p); }
+                    
                     if(valid) { localStorage.setItem('nv_current_user', u); localStorage.setItem('nv_role', 'user'); showToast(`Chào mừng ${u}!`); closeAuthModal(); checkAuthState(); switchView('profileView'); } 
                     else { showToast("Sai tài khoản hoặc mật khẩu!", "error"); }
                 }
@@ -551,16 +540,37 @@
 
         function logout() { localStorage.removeItem('nv_current_user'); localStorage.removeItem('nv_role'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }
         function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); const navAdmin = document.getElementById('navAdminBtn'); const navProfile = document.getElementById('navProfileBtn'); const mobAdmin = document.getElementById('mobileAdminBtn'); const mobProfile = document.getElementById('mobileProfileBtn'); if(user) { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = user; document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = user; if(role === 'admin') { navAdmin.classList.remove('hidden'); mobAdmin.classList.remove('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } else { navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } updateAvatarUI(); } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.add('hidden'); mobProfile.classList.add('hidden'); } }
+        
+        // UPDATE V19: CẬP NHẬT HUY HIỆU DỰA TRÊN VIP LEVEL
         async function updateProfileView() {
-            const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); if(!user) return switchView('homeView'); document.getElementById('profileNameLarge').innerText = user;
+            const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); if(!user) return switchView('homeView'); 
+            document.getElementById('profileNameLarge').innerText = user;
+            
+            let vipLevel = 'none';
+            if(role !== 'admin') {
+                if(isOnline) { const snap = await db.collection('users').where('u', '==', user).get(); if(!snap.empty) vipLevel = snap.docs[0].data().vipLevel || 'none'; } 
+                else { const users = JSON.parse(localStorage.getItem('nv_users')) || []; const uObj = users.find(x => x.u === user); if(uObj) vipLevel = uObj.vipLevel || 'none'; }
+            }
+
+            const badge = document.getElementById('profileRoleBadge');
+            const card = document.getElementById('profileContainerCard');
+
             if(role === 'admin') {
-                document.getElementById('profileRoleBadge').innerText = 'BẤT TỬ (ADMIN)'; document.getElementById('profileRoleBadge').className = 'px-4 py-1 bg-yellow-400/20 text-yellow-400 border border-yellow-400 rounded-full text-xs font-bold uppercase tracking-widest mb-6';
+                badge.innerText = 'BẤT TỬ (ADMIN)'; badge.className = 'px-4 py-1 bg-yellow-400/20 text-yellow-400 border border-yellow-400 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-[0_0_10px_#facc15]';
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';
                 document.getElementById('stat1-value').innerText = gamesDB.length; document.getElementById('stat1-label').innerText = "Đã đăng"; document.getElementById('stat2-value').innerText = "99+"; document.getElementById('stat2-label').innerText = "Tương tác";
-                if(isOnline) { const snap = await db.collection('users').get(); document.getElementById('stat3-value').innerText = snap.size; } 
-                else { const usersList = JSON.parse(localStorage.getItem('nv_users')) || []; document.getElementById('stat3-value').innerText = usersList.length; }
-                document.getElementById('stat3-label').innerText = "Người chơi";
+                if(isOnline) { const snap = await db.collection('users').get(); document.getElementById('stat3-value').innerText = snap.size; } else { const usersList = JSON.parse(localStorage.getItem('nv_users')) || []; document.getElementById('stat3-value').innerText = usersList.length; } document.getElementById('stat3-label').innerText = "Người chơi";
             } else {
-                document.getElementById('profileRoleBadge').innerText = 'THÀNH VIÊN VÀNG'; document.getElementById('profileRoleBadge').className = 'px-4 py-1 bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] rounded-full text-xs font-bold uppercase tracking-widest mb-6';
+                if(vipLevel === 'vvip') {
+                    badge.innerText = '💎 VVIP PREMIUM'; badge.className = 'px-4 py-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white border-0 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_#facc15] animate-pulse';
+                    card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';
+                } else if(vipLevel === 'vip') {
+                    badge.innerText = '✨ VIP MEMBER'; badge.className = 'px-4 py-1 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white border-0 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_#bc13fe]';
+                    card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#bc13fe] mb-8';
+                } else {
+                    badge.innerText = 'THÀNH VIÊN VÀNG'; badge.className = 'px-4 py-1 bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] rounded-full text-xs font-bold uppercase tracking-widest mb-6';
+                    card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8';
+                }
                 document.getElementById('stat1-value').innerText = "0"; document.getElementById('stat1-label').innerText = "Đã tải"; document.getElementById('stat2-value').innerText = "0"; document.getElementById('stat2-label').innerText = "Yêu thích"; document.getElementById('stat3-value').innerText = "0"; document.getElementById('stat3-label').innerText = "Bình luận";
             } updateAvatarUI();
         }
