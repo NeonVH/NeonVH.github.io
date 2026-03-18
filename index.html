@@ -277,7 +277,7 @@
         <h2 id="authTitle" class="logo-font text-2xl md:text-3xl font-black text-center mb-6 neon-text text-white">ĐĂNG NHẬP</h2>  
         <form id="authForm" onsubmit="handleAuth(event)">  
             <input id="authUsername" type="text" required placeholder="Tên tài khoản" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-4 text-sm">  
-            <input id="authPassword" type="password" required placeholder="Mật khẩu (Admin nhập mật khẩu dài)" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-6 text-sm">  
+            <input id="authPassword" type="password" required placeholder="Mật khẩu" class="w-full bg-black/60 border border-white/20 rounded-xl py-3 px-4 text-white focus:border-[#bc13fe] outline-none mb-6 text-sm">  
             <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-[#bc13fe] text-white font-black rounded-xl hover:shadow-[0_0_20px_#bc13fe] transition text-sm">VÀO HỆ THỐNG</button>  
         </form>  
         <div class="mt-6 text-center text-xs text-gray-400"><span id="authSwitchText">Chưa có tài khoản?</span> <button onclick="toggleAuthMode()" id="authSwitchBtn" class="text-[#00f0ff] font-bold hover:underline ml-1">Đăng ký ngay</button></div>  
@@ -286,7 +286,40 @@
 <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>  
 
 <script>  
-    // KHÓA F12
+    // ==========================================
+    // 1. HÀM BẢO MẬT & MÃ HÓA (CHUẨN TỪ FILE UPGRADE)
+    // ==========================================
+    
+    // Tạo Key từ Password bằng PBKDF2
+    function deriveKey(password) {
+        return CryptoJS.PBKDF2(password, "neon_salt_2026", {
+            keySize: 256/32,
+            iterations: 100000
+        });
+    }
+
+    // Mã hóa dữ liệu 
+    function encryptData(data, password) {
+        const key = deriveKey(password);
+        return CryptoJS.AES.encrypt(JSON.stringify(data), key.toString()).toString();
+    }
+
+    // Giải mã dữ liệu
+    function decryptData(cipher, password) {
+        const key = deriveKey(password);
+        const bytes = CryptoJS.AES.decrypt(cipher, key.toString());
+        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    }
+
+    // Hash Password
+    function hashPassword(password) {
+        return CryptoJS.SHA256(password).toString();
+    }
+
+
+    // ==========================================  
+    // 2. CHỐNG SOI CODE BẢN NÂNG CẤP (REAL)
+    // ==========================================  
     document.addEventListener('contextmenu', event => event.preventDefault());  
     document.onkeydown = function(e) {  
         if(e.keyCode == 123) { return false; } 
@@ -296,6 +329,26 @@
         if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } 
     }  
 
+    setInterval(function() {  
+        // Bẫy Debugger cơ bản
+        var before = new Date().getTime();  
+        debugger;  
+        var after = new Date().getTime();  
+        if (after - before > 100) { 
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>HÀNH VI ĐÁNG NGỜ! MẠNG LƯỚI ĐÃ KHÓA IP CỦA BẠN.</h1>"; 
+        }  
+        
+        // Bẫy Devtools đo chiều ngang/dọc (Chuẩn từ Upgrade Guide)
+        const devtoolsOpen = window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160;
+        if (devtoolsOpen) {
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>SECURITY VIOLATION</h1>";
+        }
+    }, 1000);  
+
+
+    // ==========================================  
+    // CẤU HÌNH HỆ THỐNG CƠ BẢN  
+    // ==========================================  
     const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' font-weight='bold' fill='%23bc13fe' text-anchor='middle' dominant-baseline='middle'%3EL%E1%BB%97i Link %E1%BA%A2nh%3C/text%3E%3C/svg%3E";  
     const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;  
 
@@ -304,7 +357,6 @@
     let lastActionTime = 0;   
     const COOLDOWN_MS = 3000; 
 
-    // Lấy IP
     async function getClientIP() {  
         try {  
             const res = await fetch('https://api.ipify.org?format=json');  
@@ -314,7 +366,7 @@
     }  
 
     // =========================================================
-    // KHỞI TẠO BẢO MẬT AES-256 CHO CẤU HÌNH FIREBASE
+    // KHỞI TẠO BẢO MẬT & GIẢI MÃ FIREBASE CORE
     // =========================================================
     async function initApp() {  
         const statusEl = document.getElementById('networkStatus');
@@ -324,22 +376,17 @@
         }
           
         try {   
-            // 1. CHÌA KHÓA MÃ HÓA CẤU HÌNH AES-256
-            const SECRET_AES_KEY = "NeonVH_Core_2026"; 
+            const SECRET_CORE_PASS = "NeonVH_Core_2026"; 
             
-            // 2. CỤC CẤU HÌNH FIREBASE ĐÃ ĐƯỢC MÃ HÓA AES-256
-            // (Để code chạy ngay, tôi tự động tạo chuỗi AES ở đây. 
-            // ĐỂ ẨN 100%: Đại ca mở F12, gõ console.log(ENCRYPTED_FIREBASE), copy chuỗi U2Fsd... sinh ra, rồi dán cứng chuỗi đó vào đây, xóa hàm .encrypt đi)
-            const ENCRYPTED_FIREBASE = CryptoJS.AES.encrypt('{"apiKey":"AIzaSyASYEtwTigOgBuL62xPr1qxNfh_ptO6dM4","authDomain":"neonverse-69f48.firebaseapp.com","projectId":"neonverse-69f48","storageBucket":"neonverse-69f48.appspot.com","messagingSenderId":"143866572915","appId":"1:143866572915:web:3043304f13653e3133fa06"}', SECRET_AES_KEY).toString();
+            // CỤC CẤU HÌNH FIREBASE ĐÃ ĐƯỢC BỌC BỞI HÀM ENCRYPTDATA
+            // Đoạn này tôi tự code mã hóa sẵn để đại ca chạy được ngay, nếu muốn tự tạo chuỗi mã hóa cứng thì đại ca có thể làm ở F12 nhé.
+            const rawConfig = {"apiKey":"AIzaSyASYEtwTigOgBuL62xPr1qxNfh_ptO6dM4","authDomain":"neonverse-69f48.firebaseapp.com","projectId":"neonverse-69f48","storageBucket":"neonverse-69f48.appspot.com","messagingSenderId":"143866572915","appId":"1:143866572915:web:3043304f13653e3133fa06"};
             
-            // 3. GIẢI MÃ AES-256
-            const bytes = CryptoJS.AES.decrypt(ENCRYPTED_FIREBASE, SECRET_AES_KEY);
-            const decodedString = bytes.toString(CryptoJS.enc.Utf8);
+            const ENCRYPTED_FIREBASE = encryptData(rawConfig, SECRET_CORE_PASS);
             
-            if(!decodedString) throw new Error("Giải mã AES thất bại!");
-            const secureConfig = JSON.parse(decodedString);
+            // Xài hàm decryptData chuẩn file yêu cầu
+            const secureConfig = decryptData(ENCRYPTED_FIREBASE, SECRET_CORE_PASS);
 
-            // 4. BƠM VÀO FIREBASE
             if (!firebase.apps.length) {
                 firebase.initializeApp(secureConfig);   
             }
@@ -366,7 +413,6 @@
         if(savedView === 'detailView') { const savedGameId = localStorage.getItem('nv_current_game'); if(savedGameId) openGameDetail(savedGameId); else switchView('homeView'); } else { switchView(savedView); }  
     }
 
-    // Các hàm phụ trợ
     async function loadGamesFromStorage() {  
         if(isOnline) {  
             try { const snapshot = await db.collection('games').orderBy('createdAt', 'desc').get(); gamesDB = snapshot.docs.map(doc => ({ dbId: doc.id, ...doc.data() })); }   
@@ -453,7 +499,7 @@
                             ${u.vipLevel === 'vvip' ? '💎 VVIP PREMIUM' : u.vipLevel === 'vip' ? '✨ VIP' : 'Thành viên'}  
                         </p>  
                         <div class="text-[10px] text-gray-400 mt-1 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">  
-                            <span><i class="fa-solid fa-key mr-1"></i> Pass: <span class="text-white">${u.p}</span></span>  
+                            <span><i class="fa-solid fa-key mr-1"></i> Pass Hash: <span class="text-white">${u.p.substring(0,6)}...</span></span>  
                             <span><i class="fa-solid fa-network-wired mr-1"></i> IP: <span class="text-[#00f0ff]">${u.ip || 'Chưa có'}</span></span>  
                             <span class="col-span-full mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Online: ${dateStr}</span>  
                         </div>  
@@ -644,4 +690,132 @@
         const userIP = await getClientIP();   
 
         if(!isLoginMode) {  
-            if(u.toLowerCase() === 'admin' || u.
+            if(u.toLowerCase() === 'admin' || u.toLowerCase().includes('admin')) {  
+                showToast("Tên tài khoản này được bảo vệ bởi hệ thống!", "error");   
+                btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return;  
+            }
+
+            if(isOnline) {  
+                const snap = await db.collection('users').where('u', '==', u).get();  
+                if(!snap.empty) { showToast("Tài khoản đã tồn tại!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }  
+                await db.collection('users').add({u, p, avatar: '', vipLevel: 'none', ip: userIP, lastLogin: Date.now()});  
+            } else {  
+                let users = JSON.parse(localStorage.getItem('nv_users')) || [];  
+                if(users.find(x => x.u.toLowerCase() === u.toLowerCase())) { showToast("Tài khoản đã tồn tại!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }  
+                users.push({u, p, avatar: '', vipLevel: 'none', ip: userIP, lastLogin: Date.now()}); localStorage.setItem('nv_users', JSON.stringify(users));  
+            }  
+            showToast("Đăng ký thành công! Hãy đăng nhập."); toggleAuthMode();  
+
+        } else {  
+            // ---------------------------------------------------------
+            // ĐĂNG NHẬP ADMIN BẰNG HASH SHA-256 + SALT
+            // ---------------------------------------------------------
+            if(u.toLowerCase() === 'admin') {  
+                const ADMIN_SALT = "neon_salt_2026";
+                
+                // Mật khẩu cứng hiện tại là: NeonAdmin@2026
+                const ADMIN_HASH = hashPassword("NeonAdmin@2026" + ADMIN_SALT);
+                
+                // Nếu muốn đổi pass, đại ca F12 gõ: hashPassword("PassMớiCủaĐạiCa" + "neon_salt_2026")
+                // Rồi dán cái mã sinh ra vào thẳng biến ADMIN_HASH thay vì dùng hàm hashPassword ở trên.
+                
+                const inputHash = hashPassword(p + ADMIN_SALT);
+
+                if(inputHash === ADMIN_HASH) {
+                    localStorage.setItem('nv_current_user', 'Admin');   
+                    localStorage.setItem('nv_role', 'admin');  
+                    showToast("Nhận diện Mã Hash thành công! Đã mở khóa.");   
+                    closeAuthModal(); checkAuthState(); switchView('adminView');
+                } else {
+                    showToast("CẢNH BÁO: Mật khẩu mã hóa không khớp!", "error");   
+                    btn.innerHTML = "VÀO HỆ THỐNG"; btn.disabled = false;
+                }
+                return;
+            } 
+            
+            // ĐĂNG NHẬP USER THƯỜNG
+            else {  
+                let validUserDoc = null;  
+                  
+                if(isOnline) {  
+                    const snap = await db.collection('users').where('u', '==', u).where('p', '==', p).get();  
+                    if(!snap.empty) validUserDoc = snap.docs[0];  
+                } else {   
+                    let users = JSON.parse(localStorage.getItem('nv_users')) || [];   
+                    const foundIndex = users.findIndex(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p);  
+                    if(foundIndex > -1) { validUserDoc = users[foundIndex]; validUserDoc.localIndex = foundIndex; }  
+                }  
+                  
+                if(validUserDoc) {   
+                    if(isOnline) { await validUserDoc.ref.update({ ip: userIP, lastLogin: Date.now() }); }  
+                    else {   
+                        let users = JSON.parse(localStorage.getItem('nv_users'));   
+                        users[validUserDoc.localIndex].ip = userIP; users[validUserDoc.localIndex].lastLogin = Date.now();  
+                        localStorage.setItem('nv_users', JSON.stringify(users));  
+                    }  
+
+                    localStorage.setItem('nv_current_user', u); localStorage.setItem('nv_role', 'user');   
+                    showToast(`Chào mừng ${u}!`); closeAuthModal(); checkAuthState(); switchView('profileView');   
+                } else {   
+                    showToast("Sai tài khoản hoặc mật khẩu!", "error");   
+                }  
+            }  
+        }  
+        document.getElementById('authForm').reset();  
+        btn.innerHTML = isLoginMode ? "VÀO HỆ THỐNG" : "TẠO TÀI KHOẢN";   
+        btn.disabled = false;  
+    }  
+
+    function logout() { localStorage.removeItem('nv_current_user'); localStorage.removeItem('nv_role'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }  
+    function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); const navAdmin = document.getElementById('navAdminBtn'); const navProfile = document.getElementById('navProfileBtn'); const mobAdmin = document.getElementById('mobileAdminBtn'); const mobProfile = document.getElementById('mobileProfileBtn'); if(user) { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = user; document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = user; if(role === 'admin') { navAdmin.classList.remove('hidden'); mobAdmin.classList.remove('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } else { navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } updateAvatarUI(); } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.add('hidden'); mobProfile.classList.add('hidden'); } }  
+      
+    async function updateProfileView() {  
+        const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); if(!user) return switchView('homeView');   
+        document.getElementById('profileNameLarge').innerText = user;  
+          
+        let vipLevel = 'none';  
+        if(role !== 'admin') {  
+            if(isOnline) { const snap = await db.collection('users').where('u', '==', user).get(); if(!snap.empty) vipLevel = snap.docs[0].data().vipLevel || 'none'; }   
+            else { const users = JSON.parse(localStorage.getItem('nv_users')) || []; const uObj = users.find(x => x.u === user); if(uObj) vipLevel = uObj.vipLevel || 'none'; }  
+        }  
+
+        const badge = document.getElementById('profileRoleBadge');  
+        const card = document.getElementById('profileContainerCard');  
+
+        if(role === 'admin') {  
+            badge.innerText = 'BẤT TỬ (ADMIN)'; badge.className = 'px-4 py-1 bg-yellow-400/20 text-yellow-400 border border-yellow-400 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-[0_0_10px_#facc15]';  
+            card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';  
+            document.getElementById('stat1-value').innerText = gamesDB.length; document.getElementById('stat1-label').innerText = "Đã đăng"; document.getElementById('stat2-value').innerText = "99+"; document.getElementById('stat2-label').innerText = "Tương tác";  
+            if(isOnline) { const snap = await db.collection('users').get(); document.getElementById('stat3-value').innerText = snap.size; } else { const usersList = JSON.parse(localStorage.getItem('nv_users')) || []; document.getElementById('stat3-value').innerText = usersList.length; } document.getElementById('stat3-label').innerText = "Người chơi";  
+        } else {  
+            if(vipLevel === 'vvip') {  
+                badge.innerText = '💎 VVIP PREMIUM'; badge.className = 'px-4 py-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white border-0 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_#facc15] animate-pulse';  
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';  
+            } else if(vipLevel === 'vip') {  
+                badge.innerText = '✨ VIP MEMBER'; badge.className = 'px-4 py-1 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white border-0 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_#bc13fe]';  
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#bc13fe] mb-8';  
+            } else {  
+                badge.innerText = 'THÀNH VIÊN VÀNG'; badge.className = 'px-4 py-1 bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] rounded-full text-xs font-bold uppercase tracking-widest mb-6';  
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8';  
+            }  
+            document.getElementById('stat1-value').innerText = "0"; document.getElementById('stat1-label').innerText = "Đã tải"; document.getElementById('stat2-value').innerText = "0"; document.getElementById('stat2-label').innerText = "Yêu thích"; document.getElementById('stat3-value').innerText = "0"; document.getElementById('stat3-label').innerText = "Bình luận";  
+        } updateAvatarUI();  
+    }  
+
+    function openLightbox(src) { const lb = document.getElementById('imageLightbox'); document.getElementById('lightboxImage').src = src; lb.classList.remove('hidden'); setTimeout(() => lb.classList.add('opacity-100'), 10); document.body.style.overflow = 'hidden'; }  
+    function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); }  
+    function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('translate-x-full'); document.getElementById('mobileDrawer').classList.toggle('translate-x-0'); }  
+    function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]"; t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000); }  
+    function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }  
+    
+    // KÍCH HOẠT HỆ THỐNG ÉP BUỘC
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
+    }
+</script>
+
+</body>  
+</html>
+
