@@ -2,12 +2,13 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>NEONVH • HỆ SINH THÁI TOÀN CẦU</title>  
+    <title>NEONVH • HỆ SINH THÁI TOÀN CẦU (MAX SECURITY)</title>  
     <script src="https://cdn.tailwindcss.com"></script>  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
 <style>  
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');  
     :root { --neon-purple: #bc13fe; --neon-cyan: #00f0ff; --neon-pink: #ff00ff; }  
@@ -128,25 +129,18 @@
     <div class="glass-panel rounded-3xl p-6 md:p-10 relative overflow-hidden border-t-4 border-[#00f0ff] mb-8">
         <h2 class="logo-font text-3xl md:text-4xl font-black text-center mb-2 text-[#00f0ff] drop-shadow-[0_0_15px_#00f0ff]"><i class="fa-solid fa-dice"></i> TÀI XỈU NEON</h2>
         <p class="text-center text-gray-300 text-sm mb-6">Thử vận may - Trúng thưởng lớn</p>
-        
         <div class="bg-black/60 border border-white/10 rounded-xl p-4 mb-8 text-center shadow-[inset_0_0_15px_rgba(0,0,0,0.8)]">
             <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Số dư hiện tại</p>
             <div id="txUserCoin" class="text-3xl font-black text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]">0 <span class="text-base text-white">COIN</span></div>
         </div>
-
         <div class="flex justify-center gap-6 my-8 text-6xl md:text-8xl text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" id="diceFaces">
-            <i class="fa-solid fa-dice-one"></i>
-            <i class="fa-solid fa-dice-two"></i>
-            <i class="fa-solid fa-dice-three"></i>
+            <i class="fa-solid fa-dice-one"></i><i class="fa-solid fa-dice-two"></i><i class="fa-solid fa-dice-three"></i>
         </div>
-
         <div class="text-center text-xl md:text-2xl font-black text-white mb-6 min-h-[40px] uppercase tracking-wider" id="txResultText">Mời đặt cược!</div>
-
         <div class="flex gap-4 justify-center mb-6">
             <button id="btnBetXiu" onclick="selectBet('xiu')" class="flex-1 py-4 rounded-xl border-2 border-blue-500 text-blue-500 font-black text-xl hover:bg-blue-500 hover:text-white transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">XỈU<br><span class="text-xs font-normal">(4 - 10)</span></button>
             <button id="btnBetTai" onclick="selectBet('tai')" class="flex-1 py-4 rounded-xl border-2 border-red-500 text-red-500 font-black text-xl hover:bg-red-500 hover:text-white transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">TÀI<br><span class="text-xs font-normal">(11 - 17)</span></button>
         </div>
-
         <input type="number" id="txBetAmount" placeholder="Nhập số Coin cược (Tối thiểu 10)..." class="w-full bg-black/80 border border-white/20 p-4 rounded-xl text-center text-white font-bold text-lg mb-6 focus:border-[#00f0ff] outline-none transition-all">
         <button onclick="rollDice()" class="w-full py-5 bg-gradient-to-r from-[#00f0ff] to-[#bc13fe] text-white font-black text-xl rounded-xl hover:shadow-[0_0_30px_#00f0ff] transition-all transform hover:scale-105 tracking-widest"><i class="fa-solid fa-play mr-2"></i> BẮT ĐẦU LẮC</button>
     </div>
@@ -264,7 +258,7 @@
                 <input id="adScreenshotsFile" type="file" accept="image/*" multiple class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#bc13fe] file:text-white hover:file:bg-[#ff00ff] transition cursor-pointer text-sm mb-2">  
                 <textarea id="adScreenshotsUrl" placeholder="Hoặc Dán Direct Link..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none text-sm h-24 resize-none leading-relaxed"></textarea>  
             </div>  
-            <div><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Nội dung</label><textarea id="adDesc" required class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none h-24 resize-none text-sm"></textarea></div>  
+            <div><label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Nội dung tóm tắt</label><textarea id="adDesc" required class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-yellow-400 outline-none h-24 resize-none text-sm"></textarea></div>  
             <div>  
                 <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Lời nhắn</label>  
                 <div class="flex items-center gap-2 mb-2 bg-black/60 p-2 rounded-lg border border-white/10 w-max">  
@@ -489,7 +483,7 @@
 
         await checkVipExpiration();
         await loadGamesFromStorage();  
-        renderGameGrid(); 
+        renderTopGames(); 
         if(!isOnline) renderLeaderboardsFallback();
         checkAuthState(); 
         initParticles();  
@@ -500,6 +494,25 @@
         await checkGlobalAnnounce();
         const user = localStorage.getItem('nv_current_user');
         if(user) await checkPersonalNotifications(user);
+    }
+
+    function renderTopGames() {
+        const gameContainer = document.getElementById('leaderboardGames');
+        if(gameContainer) {
+            const topGames = gamesDB.slice(0, 3);
+            gameContainer.innerHTML = topGames.map((game, idx) => `
+                <div class="flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5 cursor-pointer hover:border-[#bc13fe] transition" onclick="openGameDetail('${game.id}')">
+                    <div class="font-black text-lg ${idx===0 ? 'text-yellow-400' : idx===1 ? 'text-gray-300' : idx===2 ? 'text-orange-400' : 'text-gray-600'} w-6 text-center">#${idx+1}</div>
+                    <img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-10 h-10 object-cover rounded-md">
+                    <div class="flex-1 min-w-0">
+                        <div class="text-white text-xs font-bold truncate">${game.title}</div>
+                        <div class="text-[9px] text-gray-400 truncate">${game.genre} | ${game.platform}</div>
+                    </div>
+                    <div class="text-[10px] text-[#bc13fe] font-bold flex flex-col items-end"><i class="fa-solid fa-fire-flame-curved"></i> <span><i class="fa-solid fa-eye text-blue-400"></i> ${game.views || 0}</span></div>
+                </div>
+            `).join('');
+        }
+        renderGameGrid();
     }
 
     function updateLeaderboardsRealtime(allUsers) {
@@ -513,7 +526,7 @@
                 if (a.vipLevel === 'vip' && b.vipLevel === 'vvip') return 1;
                 return (b.lastLogin || 0) - (a.lastLogin || 0); 
             });
-            vips = vips.slice(0, 5);
+            vips = vips.slice(0, 3);
             if(vips.length === 0) {
                 vipContainer.innerHTML = `<div class="text-xs text-gray-500 italic text-center py-4">Trống</div>`;
             } else {
@@ -542,7 +555,7 @@
         if(gamblerContainer) {
             let gamblers = [...allUsers];
             gamblers.sort((a,b) => (b.coin || 0) - (a.coin || 0));
-            gamblers = gamblers.slice(0, 5);
+            gamblers = gamblers.slice(0, 3);
             if(gamblers.length === 0) {
                 gamblerContainer.innerHTML = `<div class="text-xs text-gray-500 italic text-center py-4">Trống</div>`;
             } else {
@@ -562,26 +575,11 @@
                 }).join('');
             }
         }
-
-        const gameContainer = document.getElementById('leaderboardGames');
-        if(gameContainer) {
-            const topGames = gamesDB.slice(0, 5);
-            gameContainer.innerHTML = topGames.map((game, idx) => `
-                <div class="flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5 cursor-pointer hover:border-[#bc13fe] transition" onclick="openGameDetail('${game.id}')">
-                    <div class="font-black text-lg ${idx===0 ? 'text-yellow-400' : idx===1 ? 'text-gray-300' : idx===2 ? 'text-orange-400' : 'text-gray-600'} w-6 text-center">#${idx+1}</div>
-                    <img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-10 h-10 object-cover rounded-md">
-                    <div class="flex-1 min-w-0">
-                        <div class="text-white text-xs font-bold truncate">${game.title}</div>
-                        <div class="text-[9px] text-gray-400 truncate">${game.genre} | ${game.platform}</div>
-                    </div>
-                    <div class="text-[10px] text-[#bc13fe] font-bold flex flex-col items-end"><i class="fa-solid fa-fire-flame-curved"></i> <span><i class="fa-solid fa-eye text-blue-400"></i> ${game.views || 0}</span></div>
-                </div>
-            `).join('');
-        }
     }
 
     function renderLeaderboardsFallback() {
         updateLeaderboardsRealtime(JSON.parse(localStorage.getItem('nv_users')) || []);
+        renderTopGames();
     }
 
     async function checkGlobalAnnounce() {
@@ -712,7 +710,7 @@
             }
 
             if(isOnline) { await uDoc.ref.update({ coin: currentCoin }); } 
-            else { let users = JSON.parse(localStorage.getItem('nv_users')); users[localIndex].coin = currentCoin; localStorage.setItem('nv_users', JSON.stringify(users)); updateLeaderboardsRealtime(users); }
+            else { let users = JSON.parse(localStorage.getItem('nv_users')); users[localIndex].coin = currentCoin; localStorage.setItem('nv_users', JSON.stringify(users)); renderLeaderboardsFallback(); }
             
         }, 2000);
     }
@@ -1042,6 +1040,7 @@
 
             if(isOnline) {  
                 const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("LỖI KẾT NỐI: Backend chưa phản hồi!")), 25000));  
+                  
                 if(gameId) {   
                     const dbId = gamesDB.find(g => g.id === gameId).dbId;   
                     await Promise.race([ db.collection('games').doc(dbId).update(gameData), timeout ]);  
@@ -1057,7 +1056,7 @@
                 localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB));  
             }  
               
-            resetAdminForm(); await loadGamesFromStorage(); renderGameGrid(); renderLeaderboard(); renderAdminManageList(); switchView('homeView');  
+            resetAdminForm(); await loadGamesFromStorage(); renderTopGames(); renderAdminManageList(); switchView('homeView');  
         } catch (error) {   
             showToast(error.message, "error");   
         } finally {  
@@ -1087,7 +1086,7 @@
         if(!confirm("XÓA VĨNH VIỄN bài đăng này?")) return;  
         if(isOnline) { const dbId = gamesDB.find(g => g.id === gameId).dbId; await db.collection('games').doc(dbId).delete(); }   
         else { gamesDB = gamesDB.filter(g => g.id !== gameId); localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB)); }  
-        showToast("Đã xóa bài đăng."); await loadGamesFromStorage(); renderGameGrid(); renderLeaderboard(); renderAdminManageList(); switchView('homeView');  
+        showToast("Đã xóa bài đăng."); await loadGamesFromStorage(); renderTopGames(); renderAdminManageList(); switchView('homeView');  
     }  
 
     function resetAdminForm() { document.getElementById('adGameId').value = ""; document.getElementById('adminForm').reset(); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> LƯU LÊN MÁY CHỦ`; }  
@@ -1101,6 +1100,7 @@
         }); 
         if(viewId === 'adminView') renderAdminManageList(); 
         if(viewId === 'profileView') updateProfileView(); 
+        if(viewId === 'taixiuView') updateTxCoinDisplay(); 
         window.scrollTo({ top: 0, behavior: 'smooth' }); 
     }  
     
@@ -1199,7 +1199,8 @@
 
                     localStorage.setItem('nv_current_user', 'Admin');   
                     localStorage.setItem('nv_role', 'admin');  
-                    showToast("Nhận diện Mã Hash thành công! Đã mở khóa.");   
+                    showToast("Nhận diện Mã Hash thành công!
+                    Đã mở khóa.");   
                     closeAuthModal(); checkAuthState(); switchView('adminView');
                 } else {
                     showToast("CẢNH BÁO: Mật khẩu mã hóa không khớp!", "error");   
