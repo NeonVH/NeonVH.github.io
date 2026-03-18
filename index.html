@@ -218,6 +218,18 @@
 </div>  
 
 <div id="adminView" class="view-section view-hidden max-w-screen-md mx-auto px-4 md:px-6 pt-28 pb-20">  
+    
+    <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-blue-500 relative overflow-hidden mb-8">
+        <h3 class="logo-font text-xl md:text-2xl font-black text-blue-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-bullhorn mr-2"></i> Phát Loa Toàn Server</h3>
+        <p class="text-xs text-gray-400 mb-4">*Nội dung này sẽ hiển thị thành một bảng thông báo cực lớn giữa màn hình ngay khi người chơi vào web.</p>
+        <textarea id="adminGlobalMsg" placeholder="Nhập nội dung thông báo cho tất cả người chơi..." class="w-full bg-black/60 border border-white/20 rounded-xl p-3 text-white focus:border-blue-500 outline-none h-20 resize-none text-sm mb-4 leading-relaxed"></textarea>
+        <div class="flex items-center gap-2 mb-4 bg-blue-500/10 border border-blue-500/30 p-3 rounded-lg w-max">
+            <input type="checkbox" id="adminGlobalShow" class="w-5 h-5 accent-blue-500 cursor-pointer">
+            <label for="adminGlobalShow" class="text-blue-400 font-bold text-sm cursor-pointer">KÍCH HOẠT HIỂN THỊ POPUP</label>
+        </div>
+        <button type="button" onclick="saveGlobalAnnounce()" class="w-full py-3 border-2 border-blue-500 text-blue-500 font-bold rounded-xl hover:bg-blue-500 hover:text-black transition">LƯU & PHÁT THÔNG BÁO</button>
+    </div>
+
     <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-yellow-400 relative overflow-hidden mb-8">  
         <h2 class="logo-font text-2xl md:text-3xl font-black text-yellow-400 mb-2"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> KHU VỰC ADMIN</h2>  
         <p class="text-gray-400 mb-6 text-sm">Thêm bài đăng trực tiếp vào hệ thống Mây (Database).</p>  
@@ -376,6 +388,16 @@
 
 <div id="imageLightbox" class="fixed inset-0 z-[100000] flex items-center justify-center bg-black/95 transition-opacity duration-300 hidden opacity-0" onclick="closeLightbox()"><img id="lightboxImage" src="" onerror="this.onerror=null; this.src=fallbackImg;" class="max-w-full max-h-full object-contain shadow-2xl animate-[zoomIn_0.3s_ease]" alt="Lightbox"></div>  
 
+<div id="globalAnnounceModal" class="fixed inset-0 z-[999999] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-md w-[90%] relative border-t-4 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+        <button onclick="closeGlobalAnnounce()" class="absolute top-4 right-5 text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+        <div class="text-center mb-4 text-6xl text-blue-500 animate-bounce"><i class="fa-solid fa-bullhorn"></i></div>
+        <h2 class="logo-font text-2xl font-black text-center mb-4 text-blue-500 uppercase tracking-widest">THÔNG BÁO HỆ THỐNG</h2>
+        <div id="globalAnnounceContent" class="text-sm text-white whitespace-pre-line leading-relaxed text-center mb-6 max-h-60 overflow-y-auto p-4 bg-black/50 rounded-xl border border-white/10 font-bold"></div>
+        <button onclick="closeGlobalAnnounce()" class="w-full py-3 bg-blue-500 text-black font-black rounded-xl hover:shadow-[0_0_20px_#3b82f6] transition text-sm uppercase tracking-wider">ĐÃ HIỂU</button>
+    </div>
+</div>
+
 <div id="authModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">  
     <div class="glass-panel rounded-3xl p-8 max-w-sm w-[90%] relative border-t-2 border-[#bc13fe]">  
         <button onclick="closeAuthModal()" class="absolute top-5 right-6 text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>  
@@ -451,6 +473,7 @@
     const COOLDOWN_MS = 3000; 
     let globalVipConfig = { priceVip: 50000, priceVvip: 100000, bankInfo: "Momo - 0123456789 - NGUYEN VAN A" };
     let globalTaixiuConfig = { winRate: 50 }; 
+    let globalAnnounceConfig = { msg: "", isShow: false };
     let currentBetType = '';
 
     async function getClientIP() {  
@@ -475,11 +498,6 @@
             
             if(statusEl) { statusEl.innerText = "☁️ Secured Cloud"; statusEl.className = "text-[10px] font-bold text-green-400 ml-2 border border-green-400 px-2 py-0.5 rounded-full"; }
 
-            const cfgSnap = await db.collection('settings').doc('vip_config').get();
-            if(cfgSnap.exists) { globalVipConfig = cfgSnap.data(); }
-            const txSnap = await db.collection('settings').doc('taixiu_config').get();
-            if(txSnap.exists) { globalTaixiuConfig = txSnap.data(); }
-
         } catch(e) {   
             console.error("Lỗi khởi tạo:", e);   
             if(statusEl) { statusEl.innerText = "⚠️ Lỗi Core"; statusEl.className = "text-[10px] font-bold text-red-500 ml-2 border border-red-500 px-2 py-0.5 rounded-full"; }
@@ -494,6 +512,53 @@
         
         const savedView = localStorage.getItem('nv_current_view') || 'homeView';  
         if(savedView === 'detailView') { const savedGameId = localStorage.getItem('nv_current_game'); if(savedGameId) openGameDetail(savedGameId); else switchView('homeView'); } else { switchView(savedView); }  
+
+        // LOA PHƯỜNG & TIN NHẮN MẬT (Chạy cuối cùng sau khi load web)
+        await checkGlobalAnnounce();
+        const user = localStorage.getItem('nv_current_user');
+        if(user) await checkPersonalNotifications(user);
+    }
+
+    // CHECK THÔNG BÁO TOÀN SERVER KHI VÀO WEB
+    async function checkGlobalAnnounce() {
+        if(sessionStorage.getItem('nv_seen_announce')) return; 
+        if(!isOnline) return;
+        try {
+            const snap = await db.collection('settings').doc('global_announcement').get();
+            if(snap.exists) {
+                globalAnnounceConfig = snap.data();
+                if(globalAnnounceConfig.isShow && globalAnnounceConfig.msg.trim() !== '') {
+                    document.getElementById('globalAnnounceContent').innerText = globalAnnounceConfig.msg;
+                    const modal = document.getElementById('globalAnnounceModal');
+                    modal.classList.remove('hidden'); 
+                    setTimeout(() => modal.classList.add('opacity-100'), 10);
+                    sessionStorage.setItem('nv_seen_announce', 'true');
+                }
+            }
+        } catch(e) { console.error("Lỗi load Loa phường", e); }
+    }
+
+    function closeGlobalAnnounce() {
+        const modal = document.getElementById('globalAnnounceModal');
+        modal.classList.remove('opacity-100'); 
+        setTimeout(() => modal.classList.add('hidden'), 300); 
+    }
+
+    // CHECK TIN NHẮN TỪ ADMIN
+    async function checkPersonalNotifications(user) {
+        if(!isOnline || !user) return;
+        try {
+            const snap = await db.collection('notifications').where('toUser', '==', user).where('read', '==', false).get();
+            snap.forEach(doc => {
+                const d = doc.data();
+                // Báo Toast đặc biệt màu vàng/xanh
+                setTimeout(() => {
+                    showToast("💌 TIN NHẮN ADMIN: " + d.msg);
+                }, 1000); 
+                // Đánh dấu đã đọc
+                doc.ref.update({read: true});
+            });
+        } catch(e) { console.log(e); }
     }
 
     async function checkVipExpiration() {
@@ -703,11 +768,34 @@
         loadAdminConfigs(); 
     }  
 
-    function loadAdminConfigs() {
+    async function loadAdminConfigs() {
+        if(!isOnline) return;
+        try {
+            const annSnap = await db.collection('settings').doc('global_announcement').get();
+            if(annSnap.exists) {
+                globalAnnounceConfig = annSnap.data();
+                document.getElementById('adminGlobalMsg').value = globalAnnounceConfig.msg || '';
+                document.getElementById('adminGlobalShow').checked = globalAnnounceConfig.isShow || false;
+            }
+        } catch(e){}
+
         document.getElementById('cfgPriceVip').value = globalVipConfig.priceVip;
         document.getElementById('cfgPriceVvip').value = globalVipConfig.priceVvip;
         document.getElementById('cfgBankInfo').value = globalVipConfig.bankInfo;
         document.getElementById('cfgWinRate').value = globalTaixiuConfig.winRate;
+    }
+
+    async function saveGlobalAnnounce() {
+        if(!isOnline) return showToast("Chỉ lưu được khi kết nối DB!", "error");
+        try {
+            const newCfg = {
+                msg: document.getElementById('adminGlobalMsg').value,
+                isShow: document.getElementById('adminGlobalShow').checked
+            };
+            await db.collection('settings').doc('global_announcement').set(newCfg);
+            globalAnnounceConfig = newCfg;
+            showToast("Đã thiết lập Loa phường toàn Server!");
+        } catch(e) { showToast("Lỗi lưu DB", "error"); }
     }
 
     async function saveVipConfig() {
@@ -739,7 +827,17 @@
             if(snap.empty) return showToast("Không tìm thấy người chơi này!", "error");
             let cur = snap.docs[0].data().coin || 0; let newCoin = cur + amt; if(newCoin < 0) newCoin = 0;
             await snap.docs[0].ref.update({ coin: newCoin });
-            showToast(`Đã cập nhật Coin thành công! ${u} đang có ${newCoin} Coin.`);
+            
+            // GỬI TIN NHẮN TẬN MẶT USER
+            let notifMsg = amt > 0 ? `🎉 Tinh Ting! Admin vừa bơm cho bạn ${amt} COIN. Chơi lớn đi nào!` : `⚠️ Bị phạt! Admin vừa trừ ${Math.abs(amt)} COIN của bạn!`;
+            await db.collection('notifications').add({
+                toUser: u,
+                msg: notifMsg,
+                read: false,
+                time: Date.now()
+            });
+
+            showToast(`Đã cập nhật Coin thành công! Đã gửi thông báo cho ${u}.`);
             document.getElementById('adminCoinUser').value = ''; document.getElementById('adminCoinAmount').value = '';
             renderAdminUserList();
         } catch(e) { showToast("Lỗi cập nhật Coin!", "error"); }
@@ -786,6 +884,15 @@
                 await userRef.update({ vipLevel: type, vipExpiry: expiryTime });
             }
             await db.collection('vip_requests').doc(docId).update({ status: 'approved' });
+            
+            // Gửi tin nhắn
+            await db.collection('notifications').add({
+                toUser: username,
+                msg: `💎 Chúc mừng! Yêu cầu nạp ${type.toUpperCase()} của bạn đã được duyệt (${daysStr} ngày). Khởi động lại web để nhận đặc quyền nhé!`,
+                read: false,
+                time: Date.now()
+            });
+
             showToast(`Đã duyệt gói ${type} cho ${username} trong ${daysStr} ngày!`);
             renderVipRequests(); renderAdminUserList();
         } catch(e) { showToast("Lỗi duyệt DB", "error"); }
@@ -796,7 +903,6 @@
         await db.collection('vip_requests').doc(docId).delete();
         renderVipRequests();
     }
-
 
     async function renderAdminUserList() {  
         let users = [];  const now = Date.now();  let deletedCount = 0;  
@@ -951,7 +1057,8 @@
             const gameId = document.getElementById('adGameId').value; const title = document.getElementById('adTitle').value; const author = document.getElementById('adAuthor').value; const version = document.getElementById('adVersion').value; const progress = document.getElementById('adProgress').value; const platform = document.getElementById('adPlatform').value; const transType = document.getElementById('adTransType').value; const size = document.getElementById('adSize').value; const genre = document.getElementById('adGenre').value; const team = document.getElementById('adTeam').value; const desc = document.getElementById('adDesc').value; const adminMsg = document.getElementById('adMsg').value; const is18 = document.getElementById('ad18').checked;  
             const isFreeLink = document.getElementById('adFreeLink').checked;
 
-            const links = { android: { terabox: document.getElementById('adLinkAndTerabox').value.trim(), mediafire: document.getElementById('adLinkAndMediafire').value.trim(), drive: document.getElementById('adLinkAndDrive').value.trim(), mega: document.getElementById('adLinkAndMega').value.trim(), pixeldrain: document.getElementById('adLinkAndPixeldrain').value.trim() }, pc: { terabox: document.getElementById('adLinkPcTerabox').value.trim(), mediafire: document.getElementById('adLinkPcMediafire').value.trim(), drive: document.getElementById('adLinkPcDrive').value.trim(), mega: document.getElementById('adLinkPcMega').value.trim(), pixeldrain: document.getElementById('adLinkPcPixeldrain').value.trim() } };  
+            const links = { android: { terabox: document.getElementById('adLinkAndTerabox').value.trim(), mediafire: document.getElementById('adLinkAndMediafire').value.trim(), drive: document.getElementById('adLinkAndDrive').value.trim(), mega: document.getElementById('adLinkAndMega').value.trim(), pixeldrain: document.getElementById('adLinkAndPixeldrain').value.trim() }, pc:
+{ terabox: document.getElementById('adLinkPcTerabox').value.trim(), mediafire: document.getElementById('adLinkPcMediafire').value.trim(), drive: document.getElementById('adLinkPcDrive').value.trim(), mega: document.getElementById('adLinkPcMega').value.trim(), pixeldrain: document.getElementById('adLinkPcPixeldrain').value.trim() } };  
 
             const coverFileInput = document.getElementById('adCoverFile'); const coverUrlInput = document.getElementById('adCoverUrl'); let coverData = coverUrlInput.value.trim();   
             if(coverData) { const match = coverData.match(/(https?:\/\/[^"'\s>]+)/); if(match) coverData = match[1]; }  
@@ -1060,7 +1167,6 @@
     async function openGameDetail(gameId) {  
         const game = gamesDB.find(g => g.id == gameId); if(!game) return; localStorage.setItem('nv_current_game', gameId);  
         
-        // TĂNG LƯỢT XEM VÀ LƯU DATABASE
         game.views = (game.views || 0) + 1;
         if(isOnline && game.dbId) { db.collection('games').doc(game.dbId).update({ views: firebase.firestore.FieldValue.increment(1) }).catch(e=>console.log(e)); }
 
@@ -1084,45 +1190,6 @@
         switchView('detailView');  
     }  
 
-    // CÁC HÀM XỬ LÝ MODAL VIP
-    function openVipModal() {
-        document.getElementById('displayBankInfo').innerText = globalVipConfig.bankInfo;
-        document.getElementById('displayPriceVip').innerText = globalVipConfig.priceVip.toLocaleString() + " VNĐ";
-        document.getElementById('displayPriceVvip').innerText = globalVipConfig.priceVvip.toLocaleString() + " VNĐ";
-        
-        const modal = document.getElementById('vipModal');  
-        modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); 
-    }
-    function closeVipModal() { 
-        const modal = document.getElementById('vipModal');
-        modal.classList.remove('opacity-100'); setTimeout(() => modal.classList.add('hidden'), 300); 
-    }
-
-    async function requestVip(type) {
-        if(!isOnline) return showToast("Hệ thống offline, không thể gửi yêu cầu!", "error");
-        if (Date.now() - lastActionTime < COOLDOWN_MS) return showToast("Đang xử lý, vui lòng đợi!", "error");  
-        lastActionTime = Date.now();
-
-        const user = localStorage.getItem('nv_current_user');
-        if(!user || user === 'Admin') return showToast("Lỗi tài khoản!", "error");
-
-        try {
-            const existSnap = await db.collection('vip_requests').where('u', '==', user).where('status', '==', 'pending').get();
-            if(!existSnap.empty) return showToast("Bạn đang có yêu cầu chờ Admin duyệt rồi!", "error");
-
-            await db.collection('vip_requests').add({
-                u: user,
-                type: type,
-                status: 'pending',
-                time: Date.now()
-            });
-            showToast("Đã gửi yêu cầu! Admin sẽ kiểm tra và duyệt sớm nhất.");
-            closeVipModal();
-        } catch(e) {
-            showToast("Lỗi mạng, thử lại sau!", "error");
-        }
-    }
-
     function toggleAuthMode() { isLoginMode = !isLoginMode; document.getElementById('authTitle').innerText = isLoginMode ? "ĐĂNG NHẬP" : "ĐĂNG KÝ"; document.getElementById('authSubmitBtn').innerText = isLoginMode ? "VÀO HỆ THỐNG" : "TẠO TÀI KHOẢN"; document.getElementById('authSwitchText').innerText = isLoginMode ? "Chưa có tài khoản?" : "Đã có tài khoản?"; document.getElementById('authSwitchBtn').innerText = isLoginMode ? "Đăng ký" : "Đăng nhập"; }  
     function toggleAuthModal(mode) { isLoginMode = (mode === 'login'); toggleAuthMode(); toggleAuthMode(); const modal = document.getElementById('authModal'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); }  
     function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }  
@@ -1145,7 +1212,7 @@
         const userIP = await getClientIP();   
 
         if(!isLoginMode) {  
-            if(u.toLowerCase() === 'admin') {  
+            if(u.toLowerCase() === 'admin' || u.toLowerCase().includes('admin')) {  
                 showToast("Tên tài khoản này được bảo vệ bởi hệ thống!", "error");   
                 btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return;  
             }
@@ -1170,7 +1237,6 @@
                 const inputHash = hashPassword(p + ADMIN_SALT);
 
                 if(inputHash === ADMIN_HASH) {
-                    // ADMIN CŨNG LÀ THÀNH VIÊN - TẠO DATA TRÊN DB ĐỂ CÓ THỂ CHƠI TÀI XỈU
                     if(isOnline) {
                         const snap = await db.collection('users').where('u', '==', 'Admin').get();
                         if(snap.empty) {
@@ -1231,7 +1297,9 @@
     }  
 
     function logout() { localStorage.removeItem('nv_current_user'); localStorage.removeItem('nv_role'); localStorage.removeItem('nv_vip_level'); localStorage.removeItem('nv_vip_expiry'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }  
-    function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); const navAdmin = document.getElementById('navAdminBtn'); const navProfile = document.getElementById('navProfileBtn'); const mobAdmin = document.getElementById('mobileAdminBtn'); const mobProfile = document.getElementById('mobileProfileBtn'); if(user) { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = user; document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = user; if(role === 'admin') { navAdmin.classList.remove('hidden'); mobAdmin.classList.remove('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } else { navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } updateAvatarUI(); } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.add('hidden'); mobProfile.classList.add('hidden'); } }    async function updateProfileView() {  
+    function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); const navAdmin = document.getElementById('navAdminBtn'); const navProfile = document.getElementById('navProfileBtn'); const mobAdmin = document.getElementById('mobileAdminBtn'); const mobProfile = document.getElementById('mobileProfileBtn'); if(user) { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = user; document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = user; if(role === 'admin') { navAdmin.classList.remove('hidden'); mobAdmin.classList.remove('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } else { navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } updateAvatarUI(); } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.add('hidden'); mobProfile.classList.add('hidden'); } }  
+      
+    async function updateProfileView() {  
         const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); if(!user) return switchView('homeView');   
         document.getElementById('profileNameLarge').innerText = user;  
           
@@ -1312,4 +1380,3 @@
 
 </body>  
 </html>
-
