@@ -4,11 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>NEONVH • HỆ SINH THÁI TOÀN CẦU (MAX SECURITY)</title>  
     <script src="https://cdn.tailwindcss.com"></script>  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  
 
 <style>  
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');  
@@ -20,6 +17,7 @@
     .card-3d:hover { transform: translateX(5px) scale(1.01); box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); z-index: 10; border-color: var(--neon-purple); }  
     .shine { position: absolute; top: -80%; left: -80%; width: 60%; height: 400%; background: linear-gradient(135deg, transparent, rgba(255,255,255,0.3), transparent); transform: skewX(-30deg); opacity: 0; pointer-events: none; z-index: 20; }  
     .card-3d:hover .shine { opacity: 1; animation: shine 1.2s forwards; }  
+    @keyframes shine { 0% { transform: translateX(-200%) skewX(-30deg); } 100% { transform: translateX(400%) skewX(-30deg); } }  
     .glitch { position: relative; }  
     .glitch:hover::before, .glitch:hover::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.85; }  
     .glitch:hover::before { animation: glitch-anim 450ms infinite linear; color: #00ffff; left: 2px; text-shadow: -2px 0 #ff00ff; }  
@@ -98,9 +96,9 @@
     </div>  
     <div class="max-w-screen-xl mx-auto px-4 md:px-6 py-10">  
         <div class="flex justify-between items-end mb-6">  
-            <h2 class="logo-font text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center">  
+            <h2 class="logo-font text-xl md:text-2xl font-bold uppercase tracking-wider">  
                 <i class="fa-solid fa-bolt text-[#bc13fe] mr-2"></i> Kho Game   
-                <span id="networkStatus" class="text-[10px] text-gray-500 font-normal ml-2 tracking-normal lowercase border border-white/20 px-2 py-0.5 rounded-full">Đang tải...</span>  
+                <span id="networkStatus" class="text-[10px] text-gray-500 font-normal ml-2 tracking-normal lowercase border border-white/20 px-2 py-0.5 rounded-full">Đang tải cấu hình...</span>  
             </h2>  
         </div>  
         <div id="gameGridContainer" class="flex flex-col gap-3 md:gap-4 scroll-mt-24"></div>  
@@ -285,25 +283,42 @@
 <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>  
 
 <script>  
-    // KHÓA F12
+    // ==========================================  
+    // KHÓA CHUỘT PHẢI & CHỐNG SOI CODE (F12)   
+    // ==========================================  
     document.addEventListener('contextmenu', event => event.preventDefault());  
     document.onkeydown = function(e) {  
-        if(e.keyCode == 123) { return false; } 
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } 
+        if(e.keyCode == 123) { return false; } // Khóa F12  
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } // Khóa Ctrl+Shift+I  
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }  
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }  
-        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } 
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } // Khóa Ctrl+U  
     }  
 
+    // BẪY DEBUGGER LÀM ĐỨNG MÁY NẾU CỐ MỞ F12  
+    setInterval(function() {  
+        var before = new Date().getTime();  
+        debugger;  
+        var after = new Date().getTime();  
+        if (after - before > 100) { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>HÀNH VI ĐÁNG NGỜ! MẠNG LƯỚI ĐÃ KHÓA IP CỦA BẠN.</h1>"; }  
+    }, 1000);  
+
+    // ==========================================  
+    // CẤU HÌNH HỆ THỐNG CƠ BẢN  
+    // ==========================================  
     const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' font-weight='bold' fill='%23bc13fe' text-anchor='middle' dominant-baseline='middle'%3EL%E1%BB%97i Link %E1%BA%A2nh%3C/text%3E%3C/svg%3E";  
     const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;  
+      
+    // 👉 CHÚ Ý CHỖ NÀY: NHỚ ĐỔI ĐÚNG TÊN MIỀN VERCEL CỦA BRO  
+    const VERCEL_API = "https://neon-vh-github-io.vercel.app/api";  
 
     let gamesDB = []; let isLoginMode = true;   
     let db = null; let isOnline = false;  
+      
     let lastActionTime = 0;   
-    const COOLDOWN_MS = 3000; 
+    const COOLDOWN_MS = 3000; // Anti-spam 3 giây  
 
-    // Lấy IP
+    // Lấy IP người dùng để log lại  
     async function getClientIP() {  
         try {  
             const res = await fetch('https://api.ipify.org?format=json');  
@@ -312,56 +327,37 @@
         } catch(e) { return "Không xác định"; }  
     }  
 
-    // =========================================================
-    // KHỞI TẠO SIÊU TỐC - TỰ ĐỘNG GIẢI MÃ TẠI CHỖ (KHÔNG CẦN VERCEL)
-    // =========================================================
+    // ==========================================  
+    // KHỞI TẠO WEB VÀ LẤY CHÌA KHÓA TỪ VERCEL BACKEND  
+    // ==========================================  
     async function initApp() {  
-        const statusEl = document.getElementById('networkStatus');
-        if(statusEl) {
-            statusEl.innerText = "Đang khởi động Core...";  
-            statusEl.className = "text-[10px] font-bold text-yellow-400 ml-2 border border-yellow-400 px-2 py-0.5 rounded-full animate-pulse";  
-        }
+        document.getElementById('networkStatus').innerText = "Đang kết nối Backend...";  
+        document.getElementById('networkStatus').className = "text-[10px] font-bold text-yellow-400 ml-2 border border-yellow-400 px-2 py-0.5 rounded-full animate-pulse";  
           
         try {   
-            // 1. CHÌA KHÓA FIREBASE ĐÃ ĐƯỢC MÃ HÓA CỨNG
-            const HASHED_KEY = "U2FsdGVkX19/L/R69pT8O+1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW1Z1w2nI/vU3q9Z1zP1pI+rW"; 
-            
-            // 2. MẬT KHẨU GIẢI MÃ 
-            const SECRET_PASS = "NeonVH_TuyetMat_2026"; 
-            
-            // 3. TỰ ĐỘNG MỞ KHÓA
-            const FIREBASE_CONFIG_TEXT = '{"apiKey":"AIzaSyASYEtwTigOgBuL62xPr1qxNfh_ptO6dM4","authDomain":"neonverse-69f48.firebaseapp.com","projectId":"neonverse-69f48","storageBucket":"neonverse-69f48.appspot.com","messagingSenderId":"143866572915","appId":"1:143866572915:web:3043304f13653e3133fa06"}';
-            
-            const secureConfig = JSON.parse(FIREBASE_CONFIG_TEXT);
-
-            // 4. BƠM VÀO FIREBASE
-            if (!firebase.apps.length) {
+            // GỌI SANG VERCEL ĐỂ LẤY CONFIG FIREBASE AN TOÀN  
+            const response = await fetch(`${VERCEL_API}?type=get_gate`);  
+            const secureConfig = await response.json();  
+              
+            if(secureConfig && secureConfig.apiKey) {  
                 firebase.initializeApp(secureConfig);   
-            }
-            db = firebase.firestore();   
-            db.settings({ experimentalForceLongPolling: true, merge: true });  
-            isOnline = true;   
-            
-            if(statusEl) {
-                statusEl.innerText = "☁️ Secured Cloud";  
-                statusEl.className = "text-[10px] font-bold text-green-400 ml-2 border border-green-400 px-2 py-0.5 rounded-full";  
-            }
-
+                db = firebase.firestore();   
+                db.settings({ experimentalForceLongPolling: true, merge: true });  
+                isOnline = true;   
+            }  
         } catch(e) {   
-            console.error("Lỗi khởi tạo:", e);   
-            if(statusEl) {
-                statusEl.innerText = "⚠️ Lỗi Core";  
-                statusEl.className = "text-[10px] font-bold text-red-500 ml-2 border border-red-500 px-2 py-0.5 rounded-full";  
-            }
+            console.error("Không thể kết nối đến Backend Vercel:", e);   
         }  
 
+        document.getElementById('networkStatus').innerText = isOnline ? "☁️ Secured Cloud" : "⚠️ Offline Mode";  
+        document.getElementById('networkStatus').className = isOnline ? "text-[10px] font-bold text-green-400 ml-2 border border-green-400 px-2 py-0.5 rounded-full" : "text-[10px] font-bold text-red-500 ml-2 border border-red-500 px-2 py-0.5 rounded-full";  
+          
         await loadGamesFromStorage();  
         renderGameGrid(); checkAuthState(); initParticles();  
         const savedView = localStorage.getItem('nv_current_view') || 'homeView';  
         if(savedView === 'detailView') { const savedGameId = localStorage.getItem('nv_current_game'); if(savedGameId) openGameDetail(savedGameId); else switchView('homeView'); } else { switchView(savedView); }  
-    }
+    }  
 
-    // Các hàm phụ trợ
     async function loadGamesFromStorage() {  
         if(isOnline) {  
             try { const snapshot = await db.collection('games').orderBy('createdAt', 'desc').get(); gamesDB = snapshot.docs.map(doc => ({ dbId: doc.id, ...doc.data() })); }   
@@ -396,6 +392,7 @@
         renderAdminUserList();  
     }  
 
+    // QUẢN LÝ TÀI KHOẢN VÀ AUTO XÓA 30 NGÀY  
     async function renderAdminUserList() {  
         let users = [];  
         const now = Date.now();  
@@ -403,9 +400,11 @@
 
         if(isOnline) {   
             const snap = await db.collection('users').get();   
+              
             for(let doc of snap.docs) {  
                 let uData = doc.data();  
                 let dbId = doc.id;  
+                  
                 if (uData.lastLogin && (now - uData.lastLogin > THIRTY_DAYS_MS)) {  
                     await db.collection('users').doc(dbId).delete();  
                     deletedCount++;  
@@ -413,7 +412,9 @@
                 }  
                 users.push({ dbId: dbId, ...uData });  
             }  
+              
             if (deletedCount > 0) showToast(`Đã tự động xóa ${deletedCount} acc không online quá 30 ngày!`);  
+
         } else {   
             let localUsers = JSON.parse(localStorage.getItem('nv_users')) || [];   
             users = localUsers.filter(u => {  
@@ -528,6 +529,8 @@
 
     async function handleAdminFormSubmit(e) {  
         e.preventDefault();   
+          
+        // CHỐNG SPAM CLICK KHI ĐĂNG BÀI  
         if (Date.now() - lastActionTime < COOLDOWN_MS) {  
             return showToast("Hệ thống đang xử lý, vui lòng đợi 3 giây!", "error");  
         }  
@@ -620,9 +623,13 @@
     function toggleAuthModal(mode) { isLoginMode = (mode === 'login'); toggleAuthMode(); toggleAuthMode(); const modal = document.getElementById('authModal'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); }  
     function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }  
       
-    // ĐĂNG NHẬP (TRỰC TIẾP FIREBASE, KHÔNG VERCEL)
+    // =================================================================  
+    // HÀM ĐĂNG NHẬP BẢO MẬT: XÁC THỰC QUA BACKEND VERCEL  
+    // =================================================================  
     async function handleAuth(e) {   
         e.preventDefault();   
+
+        // CHỐNG SPAM BOT CLICK LIÊN TỤC  
         if (Date.now() - lastActionTime < COOLDOWN_MS) {  
             return showToast("Hệ thống đang chống Spam, vui lòng đợi 3 giây!", "error");  
         }  
@@ -638,10 +645,16 @@
         const userIP = await getClientIP();   
 
         if(!isLoginMode) {  
-            if(u.toLowerCase() === 'admin' || u.toLowerCase().includes('admin')) {  
-                showToast("Tên tài khoản này được bảo vệ bởi hệ thống!", "error");   
-                btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return;  
-            }
+            // KIỂM TRA ĐĂNG KÝ (KHÔNG CHO ĐĂNG KÝ TÊN ADMIN)  
+            try {  
+                const checkAdminReq = await fetch(`${VERCEL_API}?type=admin_verify&u=${u}&p=${p}`);  
+                const checkAdminRes = await checkAdminReq.json();  
+                  
+                if(checkAdminRes.role === "admin") {  
+                    showToast("Tên tài khoản này được bảo vệ bởi hệ thống!", "error");   
+                    btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return;  
+                }  
+            } catch(e) { console.error(e); }  
 
             if(isOnline) {  
                 const snap = await db.collection('users').where('u', '==', u).get();  
@@ -655,13 +668,22 @@
             showToast("Đăng ký thành công! Hãy đăng nhập."); toggleAuthMode();  
 
         } else {  
-            if(u === 'Admin' && p === 'Admin123') {  
+            // XÁC THỰC MẬT KHẨU ADMIN TỪ BACKEND  
+            let isAdmin = false;  
+            try {  
+                const checkAdminReq = await fetch(`${VERCEL_API}?type=admin_verify&u=${u}&p=${p}`);  
+                const checkAdminRes = await checkAdminReq.json();  
+                if(checkAdminRes.role === "admin") isAdmin = true;  
+            } catch(e) { console.error("Lỗi xác thực Backend", e); }  
+
+            if(isAdmin) {  
                 localStorage.setItem('nv_current_user', 'Admin');   
                 localStorage.setItem('nv_role', 'admin');  
                 showToast("Đặc quyền Admin mở khóa!");   
                 closeAuthModal(); checkAuthState(); switchView('adminView');  
             } else {  
                 let validUserDoc = null;  
+                let isLocal = false;  
                   
                 if(isOnline) {  
                     const snap = await db.collection('users').where('u', '==', u).where('p', '==', p).get();  
@@ -669,7 +691,7 @@
                 } else {   
                     let users = JSON.parse(localStorage.getItem('nv_users')) || [];   
                     const foundIndex = users.findIndex(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p);  
-                    if(foundIndex > -1) { validUserDoc = users[foundIndex]; validUserDoc.localIndex = foundIndex; }  
+                    if(foundIndex > -1) { validUserDoc = users[foundIndex]; isLocal = true; validUserDoc.localIndex = foundIndex; }  
                 }  
                   
                 if(validUserDoc) {   
@@ -728,4 +750,13 @@
         } updateAvatarUI();  
     }  
 
-    function openLightbox(src) { const lb = document.getElementById('imageLightbox'); document.getElementById('lightboxImage').src = src; lb.classList.remove('
+    function openLightbox(src) { const lb = document.getElementById('imageLightbox'); document.getElementById('lightboxImage').src = src; lb.classList.remove('hidden'); setTimeout(() => lb.classList.add('opacity-100'), 10); document.body.style.overflow = 'hidden'; }  
+    function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); }  
+    function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('translate-x-full'); document.getElementById('mobileDrawer').classList.toggle('translate-x-0'); }  
+    function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]"; t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000); }  
+    function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }  
+    window.onload = initApp;  
+</script>
+
+</body>  
+</html>  Mày check xem trog đoạn code này có lỗ hổng kh
