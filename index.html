@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
 <style>  
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');  
     :root { --neon-purple: #bc13fe; --neon-cyan: #00f0ff; --neon-pink: #ff00ff; }  
@@ -283,7 +284,7 @@
                 <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Tỉ lệ thắng (%)</label>
                 <div class="flex gap-2">
                     <input id="cfgWinRate" type="number" min="0" max="100" class="flex-1 bg-black border border-white/20 rounded-lg p-2.5 text-white focus:border-orange-500 outline-none text-sm">
-                    <button onclick="saveTaixiuConfig()" class="px-4 py-2 bg-orange-500 text-white font-bold rounded-lg hover:shadow-[0_0_15px_#f97316] transition text-sm">LƯU</button>
+                    <button onclick="saveTaixiuConfig()" class="px-4 py-2 bg-orange-500 text-white font-bold rounded-lg hover:shadow-[0_0_15px_#f97316] transition text-sm">LƯU TỈ LỆ</button>
                 </div>
             </div>
             <div class="bg-black/40 border border-white/10 p-4 rounded-xl">
@@ -320,7 +321,7 @@
     </div>  
 
     <div class="glass-panel rounded-2xl md:rounded-3xl p-6 md:p-8 border-t-4 border-red-500 relative overflow-hidden">  
-        <h3 class="logo-font text-xl md:text-2xl font-black text-red-500 mb-2 uppercase tracking-wider"><i class="fa-solid fa-users mr-2"></i> Quản Lý Tài Khoản & Banned</h3>  
+        <h3 class="logo-font text-xl md:text-2xl font-black text-red-500 mb-2 uppercase tracking-wider"><i class="fa-solid fa-users mr-2"></i> Quản Lý Tài Khoản</h3>  
         <div id="adminUserManageListContainer" class="flex flex-col gap-3 md:gap-4 mt-4"></div>  
     </div>  
 </div>  
@@ -402,12 +403,12 @@
 <div id="toastContainer" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none"></div>  
 
 <script>  
-    function deriveKey(p) { return CryptoJS.PBKDF2(p, "neon_salt_2026", { keySize: 256/32, iterations: 100000 }); }
-    function encryptData(d, p) { const k = deriveKey(p); return CryptoJS.AES.encrypt(JSON.stringify(d), k.toString()).toString(); }
-    function decryptData(c, p) { const k = deriveKey(p); const b = CryptoJS.AES.decrypt(c, k.toString()); return JSON.parse(b.toString(CryptoJS.enc.Utf8)); }
-    function hashPassword(p) { return CryptoJS.SHA256(p).toString(); }
+    function deriveKey(password) { return CryptoJS.PBKDF2(password, "neon_salt_2026", { keySize: 256/32, iterations: 100000 }); }
+    function encryptData(data, password) { const key = deriveKey(password); return CryptoJS.AES.encrypt(JSON.stringify(data), key.toString()).toString(); }
+    function decryptData(cipher, password) { const key = deriveKey(password); const bytes = CryptoJS.AES.decrypt(cipher, key.toString()); return JSON.parse(bytes.toString(CryptoJS.enc.Utf8)); }
+    function hashPassword(password) { return CryptoJS.SHA256(password).toString(); }
 
-    document.addEventListener('contextmenu', e => e.preventDefault());  
+    document.addEventListener('contextmenu', event => event.preventDefault());  
     document.onkeydown = function(e) {  
         if(e.keyCode == 123) { return false; } 
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } 
@@ -417,10 +418,10 @@
     }  
 
     setInterval(function() {  
-        var b = new Date().getTime(); debugger; var a = new Date().getTime();  
-        if (a - b > 100) { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>HÀNH VI ĐÁNG NGỜ! MẠNG LƯỚI ĐÃ KHÓA.</h1>"; }  
-        const dto = window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160;
-        if (dto) { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>SECURITY VIOLATION</h1>"; }
+        var before = new Date().getTime(); debugger; var after = new Date().getTime();  
+        if (after - before > 100) { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>HÀNH VI ĐÁNG NGỜ! MẠNG LƯỚI ĐÃ KHÓA.</h1>"; }  
+        const devtoolsOpen = window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160;
+        if (devtoolsOpen) { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>SECURITY VIOLATION</h1>"; }
     }, 1000);  
 
     const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' fill='%231a1a1a'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' font-weight='bold' fill='%23bc13fe' text-anchor='middle' dominant-baseline='middle'%3EL%E1%BB%97i Link %E1%BA%A2nh%3C/text%3E%3C/svg%3E";  
@@ -442,7 +443,7 @@
 
     async function initApp() {  
         const statusEl = document.getElementById('networkStatus');
-        if(statusEl) { statusEl.innerText = "Đang giải mã..."; statusEl.className = "text-[10px] font-bold text-yellow-400 ml-2 border border-yellow-400 px-2 py-0.5 rounded-full animate-pulse"; }
+        if(statusEl) { statusEl.innerText = "Đang giải mã Core..."; statusEl.className = "text-[10px] font-bold text-yellow-400 ml-2 border border-yellow-400 px-2 py-0.5 rounded-full animate-pulse"; }
           
         try {   
             const SECRET_CORE_PASS = "NeonVH_Core_2026"; 
@@ -456,24 +457,12 @@
             isOnline = true;   
             
             if(statusEl) { statusEl.innerText = "☁️ Secured Cloud"; statusEl.className = "text-[10px] font-bold text-green-400 ml-2 border border-green-400 px-2 py-0.5 rounded-full"; }
+
         } catch(e) {   
             if(statusEl) { statusEl.innerText = "⚠️ Lỗi Core"; statusEl.className = "text-[10px] font-bold text-red-500 ml-2 border border-red-500 px-2 py-0.5 rounded-full"; }
         }  
 
-        let dId = localStorage.getItem('nv_did');
-        if(!dId) { dId = CryptoJS.lib.WordArray.random(16).toString(); localStorage.setItem('nv_did', dId); }
-
         if(isOnline) {
-            let myIp = await getClientIP();
-            let banDoc = await db.collection('banned_devices').doc(dId).get();
-            let ipDoc = await db.collection('banned_ips').doc(myIp.replace(/\./g, '_')).get();
-            
-            if(banDoc.exists || ipDoc.exists) {
-                let r = banDoc.exists ? banDoc.data().reason : ipDoc.data().reason;
-                document.body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:black;color:red;font-family:sans-serif;text-align:center;padding:20px;"><h1 style="font-size:3rem;margin-bottom:10px;">BANNED</h1><p style="font-size:1.2rem;color:white;">Tài khoản hoặc thiết bị của bạn đã bị cấm vĩnh viễn.</p><p style="color:yellow;margin-top:10px;">Lý do: ${r}</p></div>`;
-                return; 
-            }
-
             db.collection('users').onSnapshot(snap => {
                 let allUsers = [];
                 snap.forEach(doc => allUsers.push(doc.data()));
@@ -483,10 +472,6 @@
                 if(user) {
                     const currentUserData = allUsers.find(x => x.u === user);
                     if(currentUserData) {
-                        if(currentUserData.status === 'banned') {
-                            document.body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:black;color:red;font-family:sans-serif;text-align:center;padding:20px;"><h1 style="font-size:3rem;margin-bottom:10px;">BANNED</h1><p style="font-size:1.2rem;color:white;">Tài khoản của bạn đã bị cấm vĩnh viễn.</p><p style="color:yellow;margin-top:10px;">Lý do: ${currentUserData.banReason || 'Vi phạm điều khoản'}</p></div>`;
-                            return;
-                        }
                         const cEl = document.getElementById('txUserCoin');
                         if(cEl) cEl.innerHTML = `${currentUserData.coin || 0} <span class="text-base text-white">COIN</span>`;
                         const sEl = document.getElementById('stat2-value');
@@ -494,17 +479,11 @@
                     }
                 }
             });
-        } else {
-            let b = localStorage.getItem('nv_ban');
-            if(b) {
-                document.body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:black;color:red;font-family:sans-serif;text-align:center;padding:20px;"><h1 style="font-size:3rem;margin-bottom:10px;">BANNED</h1><p style="font-size:1.2rem;color:white;">Thiết bị đã bị cấm vĩnh viễn.</p><p style="color:yellow;margin-top:10px;">Lý do: ${b}</p></div>`;
-                return;
-            }
         }
 
         await checkVipExpiration();
         await loadGamesFromStorage();  
-        renderGameGrid(); 
+        renderTopGames(); 
         if(!isOnline) renderLeaderboardsFallback();
         checkAuthState(); 
         initParticles();  
@@ -515,6 +494,25 @@
         await checkGlobalAnnounce();
         const user = localStorage.getItem('nv_current_user');
         if(user) await checkPersonalNotifications(user);
+    }
+
+    function renderTopGames() {
+        const gameContainer = document.getElementById('leaderboardGames');
+        if(gameContainer) {
+            const topGames = gamesDB.slice(0, 3);
+            gameContainer.innerHTML = topGames.map((game, idx) => `
+                <div class="flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5 cursor-pointer hover:border-[#bc13fe] transition" onclick="openGameDetail('${game.id}')">
+                    <div class="font-black text-lg ${idx===0 ? 'text-yellow-400' : idx===1 ? 'text-gray-300' : idx===2 ? 'text-orange-400' : 'text-gray-600'} w-6 text-center">#${idx+1}</div>
+                    <img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-10 h-10 object-cover rounded-md">
+                    <div class="flex-1 min-w-0">
+                        <div class="text-white text-xs font-bold truncate">${game.title}</div>
+                        <div class="text-[9px] text-gray-400 truncate">${game.genre} | ${game.platform}</div>
+                    </div>
+                    <div class="text-[10px] text-[#bc13fe] font-bold flex flex-col items-end"><i class="fa-solid fa-fire-flame-curved"></i> <span><i class="fa-solid fa-eye text-blue-400"></i> ${game.views || 0}</span></div>
+                </div>
+            `).join('');
+        }
+        renderGameGrid();
     }
 
     function updateLeaderboardsRealtime(allUsers) {
@@ -528,16 +526,16 @@
                 if (a.vipLevel === 'vip' && b.vipLevel === 'vvip') return 1;
                 return (b.lastLogin || 0) - (a.lastLogin || 0); 
             });
-            vips = vips.slice(0, 5);
+            vips = vips.slice(0, 3);
             if(vips.length === 0) {
                 vipContainer.innerHTML = `<div class="text-xs text-gray-500 italic text-center py-4">Trống</div>`;
             } else {
                 vipContainer.innerHTML = vips.map((u, idx) => {
                     let rankClass = idx===0 ? 'text-yellow-400' : idx===1 ? 'text-gray-300' : idx===2 ? 'text-orange-400' : 'text-gray-600';
                     let badgeHtml = '';
-                    if(u.u === 'Admin') badgeHtml = '<span class="text-yellow-400 font-black">👑 GOD</span>';
-                    else if(u.vipLevel === 'vvip') badgeHtml = '<span class="text-yellow-400 font-black">💎 VVIP</span>';
-                    else badgeHtml = '<span class="text-[#ff00ff] font-bold">✨ VIP</span>';
+                    if(u.u === 'Admin') badgeHtml = '<span class="text-yellow-400 font-black">👑 GOD (ADMIN)</span>';
+                    else if(u.vipLevel === 'vvip') badgeHtml = '<span class="text-yellow-400 font-black">💎 VVIP PREMIUM</span>';
+                    else badgeHtml = '<span class="text-[#ff00ff] font-bold">✨ VIP MEMBER</span>';
                     return `
                     <div class="flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5">
                         <div class="font-black text-lg ${rankClass} w-6 text-center">#${idx+1}</div>
@@ -557,7 +555,7 @@
         if(gamblerContainer) {
             let gamblers = [...allUsers];
             gamblers.sort((a,b) => (b.coin || 0) - (a.coin || 0));
-            gamblers = gamblers.slice(0, 5);
+            gamblers = gamblers.slice(0, 3);
             if(gamblers.length === 0) {
                 gamblerContainer.innerHTML = `<div class="text-xs text-gray-500 italic text-center py-4">Trống</div>`;
             } else {
@@ -577,26 +575,11 @@
                 }).join('');
             }
         }
-
-        const gameContainer = document.getElementById('leaderboardGames');
-        if(gameContainer) {
-            const topGames = gamesDB.slice(0, 5);
-            gameContainer.innerHTML = topGames.map((game, idx) => `
-                <div class="flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5 cursor-pointer hover:border-[#bc13fe] transition" onclick="openGameDetail('${game.id}')">
-                    <div class="font-black text-lg ${idx===0 ? 'text-yellow-400' : idx===1 ? 'text-gray-300' : idx===2 ? 'text-orange-400' : 'text-gray-600'} w-6 text-center">#${idx+1}</div>
-                    <img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-10 h-10 object-cover rounded-md">
-                    <div class="flex-1 min-w-0">
-                        <div class="text-white text-xs font-bold truncate">${game.title}</div>
-                        <div class="text-[9px] text-gray-400 truncate">${game.genre} | ${game.platform}</div>
-                    </div>
-                    <div class="text-[10px] text-[#bc13fe] font-bold"><i class="fa-solid fa-fire-flame-curved"></i> NEW</div>
-                </div>
-            `).join('');
-        }
     }
 
     function renderLeaderboardsFallback() {
         updateLeaderboardsRealtime(JSON.parse(localStorage.getItem('nv_users')) || []);
+        renderTopGames();
     }
 
     async function checkGlobalAnnounce() {
@@ -717,7 +700,7 @@
             let color = resultType === 'TÀI' ? 'text-red-500' : 'text-blue-500';
             
             if(isWin) {
-                resEl.innerHTML = `<span class="${color}">${sum} - ${resultType}</span> | <span class="text-green-400 drop-shadow-[0_0_10px_#4ade80]">THẮNG +${betAmount}</span>`;
+                resEl.innerHTML = `<span class="${color}">${sum} - ${resultType}</span> | <span class="text-green-400">THẮNG +${betAmount}</span>`;
                 resEl.className = "text-center text-xl md:text-2xl font-black mb-6 uppercase tracking-wider drop-shadow-[0_0_10px_#4ade80]";
                 currentCoin += betAmount;
             } else {
@@ -754,7 +737,7 @@
     function renderAdminManageList() {  
         const container = document.getElementById('adminGameManageListContainer'); if(!container) return;  
         if(gamesDB.length === 0) { container.innerHTML = '<p class="text-gray-500 italic text-sm p-4 text-center">Trống.</p>'; } else {  
-            container.innerHTML = gamesDB.map(game => `<div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-center gap-4 hover:border-yellow-400/50 transition-colors"><div class="w-24 aspect-video flex-shrink-0 relative rounded-lg overflow-hidden"><img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><h3 class="font-bold text-white truncate text-base mb-1">${game.title}</h3><p class="text-xs text-gray-500 truncate">${game.author || 'Unknown'} | <i class="fa-solid fa-eye text-blue-400"></i> ${game.views || 0}</p></div><div class="flex flex-col gap-2"><button onclick="startEditGame('${game.id}')" class="px-4 py-1.5 bg-yellow-400 text-black rounded-lg text-xs font-bold hover:opacity-80 transition">SỬA</button><button onclick="deleteGame('${game.id}')" class="px-4 py-1.5 border border-red-500 text-red-500 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">XÓA</button></div></div>`).join('');  
+            container.innerHTML = gamesDB.map(game => `<div class="card-3d glass-panel p-3 rounded-xl flex items-center h-[120px]"><div class="w-24 flex-shrink-0 relative rounded-lg overflow-hidden h-full"><img src="${game.cover}" onerror="this.onerror=null; this.src=fallbackImg;" class="w-full h-full object-cover"></div><div class="flex-1 p-3 flex flex-col min-w-0 h-full justify-between"><h3 class="font-bold text-white truncate text-base">${game.title}</h3><p class="text-xs text-gray-500 truncate">${game.author || 'Unknown'} | <i class="fa-solid fa-eye text-blue-400"></i> ${game.views || 0}</p><div class="flex gap-2 mt-auto"><button onclick="startEditGame('${game.id}')" class="flex-1 py-1.5 bg-yellow-400 text-black rounded-lg text-xs font-bold transition">Sửa</button><button onclick="deleteGame('${game.id}')" class="flex-1 py-1.5 border border-red-500 text-red-500 rounded-lg text-xs font-bold transition hover:bg-red-500 hover:text-white">Xóa</button></div></div></div>`).join('');  
         }   
         renderAdminUserList();  
         renderVipRequests(); 
@@ -820,7 +803,7 @@
             let notifMsg = amt > 0 ? `🎉 Tinh Ting! Admin vừa bơm cho bạn ${amt} COIN. Chơi lớn đi nào!` : `⚠️ Bị phạt! Admin vừa trừ ${Math.abs(amt)} COIN của bạn!`;
             await db.collection('notifications').add({ toUser: u, msg: notifMsg, read: false, time: Date.now() });
 
-            showToast(`Đã cập nhật Coin thành công! Đã gửi thông báo.`);
+            showToast(`Đã cập nhật Coin thành công! Đã gửi thông báo cho ${u}.`);
             document.getElementById('adminCoinUser').value = ''; document.getElementById('adminCoinAmount').value = '';
         } catch(e) { showToast("Lỗi cập nhật Coin!", "error"); }
     }
@@ -907,47 +890,39 @@
             let dateStr = "Chưa rõ";  
             if(u.lastLogin) { let d = new Date(u.lastLogin); dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`; }  
             let expStr = "";
-            if(u.vipExpiry) { let e = new Date(u.vipExpiry); expStr = `<span class="text-yellow-400 ml-2 font-bold">(Hết hạn: ${e.getDate()}/${e.getMonth()+1}/${e.getFullYear()})</span>`; }
+            if(u.vipExpiry) { let e = new Date(u.vipExpiry); expStr = `<span class="text-yellow-400 ml-2">(Hết hạn: ${e.getDate()}/${e.getMonth()+1}/${e.getFullYear()})</span>`; }
 
             let badgeHtml = '';
-            if(u.u === 'Admin') badgeHtml = '<span class="bg-yellow-400/20 text-yellow-400 border border-yellow-400/50 px-2 py-0.5 rounded text-[10px] font-black">👑 GOD</span>';
-            else if(u.vipLevel === 'vvip') badgeHtml = '<span class="bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 px-2 py-0.5 rounded text-[10px] font-bold">💎 VVIP</span>';
-            else if(u.vipLevel === 'vip') badgeHtml = '<span class="bg-[#ff00ff]/10 text-[#ff00ff] border border-[#ff00ff]/30 px-2 py-0.5 rounded text-[10px] font-bold">✨ VIP</span>';
-            else badgeHtml = '<span class="text-gray-400 text-[10px] border border-gray-600 px-2 py-0.5 rounded">Thành viên</span>';
-
-            let isBanned = u.status === 'banned';
-            if(isBanned) badgeHtml = '<span class="bg-red-500/20 text-red-500 border border-red-500/50 px-2 py-0.5 rounded text-[10px] font-black">🚫 BANNED</span>';
+            if(u.u === 'Admin') badgeHtml = '👑 GOD (ADMIN)';
+            else if(u.vipLevel === 'vvip') badgeHtml = '💎 VVIP PREMIUM';
+            else if(u.vipLevel === 'vip') badgeHtml = '✨ VIP MEMBER';
+            else badgeHtml = 'Thành viên thường';
 
             return `  
-            <div class="bg-black/50 p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-white/5 hover:border-red-500/50 transition-colors ${isBanned ? 'opacity-50' : ''}">  
-                <div class="flex items-center gap-4 w-full md:w-auto">  
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr ${u.u === 'Admin' || u.vipLevel === 'vvip' ? 'from-yellow-400 to-red-500' : 'from-[#bc13fe] to-[#00f0ff]'} flex items-center justify-center text-black font-bold overflow-hidden flex-shrink-0 p-[2px]">  
-                        ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full rounded-full object-cover border-2 border-black">` : `<div class="w-full h-full rounded-full bg-black flex items-center justify-center text-white border-2 border-black">${u.u[0].toUpperCase()}</div>`}  
+            <div class="card-3d glass-panel p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-l-2 ${u.u === 'Admin' || u.vipLevel === 'vvip' ? 'border-yellow-400' : u.vipLevel === 'vip' ? 'border-[#bc13fe]' : 'border-gray-500'}">  
+                <div class="flex items-center gap-3 w-full md:w-auto">  
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr ${u.u === 'Admin' || u.vipLevel === 'vvip' ? 'from-yellow-400 to-red-500' : 'from-[#bc13fe] to-[#00f0ff]'} flex items-center justify-center text-black font-bold overflow-hidden flex-shrink-0 p-[1.5px]">  
+                        ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full rounded-full object-cover">` : `<div class="w-full h-full rounded-full bg-black flex items-center justify-center text-white">${u.u[0].toUpperCase()}</div>`}  
                     </div>  
                     <div class="flex-1">  
-                        <h4 class="font-bold ${isBanned ? 'text-red-500 line-through' : 'text-white'} text-base">${u.u}</h4>  
-                        <div class="mt-1">${badgeHtml} ${!isBanned ? expStr : ''}</div>  
-                        <div class="text-[11px] text-gray-400 mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5">  
+                        <h4 class="font-bold text-white text-sm md:text-base">${u.u}</h4>  
+                        <p class="text-[10px] ${u.u === 'Admin' || u.vipLevel === 'vvip' ? 'text-yellow-400 font-bold' : u.vipLevel === 'vip' ? 'text-[#ff00ff] font-bold' : 'text-gray-400'}">  
+                            ${badgeHtml} ${expStr}
+                        </p>  
+                        <div class="text-[10px] text-gray-400 mt-1 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">  
                             <span><i class="fa-solid fa-network-wired mr-1"></i> IP: <span class="text-[#00f0ff]">${u.ip || 'Chưa có'}</span></span>  
-                            <span><i class="fa-solid fa-coins mr-1 text-yellow-400"></i> Coin: <span class="text-white font-bold">${u.coin || 0}</span></span>
-                            <span class="col-span-full"><i class="fa-regular fa-clock mr-1"></i> Online: ${dateStr}</span>  
+                            <span class="col-span-full mt-0.5"><i class="fa-solid fa-coins mr-1 text-yellow-400"></i> Coin: <span class="text-white font-bold">${u.coin || 0}</span></span>
+                            <span class="col-span-full mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Online: ${dateStr}</span>  
                         </div>  
                     </div>  
                 </div>  
-                <div class="flex flex-col gap-2 w-full md:w-auto mt-2 md:mt-0">  
-                    <div class="flex gap-2">
-                        <select onchange="changeUserVip('${u.u}', this.value)" class="flex-1 bg-black/80 border border-white/20 text-xs text-white p-2 rounded-lg focus:border-red-500 outline-none" ${isBanned ? 'disabled' : ''}>  
-                            <option value="none" ${(!u.vipLevel || u.vipLevel === 'none') ? 'selected' : ''}>Thường</option>  
-                            <option value="vip" ${u.vipLevel === 'vip' ? 'selected' : ''}>Set VIP (VV)</option>  
-                            <option value="vvip" ${u.vipLevel === 'vvip' ? 'selected' : ''}>Set VVIP (VV)</option>  
-                        </select>  
-                        <button onclick="deleteUserAccount('${u.u}')" class="px-3 py-2 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-xs font-black transition flex-shrink-0 btn-neon" title="Xóa acc"><i class="fa-solid fa-trash"></i></button>  
-                    </div>
-                    ${!isBanned ? 
-                    `<button onclick="banUserDevice('${u.u}', '${u.ip}')" class="w-full px-3 py-2 bg-red-600 text-white rounded-lg text-xs font-black transition btn-neon uppercase tracking-wider"><i class="fa-solid fa-ban mr-1"></i> BAN IP & ACC</button>` 
-                    : 
-                    `<button onclick="unbanUserDevice('${u.u}', '${u.ip}')" class="w-full px-3 py-2 bg-green-600 text-white rounded-lg text-xs font-black transition btn-neon uppercase tracking-wider"><i class="fa-solid fa-unlock mr-1"></i> GỠ BAN</button>`
-                    }
+                <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">  
+                    <select onchange="changeUserVip('${u.u}', this.value)" class="flex-1 md:flex-none bg-black/60 border border-white/20 text-xs text-white p-1.5 rounded focus:border-yellow-400 outline-none">  
+                        <option value="none" ${(!u.vipLevel || u.vipLevel === 'none') ? 'selected' : ''}>Thường</option>  
+                        <option value="vip" ${u.vipLevel === 'vip' ? 'selected' : ''}>VIP (Vĩnh viễn)</option>  
+                        <option value="vvip" ${u.vipLevel === 'vvip' ? 'selected' : ''}>VVIP (Vĩnh viễn)</option>  
+                    </select>  
+                    <button onclick="deleteUserAccount('${u.u}')" class="px-3 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded text-xs font-bold transition flex-shrink-0"><i class="fa-solid fa-trash"></i></button>  
                 </div>  
             </div>  
         `}).join('');  
@@ -962,11 +937,11 @@
             const index = users.findIndex(u => u.u === username);   
             if(index > -1) { users[index].vipLevel = newVip; localStorage.setItem('nv_users', JSON.stringify(users)); }   
         }  
-        showToast(`Đã set ${newVip.toUpperCase()} vĩnh viễn cho ${username}!`);   
+        showToast(`Đã đổi quyền ${newVip.toUpperCase()} vĩnh viễn cho ${username}!`);   
     }  
 
     async function deleteUserAccount(username) {  
-        if(!confirm(`XÓA VĨNH VIỄN ${username}?`)) return;  
+        if(!confirm(`XÓA vĩnh viễn tài khoản: ${username}?`)) return;  
         if(isOnline) {   
             const snap = await db.collection('users').where('u', '==', username).get();   
             snap.forEach(doc => doc.ref.delete());   
@@ -974,60 +949,19 @@
             let users = JSON.parse(localStorage.getItem('nv_users')) || [];   
             localStorage.setItem('nv_users', JSON.stringify(users.filter(u => u.u !== username)));   
         }  
-        showToast(`Đã diệt ${username}!`);   
+        showToast(`Đã xóa ${username}!`);   
         if(localStorage.getItem('nv_current_view') === 'profileView') updateProfileView();  
     }  
 
-    async function banUserDevice(username, ip) {
-        let reason = prompt("Nhập lý do BAN (Sẽ hiển thị cho user):", "Gian lận / Spam");
-        if(reason === null) return;
-        if(!isOnline) {
-            localStorage.setItem('nv_ban', reason);
-            showToast("Đã BAN Local!", "error");
-            return;
-        }
-
-        try {
-            const snap = await db.collection('users').where('u', '==', username).get();   
-            snap.forEach(doc => doc.ref.update({ status: 'banned', banReason: reason }));
-            
-            if(ip && ip !== 'Chưa có' && ip !== 'Không xác định') {
-                await db.collection('banned_ips').doc(ip.replace(/\./g, '_')).set({ reason: reason, time: Date.now() });
-            }
-            
-            showToast(`Đã tiễn ${username} ra đảo!`, "error");
-        } catch(e) { showToast("Lỗi hệ thống BAN", "error"); }
-    }
-
-    async function unbanUserDevice(username, ip) {
-        if(!confirm(`Chắc chắn GỠ BAN cho ${username}?`)) return;
-        if(!isOnline) {
-            localStorage.removeItem('nv_ban');
-            showToast("Đã gỡ BAN Local!");
-            return;
-        }
-
-        try {
-            const snap = await db.collection('users').where('u', '==', username).get();   
-            snap.forEach(doc => doc.ref.update({ status: firebase.firestore.FieldValue.delete(), banReason: firebase.firestore.FieldValue.delete() }));
-            
-            if(ip && ip !== 'Chưa có' && ip !== 'Không xác định') {
-                await db.collection('banned_ips').doc(ip.replace(/\./g, '_')).delete();
-            }
-            
-            showToast(`Đã ân xá cho ${username}!`);
-        } catch(e) { showToast("Lỗi hệ thống GỠ BAN", "error"); }
-    }
-
     function readFileAsBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); reader.readAsDataURL(file); }); }  
-    function applyColorToMsg() { const textarea = document.getElementById('adMsg'); const color = document.getElementById('adColorPicker').value; const start = textarea.selectionStart; const end = textarea.selectionEnd; const selectedText = textarea.value.substring(start, end); if (!selectedText) return showToast("Bôi đen chữ cần tô màu!", "error"); textarea.value = textarea.value.substring(0, start) + `<span style="color: ${color}">${selectedText}</span>` + textarea.value.substring(end); textarea.focus(); }  
+    function applyColorToMsg() { const textarea = document.getElementById('adMsg'); const color = document.getElementById('adColorPicker').value; const start = textarea.selectionStart; const end = textarea.selectionEnd; const selectedText = textarea.value.substring(start, end); if (!selectedText) return showToast("Bôi đen chữ cần tô màu trước!", "error"); textarea.value = textarea.value.substring(0, start) + `<span style="color: ${color}">${selectedText}</span>` + textarea.value.substring(end); textarea.focus(); }  
 
     async function handleAvatarChange(e) {  
         const file = e.target.files[0]; if(!file) return;  
         try {  
-            showToast("Đang tải ảnh lên...");   
+            showToast("Đang xử lý Avatar...");   
             const base64 = await readFileAsBase64(file);   
-            if(base64.length > 500000) throw new Error("Ảnh quá nặng!");   
+            if(base64.length > 500000) throw new Error("Ảnh nặng quá nha đại ca!");   
               
             const user = localStorage.getItem('nv_current_user');  
             if(isOnline) { 
@@ -1038,8 +972,8 @@
                 const index = users.findIndex(x => x.u === user); 
                 if(index > -1) { users[index].avatar = base64; localStorage.setItem('nv_users', JSON.stringify(users)); } 
             }  
-            updateAvatarUI(); showToast("Lên ảnh thành công!");  
-        } catch(err) { showToast(err.message, "error"); }  
+            updateAvatarUI(); showToast("Đổi Avatar thành công!");  
+        } catch(err) { showToast(err.message || "Lỗi cập nhật ảnh!", "error"); }  
     }  
 
     async function updateAvatarUI() {  
@@ -1053,20 +987,21 @@
             if(uObj && uObj.avatar) avatarData = uObj.avatar; 
         }  
         const navAv = document.getElementById('userAvatar');  
-        if(avatarData) { navAv.innerHTML = `<img src="${avatarData}" class="w-full h-full rounded-full object-cover">`; navAv.classList.remove('bg-gradient-to-r', 'from-[#bc13fe]', 'to-[#00f0ff]', 'p-[1px]'); navAv.classList.add('border', 'border-[#bc13fe]'); }   
-        else { navAv.innerHTML = user[0].toUpperCase(); navAv.classList.add('bg-gradient-to-r', 'from-[#bc13fe]', 'to-[#00f0ff]', 'p-[1px]'); navAv.classList.remove('border', 'border-[#bc13fe]'); }  
+        if(avatarData) { navAv.innerHTML = `<img src="${avatarData}" class="w-full h-full rounded-full object-cover">`; navAv.classList.remove('bg-gradient-to-r', 'from-[#bc13fe]', 'to-[#00f0ff]'); }   
+        else { navAv.innerHTML = user[0].toUpperCase(); navAv.classList.add('bg-gradient-to-r', 'from-[#bc13fe]', 'to-[#00f0ff]'); }  
         const profImg = document.getElementById('profileAvatarImg'); const profText = document.getElementById('profileAvatarText');  
         if(profImg && profText) { if(avatarData) { profImg.src = avatarData; profImg.classList.remove('hidden'); profText.classList.add('hidden'); } else { profImg.classList.add('hidden'); profText.classList.remove('hidden'); profText.innerText = user[0].toUpperCase(); } }  
     }  
 
     async function handleAdminFormSubmit(e) {  
         e.preventDefault();   
-        if (Date.now() - lastActionTime < COOLDOWN_MS) { return showToast("Bình tĩnh đại ca!", "error"); }  
+        if (Date.now() - lastActionTime < COOLDOWN_MS) { return showToast("Hệ thống đang xử lý, vui lòng đợi 3 giây!", "error"); }  
         lastActionTime = Date.now();  
 
         const btn = document.getElementById('adminSubmitBtn');  
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ĐANG BƠM LÊN MÂY...`;  
-        btn.classList.add('opacity-50', 'cursor-not-allowed');  btn.disabled = true;  
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ĐANG ĐẨY LÊN MÂY...`;  
+        btn.classList.add('opacity-50', 'cursor-not-allowed');  
+        btn.disabled = true;  
 
         try {  
             const gameId = document.getElementById('adGameId').value; const title = document.getElementById('adTitle').value; const author = document.getElementById('adAuthor').value; const version = document.getElementById('adVersion').value; const progress = document.getElementById('adProgress').value; const platform = document.getElementById('adPlatform').value; const transType = document.getElementById('adTransType').value; const size = document.getElementById('adSize').value; const genre = document.getElementById('adGenre').value; const team = document.getElementById('adTeam').value; const desc = document.getElementById('adDesc').value; const adminMsg = document.getElementById('adMsg').value; const is18 = document.getElementById('ad18').checked;  
@@ -1099,32 +1034,35 @@
             let estimatedSize = 0;  
             if(coverData && coverData.startsWith('data:image')) estimatedSize += coverData.length;  
             screenshotsArray.forEach(img => { if(img.startsWith('data:image')) estimatedSize += img.length; });  
-            if(estimatedSize > 700000) { throw new Error("Tổng dung lượng ảnh quá nặng! Ưu tiên Link URL."); }  
+            if(estimatedSize > 700000) { throw new Error("LỖI: Tổng dung lượng ảnh quá nặng! BẮT BUỘC dùng Link URL (ImgBB) để đăng."); }  
 
             const gameData = { title, author, version, progress, platform, transType, size, genre, team, cover: coverData, desc, adminMsg, is18, isFreeLink, views: currentViews, screenshots: screenshotsArray, links, createdAt: gameId ? gamesDB.find(g=>g.id===gameId).createdAt : Date.now() };  
 
             if(isOnline) {  
-                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Mạng mẽo chán quá, không kết nối được!")), 25000));  
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("LỖI KẾT NỐI: Backend chưa phản hồi!")), 25000));  
+                  
                 if(gameId) {   
                     const dbId = gamesDB.find(g => g.id === gameId).dbId;   
                     await Promise.race([ db.collection('games').doc(dbId).update(gameData), timeout ]);  
-                    showToast("Đã độ lại con game này lên Cloud!");   
+                    showToast("Cập nhật bài viết lên Cloud thành công!");   
                 } else {   
                     gameData.id = 'cloud_' + Date.now();   
                     await Promise.race([ db.collection('games').add(gameData), timeout ]);  
-                    showToast("Đã ném game mới lên Cloud!");   
+                    showToast("Đã lưu bài viết lên Cloud!");   
                 }  
             } else {  
-                if(gameId) { const index = gamesDB.findIndex(g => g.id === gameId); gamesDB[index] = { ...gamesDB[index], ...gameData }; showToast("Đã lưu (Local)!"); }   
-                else { gameData.id = 'local_' + Date.now(); gamesDB.unshift(gameData); showToast("Đã lưu (Local)!"); }  
+                if(gameId) { const index = gamesDB.findIndex(g => g.id === gameId); gamesDB[index] = { ...gamesDB[index], ...gameData }; showToast("Đã cập nhật (Local)!"); }   
+                else { gameData.id = 'local_' + Date.now(); gamesDB.unshift(gameData); showToast("Đã đăng bài (Local)!"); }  
                 localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB));  
             }  
               
             resetAdminForm(); await loadGamesFromStorage(); renderTopGames(); renderAdminManageList(); switchView('homeView');  
-        } catch (error) { showToast(error.message, "error"); } 
-        finally {  
-            btn.innerHTML = `<i class="fa-solid fa-satellite-dish mr-2"></i> BẮN LÊN MÁY CHỦ CLOUD`;  
-            btn.classList.remove('opacity-50', 'cursor-not-allowed'); btn.disabled = false;  
+        } catch (error) {   
+            showToast(error.message, "error");   
+        } finally {  
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> LƯU LÊN DATABASE`;  
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');  
+            btn.disabled = false;  
         }  
     }  
 
@@ -1136,20 +1074,22 @@
         document.getElementById('adLinkAndTerabox').value = links.android?.terabox || ""; document.getElementById('adLinkAndMediafire').value = links.android?.mediafire || ""; document.getElementById('adLinkAndDrive').value = links.android?.drive || ""; document.getElementById('adLinkAndMega').value = links.android?.mega || ""; document.getElementById('adLinkAndPixeldrain').value = links.android?.pixeldrain || "";
         document.getElementById('adLinkPcTerabox').value = links.pc?.terabox || ""; document.getElementById('adLinkPcMediafire').value = links.pc?.mediafire || ""; document.getElementById('adLinkPcDrive').value = links.pc?.drive || ""; document.getElementById('adLinkPcMega').value = links.pc?.mega || ""; document.getElementById('adLinkPcPixeldrain').value = links.pc?.pixeldrain || ""; 
         
-        document.getElementById('adCoverFile').value = ""; document.getElementById('adCoverUrl').value = (game.cover && game.cover.startsWith('http')) ? game.cover : ""; 
-        document.getElementById('adScreenshotsFile').value = ""; const scUrls = (game.screenshots || []).filter(s => s.startsWith('http')); document.getElementById('adScreenshotsUrl').value = scUrls.join('\n');  
+        document.getElementById('adCoverFile').value = ""; 
+        document.getElementById('adCoverUrl').value = (game.cover && game.cover.startsWith('http')) ? game.cover : ""; 
+        document.getElementById('adScreenshotsFile').value = "";  
+        const scUrls = (game.screenshots || []).filter(s => s.startsWith('http')); document.getElementById('adScreenshotsUrl').value = scUrls.join('\n');  
         
         document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-pen mr-2"></i> CẬP NHẬT TRÊN KHO`; showToast("Chế độ sửa bài đăng."); window.scrollTo({ top: 0, behavior: 'smooth' });  
     }  
 
     async function deleteGame(gameId) {  
-        if(!confirm("Chắc chắn XÓA VĨNH VIỄN bài này?")) return;  
+        if(!confirm("XÓA VĨNH VIỄN bài đăng này?")) return;  
         if(isOnline) { const dbId = gamesDB.find(g => g.id === gameId).dbId; await db.collection('games').doc(dbId).delete(); }   
         else { gamesDB = gamesDB.filter(g => g.id !== gameId); localStorage.setItem('nv_custom_games', JSON.stringify(gamesDB)); }  
-        showToast("Đã xóa sạch sẽ."); await loadGamesFromStorage(); renderTopGames(); renderAdminManageList(); switchView('homeView');  
+        showToast("Đã xóa bài đăng."); await loadGamesFromStorage(); renderTopGames(); renderAdminManageList(); switchView('homeView');  
     }  
 
-    function resetAdminForm() { document.getElementById('adGameId').value = ""; document.getElementById('adminForm').reset(); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-satellite-dish mr-2"></i> BẮN LÊN MÁY CHỦ CLOUD`; }  
+    function resetAdminForm() { document.getElementById('adGameId').value = ""; document.getElementById('adminForm').reset(); document.getElementById('adminSubmitBtn').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> LƯU LÊN MÁY CHỦ`; }  
     function switchView(viewId) { 
         localStorage.setItem('nv_current_view', viewId); 
         const views = ['homeView', 'detailView', 'adminView', 'profileView', 'taixiuView']; 
@@ -1160,46 +1100,47 @@
         }); 
         if(viewId === 'adminView') renderAdminManageList(); 
         if(viewId === 'profileView') updateProfileView(); 
+        if(viewId === 'taixiuView') updateTxCoinDisplay(); 
         window.scrollTo({ top: 0, behavior: 'smooth' }); 
     }  
     
     function renderLinkButton(url, name, bgClass, iconClass, reqPremium, hasAccess) { 
         if(!url) return ''; 
         if(reqPremium && !hasAccess) {
-            return `<button onclick="showToast('Phải có thẻ VIP / VVIP mới mở được cửa này!', 'error')" class="w-full py-4 bg-black/80 text-gray-500 font-bold rounded-2xl flex items-center justify-center gap-2 cursor-not-allowed text-base border border-gray-800 hover:border-red-500/50 transition-colors"><i class="fa-solid fa-lock text-red-500"></i> ${name} (Khóa VIP)</button>`;
+            return `<button onclick="showToast('Yêu cầu cấp bậc VIP / VVIP để mở link ${name}!', 'error')" class="w-full py-3 md:py-3.5 bg-gray-800 text-gray-500 font-bold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed text-sm border border-gray-700 hover:border-red-500 transition"><i class="fa-solid fa-lock"></i> ${name} (Khóa VIP)</button>`;
         }
-        return `<a href="${url}" target="_blank" class="btn-neon w-full py-4 ${bgClass} text-white font-black rounded-2xl flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] text-base tracking-wider border border-white/10"><i class="${iconClass} text-xl"></i> Tải qua ${name}</a>`; 
+        return `<a href="${url}" target="_blank" class="w-full py-3 md:py-3.5 ${bgClass} text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-80 hover:shadow-lg transition transform hover:-translate-y-1 text-sm"><i class="${iconClass}"></i> Tải qua ${name}</a>`; 
     }  
 
     async function openGameDetail(gameId) {  
         const game = gamesDB.find(g => g.id == gameId); if(!game) return; localStorage.setItem('nv_current_game', gameId);  
         
         game.views = (game.views || 0) + 1;
-        if(isOnline && game.dbId) { db.collection('games').doc(game.dbId).update({ views: firebase.firestore.FieldValue.increment(1) }).catch(e=>{}); }
+        if(isOnline && game.dbId) { db.collection('games').doc(game.dbId).update({ views: firebase.firestore.FieldValue.increment(1) }).catch(e=>console.log(e)); }
 
         const vipLvl = localStorage.getItem('nv_vip_level') || 'none';
         const role = localStorage.getItem('nv_role') || 'user';
         const hasPremiumAccess = (role === 'admin' || vipLvl === 'vip' || vipLvl === 'vvip' || game.isFreeLink === true);
 
         const coverImg = document.getElementById('detailCover'); coverImg.src = game.cover; coverImg.onerror = function() { this.src = fallbackImg; };  
-        document.getElementById('detailTitle').innerText = game.title; document.getElementById('detailAuthor').innerText = game.author || "Đang cập nhật"; document.getElementById('detailVersion').innerText = game.version || "v1.0"; document.getElementById('detailProgress').innerHTML = `<i class="fa-solid fa-spinner mr-1"></i> ${game.progress || "Đang cập nhật"}`; document.getElementById('detailPlatform').innerHTML = `<i class="fa-solid fa-desktop mr-1 text-[#00f0ff]"></i> ${game.platform || "Android/PC"}`; document.getElementById('detailTransType').innerHTML = `<i class="fa-solid fa-language mr-1"></i> ${game.transType || "Dev+AI"}`; document.getElementById('detailSize').innerHTML = `<i class="fa-solid fa-database mr-1"></i> ${game.size || "Chưa rõ"}`; document.getElementById('detailGenre').innerText = game.genre; document.getElementById('detailTeam').innerText = game.team; document.getElementById('detailDesc').innerText = game.desc;  
-        document.getElementById('detailViews').innerHTML = `<i class="fa-solid fa-eye mr-1"></i> ${game.views} Lượt xem`;
+        document.getElementById('detailTitle').innerText = game.title; document.getElementById('detailAuthor').innerText = game.author || "Đang cập nhật"; document.getElementById('detailVersion').innerText = game.version || "v1.0"; document.getElementById('detailProgress').innerHTML = `<i class="fa-solid fa-spinner mr-1"></i> ${game.progress || "Đang cập nhật"}`; document.getElementById('detailPlatform').innerHTML = `<i class="fa-solid fa-desktop mr-1"></i> ${game.platform || "Android/PC"}`; document.getElementById('detailTransType').innerHTML = `<i class="fa-solid fa-language mr-1"></i> ${game.transType || "Dev+AI"}`; document.getElementById('detailSize').innerHTML = `<i class="fa-solid fa-database mr-1"></i> ${game.size || "Chưa rõ"}`; document.getElementById('detailGenre').innerText = game.genre; document.getElementById('detailTeam').innerText = game.team; document.getElementById('detailDesc').innerText = game.desc;  
+        document.getElementById('detailViews').innerHTML = `<i class="fa-solid fa-eye mr-1"></i> ${game.views}`;
 
         const adminMsgBox = document.getElementById('detailAdminMsgBox'); if(game.adminMsg && game.adminMsg.trim() !== "") { adminMsgBox.classList.remove('hidden'); document.getElementById('detailAdminMsg').innerHTML = game.adminMsg; } else { adminMsgBox.classList.add('hidden'); }  
-        const scContainer = document.getElementById('detailScreenshots'); if(game.screenshots && game.screenshots.length > 0) { scContainer.innerHTML = game.screenshots.map(img => `<div class="rounded-2xl overflow-hidden border border-white/5 aspect-video hover:border-[#bc13fe]/50 transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(188,19,254,0.3)] cursor-pointer group"><img src="${img}" onerror="this.onerror=null; this.src='${fallbackImg}';" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>`).join(''); } else { scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu.</p>'; }  
+        const scContainer = document.getElementById('detailScreenshots'); if(game.screenshots && game.screenshots.length > 0) { scContainer.innerHTML = game.screenshots.map(img => `<div class="rounded-xl overflow-hidden border border-white/10 aspect-video hover:border-[#bc13fe] transition shadow-lg cursor-pointer" onclick="openLightbox(this.querySelector('img').src)"><img src="${img}" onerror="this.onerror=null; this.src='${fallbackImg}';" class="w-full h-full object-cover"></div>`).join(''); } else { scContainer.innerHTML = '<p class="text-gray-500 italic text-sm">Chưa có ảnh giới thiệu.</p>'; }  
         
         const links = game.links || { android: {}, pc: {} }; 
-        let andHtml = renderLinkButton(links.android?.terabox, 'Terabox', 'bg-blue-600', 'fa-solid fa-cloud', false, hasPremiumAccess) + renderLinkButton(links.android?.mediafire, 'MediaFire', 'bg-red-600', 'fa-solid fa-fire', true, hasPremiumAccess) + renderLinkButton(links.android?.drive, 'Google Drive', 'bg-green-600', 'fa-brands fa-google-drive', true, hasPremiumAccess) + renderLinkButton(links.android?.mega, 'Mega', 'bg-red-700', 'fa-solid fa-m', true, hasPremiumAccess) + renderLinkButton(links.android?.pixeldrain, 'Pixeldrain', 'bg-gray-700', 'fa-solid fa-droplet', true, hasPremiumAccess); 
-        document.getElementById('detailAndroidLinks').innerHTML = andHtml || '<p class="text-sm text-gray-500 italic bg-black/40 p-4 rounded-xl border border-white/5 text-center">Chưa có bản Android.</p>'; 
-        let pcHtml = renderLinkButton(links.pc?.terabox, 'Terabox', 'bg-blue-600', 'fa-solid fa-cloud', false, hasPremiumAccess) + renderLinkButton(links.pc?.mediafire, 'MediaFire', 'bg-red-600', 'fa-solid fa-fire', true, hasPremiumAccess) + renderLinkButton(links.pc?.drive, 'Google Drive', 'bg-green-600', 'fa-brands fa-google-drive', true, hasPremiumAccess) + renderLinkButton(links.pc?.mega, 'Mega', 'bg-red-700', 'fa-solid fa-m', true, hasPremiumAccess) + renderLinkButton(links.pc?.pixeldrain, 'Pixeldrain', 'bg-gray-700', 'fa-solid fa-droplet', true, hasPremiumAccess); 
-        document.getElementById('detailPcLinks').innerHTML = pcHtml || '<p class="text-sm text-gray-500 italic bg-black/40 p-4 rounded-xl border border-white/5 text-center">Chưa có bản PC.</p>';  
+        let andHtml = renderLinkButton(links.android?.terabox, 'Terabox', 'bg-blue-600', 'fa-solid fa-cloud', false, hasPremiumAccess) + renderLinkButton(links.android?.mediafire, 'MediaFire', 'bg-red-500', 'fa-solid fa-fire', true, hasPremiumAccess) + renderLinkButton(links.android?.drive, 'Google Drive', 'bg-green-600', 'fa-brands fa-google-drive', true, hasPremiumAccess) + renderLinkButton(links.android?.mega, 'Mega', 'bg-red-700', 'fa-solid fa-m', true, hasPremiumAccess) + renderLinkButton(links.android?.pixeldrain, 'Pixeldrain', 'bg-gray-700', 'fa-solid fa-droplet', true, hasPremiumAccess); 
+        document.getElementById('detailAndroidLinks').innerHTML = andHtml || '<p class="text-sm text-gray-500 italic">Chưa có bản Android.</p>'; 
+        let pcHtml = renderLinkButton(links.pc?.terabox, 'Terabox', 'bg-blue-600', 'fa-solid fa-cloud', false, hasPremiumAccess) + renderLinkButton(links.pc?.mediafire, 'MediaFire', 'bg-red-500', 'fa-solid fa-fire', true, hasPremiumAccess) + renderLinkButton(links.pc?.drive, 'Google Drive', 'bg-green-600', 'fa-brands fa-google-drive', true, hasPremiumAccess) + renderLinkButton(links.pc?.mega, 'Mega', 'bg-red-700', 'fa-solid fa-m', true, hasPremiumAccess) + renderLinkButton(links.pc?.pixeldrain, 'Pixeldrain', 'bg-gray-700', 'fa-solid fa-droplet', true, hasPremiumAccess); 
+        document.getElementById('detailPcLinks').innerHTML = pcHtml || '<p class="text-sm text-gray-500 italic">Chưa có bản PC.</p>';  
         
         switchView('detailView');  
     }  
 
-    function toggleAuthMode() { isLoginMode = !isLoginMode; document.getElementById('authTitle').innerText = isLoginMode ? "ĐĂNG NHẬP" : "ĐĂNG KÝ"; document.getElementById('authSubmitBtn').innerText = isLoginMode ? "VÀO HỆ THỐNG" : "TẠO TÀI KHOẢN"; document.getElementById('authSwitchText').innerText = isLoginMode ? "Chưa có tài khoản?" : "Đã có tài khoản?"; document.getElementById('authSwitchBtn').innerText = isLoginMode ? "Đăng ký ngay" : "Đăng nhập"; }  
-    function toggleAuthModal(mode) { isLoginMode = (mode === 'login'); toggleAuthMode(); toggleAuthMode(); const modal = document.getElementById('authModal'); const box = document.getElementById('authBox'); modal.classList.remove('hidden'); setTimeout(() => { modal.classList.add('opacity-100'); box.classList.remove('scale-95'); box.classList.add('scale-100'); }, 10); }  
-    function closeAuthModal() { const modal = document.getElementById('authModal'); const box = document.getElementById('authBox'); modal.classList.remove('opacity-100'); box.classList.remove('scale-100'); box.classList.add('scale-95'); setTimeout(() => modal.classList.add('hidden'), 500); }  
+    function toggleAuthMode() { isLoginMode = !isLoginMode; document.getElementById('authTitle').innerText = isLoginMode ? "ĐĂNG NHẬP" : "ĐĂNG KÝ"; document.getElementById('authSubmitBtn').innerText = isLoginMode ? "VÀO HỆ THỐNG" : "TẠO TÀI KHOẢN"; document.getElementById('authSwitchText').innerText = isLoginMode ? "Chưa có tài khoản?" : "Đã có tài khoản?"; document.getElementById('authSwitchBtn').innerText = isLoginMode ? "Đăng ký" : "Đăng nhập"; }  
+    function toggleAuthModal(mode) { isLoginMode = (mode === 'login'); toggleAuthMode(); toggleAuthMode(); const modal = document.getElementById('authModal'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('opacity-100'), 10); }  
+    function closeAuthModal() { document.getElementById('authModal').classList.remove('opacity-100'); setTimeout(() => document.getElementById('authModal').classList.add('hidden'), 300); }  
       
     async function handleAuth(e) {   
         e.preventDefault();   
@@ -1213,36 +1154,32 @@
         const p = document.getElementById('authPassword').value;  
         const btn = document.getElementById('authSubmitBtn');  
           
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ĐANG XÁC THỰC...`;   
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG XÁC THỰC...`;   
         btn.disabled = true;  
 
         const userIP = await getClientIP();   
-        const dId = localStorage.getItem('nv_did');
 
         if(!isLoginMode) {  
-            if(u.toLowerCase() === 'admin' || u.toLowerCase().includes('admin') || u.toLowerCase().includes('bot')) {  
-                showToast("Tên tài khoản này là cấm kỵ!", "error");   
+            if(u.toLowerCase() === 'admin' || u.toLowerCase().includes('admin')) {  
+                showToast("Tên tài khoản này được bảo vệ bởi hệ thống!", "error");   
                 btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return;  
             }
 
             const STARTING_COIN = 500;
 
             if(isOnline) {  
-                const banSnap = await db.collection('banned_devices').doc(dId).get();
-                if(banSnap.exists) { showToast("Thiết bị này đã bị cấm!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
-
                 const ipSnap = await db.collection('users').where('ip', '==', userIP).get();
-                if(!ipSnap.empty) { showToast("CẢNH BÁO: Thiết bị này đã đăng ký tài khoản! Chống tạo acc Clone.", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
+                if(!ipSnap.empty) { showToast("Thiết bị này đã đăng ký tài khoản!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
                 const snap = await db.collection('users').where('u', '==', u).get();  
-                if(!snap.empty) { showToast("Tên giang hồ này đã có người xưng danh!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }  
-                await db.collection('users').add({u, p: hashPassword(p + "neon_salt_2026"), avatar: '', vipLevel: 'none', ip: userIP, coin: STARTING_COIN, lastLogin: Date.now()});  
+                if(!snap.empty) { showToast("Tài khoản đã tồn tại!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }  
+                await db.collection('users').add({u, p, avatar: '', vipLevel: 'none', ip: userIP, coin: STARTING_COIN, lastLogin: Date.now()});  
             } else {  
                 let users = JSON.parse(localStorage.getItem('nv_users')) || [];  
-                if(users.find(x => x.ip === userIP)) { showToast("CẢNH BÁO: Thiết bị này đã đăng ký tài khoản! Chống tạo acc Clone.", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
-                if(users.find(x => x.u.toLowerCase() === u.toLowerCase())) { showToast("Tên giang hồ này đã có người xưng danh!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }  
-                users.push({u, p: hashPassword(p + "neon_salt_2026"), avatar: '', vipLevel: 'none', ip: userIP, coin: STARTING_COIN, lastLogin: Date.now()}); localStorage.setItem('nv_users', JSON.stringify(users));  
+                if(users.find(x => x.ip === userIP)) { showToast("Thiết bị này đã đăng ký tài khoản!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }
+                if(users.find(x => x.u.toLowerCase() === u.toLowerCase())) { showToast("Tài khoản đã tồn tại!", "error"); btn.innerHTML = "TẠO TÀI KHOẢN"; btn.disabled = false; return; }  
+                users.push({u, p, avatar: '', vipLevel: 'none', ip: userIP, coin: STARTING_COIN, lastLogin: Date.now()}); localStorage.setItem('nv_users', JSON.stringify(users));  
             }  
-            showToast("Đăng ký thành công! Tặng " + STARTING_COIN + " COIN khởi nghiệp."); toggleAuthMode();  
+            showToast("Đăng ký thành công! Tặng 500 COIN khởi nghiệp."); toggleAuthMode();  
 
         } else {  
             if(u.toLowerCase() === 'admin') {  
@@ -1254,7 +1191,7 @@
                     if(isOnline) {
                         const snap = await db.collection('users').where('u', '==', 'Admin').get();
                         if(snap.empty) {
-                            await db.collection('users').add({u: 'Admin', p: ADMIN_HASH, avatar: '', vipLevel: 'vvip', ip: userIP, coin: 9999999, lastLogin: Date.now()});
+                            await db.collection('users').add({u: 'Admin', p: 'Admin123', avatar: '', vipLevel: 'vvip', ip: userIP, coin: 9999999, lastLogin: Date.now()});
                         } else {
                             await snap.docs[0].ref.update({ ip: userIP, lastLogin: Date.now() });
                         }
@@ -1262,7 +1199,7 @@
 
                     localStorage.setItem('nv_current_user', 'Admin');   
                     localStorage.setItem('nv_role', 'admin');  
-                    showToast("Nhận diện Mã Hash thành công! Đã mở khóa Admin.");   
+                    showToast("Nhận diện Mã Hash thành công!                    Đã mở khóa.");   
                     closeAuthModal(); checkAuthState(); switchView('adminView');
                 } else {
                     showToast("CẢNH BÁO: Mật khẩu mã hóa không khớp!", "error");   
@@ -1273,27 +1210,17 @@
             
             else {  
                 let validUserDoc = null;  
-                const hashedInputPass = hashPassword(p + "neon_salt_2026");
                   
                 if(isOnline) {  
-                    const banSnap = await db.collection('banned_devices').doc(dId).get();
-                    if(banSnap.exists) { showToast("Thiết bị này đã bị cấm!", "error"); btn.innerHTML = "VÀO HỆ THỐNG"; btn.disabled = false; return; }
-
-                    const snap = await db.collection('users').where('u', '==', u).where('p', '==', hashedInputPass).get();  
+                    const snap = await db.collection('users').where('u', '==', u).where('p', '==', p).get();  
                     if(!snap.empty) validUserDoc = snap.docs[0];  
                 } else {   
                     let users = JSON.parse(localStorage.getItem('nv_users')) || [];   
-                    const foundIndex = users.findIndex(x => x.u.toLowerCase() === u.toLowerCase() && x.p === hashedInputPass);  
+                    const foundIndex = users.findIndex(x => x.u.toLowerCase() === u.toLowerCase() && x.p === p);  
                     if(foundIndex > -1) { validUserDoc = users[foundIndex]; validUserDoc.localIndex = foundIndex; }  
                 }  
                   
                 if(validUserDoc) {   
-                    let uData = isOnline ? validUserDoc.data() : validUserDoc;
-                    if(uData.status === 'banned') {
-                        showToast("Tài khoản này đã bị BANNED!", "error");
-                        btn.innerHTML = "VÀO HỆ THỐNG"; btn.disabled = false; return;
-                    }
-
                     if(isOnline) { await validUserDoc.ref.update({ ip: userIP, lastLogin: Date.now() }); }  
                     else {   
                         let users = JSON.parse(localStorage.getItem('nv_users'));   
@@ -1309,7 +1236,7 @@
                     else localStorage.removeItem('nv_vip_expiry');
 
                     localStorage.setItem('nv_current_user', u); localStorage.setItem('nv_role', 'user');   
-                    showToast(`Đã nhận dạng ${u}. Chào mừng trở lại!`); closeAuthModal(); checkAuthState(); switchView('profileView');   
+                    showToast(`Chào mừng ${u}!`); closeAuthModal(); checkAuthState(); switchView('profileView');   
                 } else {   
                     showToast("Sai tài khoản hoặc mật khẩu!", "error");   
                 }  
@@ -1320,8 +1247,8 @@
         btn.disabled = false;  
     }  
 
-    function logout() { localStorage.removeItem('nv_current_user'); localStorage.removeItem('nv_role'); localStorage.removeItem('nv_vip_level'); localStorage.removeItem('nv_vip_expiry'); checkAuthState(); showToast("Đã thoát kết nối!"); switchView('homeView'); }  
-    function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); const navAdmin = document.getElementById('navAdminBtn'); const navProfile = document.getElementById('navProfileBtn'); const mobAdmin = document.mobileAdminBtn'); const mobProfile = document.getElementById('mobileProfileBtn'); if(user) { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = user; document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = user; if(role === 'admin') { navAdmin.classList.remove('hidden'); mobAdmin.classList.remove('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } else { navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } updateAvatarUI(); } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.add('hidden'); mobProfile.classList.add('hidden'); } }  
+    function logout() { localStorage.removeItem('nv_current_user'); localStorage.removeItem('nv_role'); localStorage.removeItem('nv_vip_level'); localStorage.removeItem('nv_vip_expiry'); checkAuthState(); showToast("Đã đăng xuất!"); switchView('homeView'); }  
+    function checkAuthState() { const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); const authC = document.getElementById('authContainer'); const userC = document.getElementById('userContainer'); const navAdmin = document.getElementById('navAdminBtn'); const navProfile = document.getElementById('navProfileBtn'); const mobAdmin = document.getElementById('mobileAdminBtn'); const mobProfile = document.getElementById('mobileProfileBtn'); if(user) { authC.classList.replace('md:flex', 'hidden'); userC.classList.replace('hidden', 'md:flex'); document.getElementById('userNameDisplay').innerText = user; document.getElementById('mobileAuthMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('flex'); document.getElementById('mobileUserName').innerText = user; if(role === 'admin') { navAdmin.classList.remove('hidden'); mobAdmin.classList.remove('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } else { navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.remove('hidden'); mobProfile.classList.remove('hidden'); } updateAvatarUI(); } else { authC.classList.replace('hidden', 'md:flex'); userC.classList.replace('md:flex', 'hidden'); document.getElementById('mobileAuthMenu').classList.remove('hidden'); document.getElementById('mobileUserMenu').classList.add('hidden'); document.getElementById('mobileUserMenu').classList.remove('flex'); navAdmin.classList.add('hidden'); mobAdmin.classList.add('hidden'); navProfile.classList.add('hidden'); mobProfile.classList.add('hidden'); } }  
       
     async function updateProfileView() {  
         const user = localStorage.getItem('nv_current_user'); const role = localStorage.getItem('nv_role'); if(!user) return switchView('homeView');   
@@ -1360,10 +1287,10 @@
         const btnVip = document.getElementById('btnOpenVipModal');
 
         if(role === 'admin') {  
-            badge.innerText = 'BẤT TỬ (ADMIN)'; badge.className = 'px-6 py-2 bg-yellow-400/20 text-yellow-400 border border-yellow-400/50 rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[0_0_15px_rgba(250,204,21,0.3)]';  
-            card.className = 'glass-panel rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)]';  
+            badge.innerText = 'BẤT TỬ (ADMIN)'; badge.className = 'px-4 py-1 bg-yellow-400/20 text-yellow-400 border border-yellow-400 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-[0_0_10px_#facc15]';  
+            card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';  
             btnVip.classList.add('hidden'); expBadge.classList.add('hidden');
-            document.getElementById('stat1-value').innerText = gamesDB.length; document.getElementById('stat1-label').innerText = "Game trên Cloud"; document.getElementById('stat2-value').innerHTML = `<i class="fa-solid fa-coins mr-1 text-yellow-400 text-2xl"></i> ` + currentCoin; document.getElementById('stat2-label').innerText = "Kho báu";  
+            document.getElementById('stat1-value').innerText = gamesDB.length; document.getElementById('stat1-label').innerText = "Đã đăng"; document.getElementById('stat2-value').innerHTML = `<i class="fa-solid fa-coins mr-1 text-yellow-400 text-lg"></i> ` + currentCoin; document.getElementById('stat2-label').innerText = "Neon Coin";  
             if(isOnline) { const snap = await db.collection('users').get(); document.getElementById('stat3-value').innerText = snap.size; } else { const usersList = JSON.parse(localStorage.getItem('nv_users')) || []; document.getElementById('stat3-value').innerText = usersList.length; } document.getElementById('stat3-label').innerText = "Người chơi";  
         } else {  
             btnVip.classList.remove('hidden');
@@ -1374,26 +1301,26 @@
             } else { expBadge.classList.add('hidden'); }
 
             if(vipLevel === 'vvip') {  
-                badge.innerText = '💎 VVIP PREMIUM'; badge.className = 'px-6 py-2 bg-gradient-to-r from-yellow-400 to-red-500 text-white border-0 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(250,204,21,0.5)] animate-pulse';  
-                card.className = 'glass-panel rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)]';  
+                badge.innerText = '💎 VVIP PREMIUM'; badge.className = 'px-4 py-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white border-0 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_0_15px_#facc15] animate-pulse';  
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-yellow-400 mb-8';  
             } else if(vipLevel === 'vip') {  
-                badge.innerText = '✨ VIP MEMBER'; badge.className = 'px-6 py-2 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white border-0 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(188,19,254,0.5)]';  
-                card.className = 'glass-panel rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#bc13fe] mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)]';  
+                badge.innerText = '✨ VIP MEMBER'; badge.className = 'px-4 py-1 bg-gradient-to-r from-[#bc13fe] to-[#ff00ff] text-white border-0 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_0_15px_#bc13fe]';  
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#bc13fe] mb-8';  
             } else {  
-                badge.innerText = 'THÀNH VIÊN VÀNG'; badge.className = 'px-6 py-2 bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/50 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_0_15px_rgba(0,240,255,0.2)]';  
-                card.className = 'glass-panel rounded-[2.5rem] p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)]';  
+                badge.innerText = 'THÀNH VIÊN VÀNG'; badge.className = 'px-4 py-1 bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] rounded-full text-xs font-bold uppercase tracking-widest';  
+                card.className = 'glass-panel rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden border-t-4 border-[#00f0ff] mb-8';  
             }  
             document.getElementById('stat1-value').innerText = "0"; document.getElementById('stat1-label').innerText = "Đã tải"; 
-            document.getElementById('stat2-value').innerHTML = `<i class="fa-solid fa-coins mr-2 text-yellow-400 text-2xl"></i> ` + currentCoin; document.getElementById('stat2-label').innerText = "Tài sản (Coin)"; 
+            document.getElementById('stat2-value').innerHTML = `<i class="fa-solid fa-coins mr-1 text-yellow-400 text-lg"></i> ` + currentCoin; document.getElementById('stat2-label').innerText = "Neon Coin"; 
             document.getElementById('stat3-value').innerText = "0"; document.getElementById('stat3-label').innerText = "Bình luận";  
         } updateAvatarUI();  
     }  
 
     function openLightbox(src) { const lb = document.getElementById('imageLightbox'); document.getElementById('lightboxImage').src = src; lb.classList.remove('hidden'); setTimeout(() => lb.classList.add('opacity-100'), 10); document.body.style.overflow = 'hidden'; }  
-    function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); }  
+    function closeLightbox() { const lb = document.getElementById('imageLightbox'); lb.classList.remove('opacity-100'); setTimeout(() => { lb.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); }  
     function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('translate-x-full'); document.getElementById('mobileDrawer').classList.toggle('translate-x-0'); }  
-    function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] text-red-500" : "border-[#00f0ff] shadow-[0_0_20px_rgba(0,240,255,0.5)] text-[#00f0ff]"; t.className = `glass-panel px-6 py-4 rounded-2xl border ${borderColor} font-bold text-sm transform transition-all duration-500 translate-y-10 opacity-0 bg-black/95 backdrop-blur-xl flex items-center gap-3`; t.innerHTML = (type === "error" ? '<i class="fa-solid fa-triangle-exclamation text-xl"></i> ' : '<i class="fa-solid fa-circle-check text-xl"></i> ') + msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-20'); setTimeout(() => t.remove(), 500); }, 3500); }  
-    function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<40; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.3, dy: (Math.random()-0.5)*0.3 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.3)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }  
+    function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); const borderColor = type === "error" ? "border-red-500 shadow-[0_0_15px_red] text-red-500" : "border-[#00f0ff] shadow-[0_0_15px_#00f0ff] text-[#00f0ff]"; t.className = `glass-panel px-5 py-3 rounded-xl border ${borderColor} font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0 bg-black/90`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.remove('translate-y-10', 'opacity-0'), 10); setTimeout(() => { t.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => t.remove(), 300); }, 3000); }  
+    function initParticles() { const c = document.getElementById("particleCanvas"); if(!c) return; const ctx = c.getContext("2d"); c.width = window.innerWidth; c.height = window.innerHeight; let p = []; for(let i=0; i<30; i++) p.push({ x: Math.random()*c.width, y: Math.random()*c.height, r: Math.random()*2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 }); function draw() { ctx.clearRect(0, 0, c.width, c.height); ctx.fillStyle = "rgba(188, 19, 254, 0.5)"; p.forEach(i => { ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI * 2); ctx.fill(); i.x += i.dx; i.y += i.dy; if(i.x<0||i.x>c.width) i.dx*=-1; if(i.y<0||i.y>c.height) i.dy*=-1; }); requestAnimationFrame(draw); } draw(); }  
     
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initApp);
